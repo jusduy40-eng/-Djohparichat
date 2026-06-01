@@ -4,21 +4,187 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ประกันชีวิต | Djohparichat</title>
+    
+    <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/responsive.css">
     <link rel="stylesheet" href="../assets/css/animations.css">
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* Auth Modal Styles */
+        .auth-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center;
+            z-index: 10000; opacity: 0; visibility: hidden; transition: all 0.3s ease; padding: 20px;
+        }
+        .auth-modal.active { opacity: 1; visibility: visible; }
+        .auth-modal-content {
+            background: var(--white); border-radius: var(--radius-lg); width: 100%;
+            max-width: 420px; max-height: 90vh; overflow-y: auto; position: relative;
+            transform: translateY(20px); transition: transform 0.3s ease; box-shadow: var(--shadow-xl);
+        }
+        .auth-modal.active .auth-modal-content { transform: translateY(0); }
+        .auth-modal-close {
+            position: absolute; top: 16px; right: 16px; width: 36px; height: 36px;
+            border: none; background: var(--gray-100); border-radius: var(--radius-full);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            color: var(--gray-600); transition: var(--transition-fast); z-index: 10;
+        }
+        .auth-modal-close:hover { background: var(--gray-200); color: var(--gray-900); }
+        .auth-modal-header { padding: 24px 24px 0; text-align: center; }
+        .auth-modal-header h3 { font-size: 1.5rem; color: var(--gray-900); margin-bottom: 8px; }
+        .auth-modal-header p { color: var(--gray-600); margin: 0; font-size: 0.95rem; }
+        .auth-modal-body { padding: 24px; }
+        .auth-form { display: flex; flex-direction: column; gap: 16px; }
+        .auth-form .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .auth-form .form-group label { font-weight: 500; color: var(--gray-700); font-size: 0.9rem; }
+        .auth-form .form-group input {
+            padding: 12px 16px; border: 2px solid var(--gray-200); border-radius: var(--radius-md);
+            font-size: 1rem; transition: var(--transition-fast); outline: none;
+        }
+        .auth-form .form-group input:focus {
+            border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+        }
+        .auth-form .form-options { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
+        .auth-form .form-options label { display: flex; align-items: center; gap: 6px; color: var(--gray-600); cursor: pointer; }
+        .auth-form .form-options a { color: var(--primary-blue); text-decoration: none; font-weight: 500; }
+        .auth-form .form-options a:hover { text-decoration: underline; }
+        .auth-form .btn-auth {
+            width: 100%; padding: 14px; background: var(--gradient-primary); color: var(--white);
+            border: none; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: var(--transition-normal); display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .auth-form .btn-auth:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .auth-form .btn-auth:disabled { opacity: 0.7; cursor: not-allowed; }
+        .auth-divider { text-align: center; margin: 16px 0; position: relative; }
+        .auth-divider::before {
+            content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--gray-200);
+        }
+        .auth-divider span { background: var(--white); padding: 0 12px; color: var(--gray-500); font-size: 0.9rem; position: relative; }
+        .auth-toggle { text-align: center; margin-top: 16px; font-size: 0.95rem; color: var(--gray-600); }
+        .auth-toggle a { color: var(--primary-blue); text-decoration: none; font-weight: 600; cursor: pointer; }
+        .auth-toggle a:hover { text-decoration: underline; }
+        .auth-message { padding: 12px 16px; border-radius: var(--radius-md); margin-bottom: 16px; font-size: 0.9rem; display: none; }
+        .auth-message.success { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
+        .auth-message.error { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
+        .auth-form-view { display: none; }
+        .auth-form-view.active { display: block; }
+        
+        /* User Menu */
+        .user-menu { position: relative; display: flex; align-items: center; gap: 12px; }
+        .user-auth-buttons { display: flex; gap: 8px; }
+        .user-auth-buttons .btn { padding: 8px 16px; font-size: 0.9rem; }
+        .user-auth-buttons .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
+        .user-info { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .user-avatar {
+            width: 36px; height: 36px; background: var(--gradient-primary); border-radius: var(--radius-full);
+            display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: 600; font-size: 0.9rem;
+        }
+        .user-name { font-weight: 500; color: var(--gray-800); font-size: 0.95rem; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .user-dropdown {
+            position: absolute; top: calc(100% + 8px); right: 0; background: var(--white);
+            border-radius: var(--radius-md); box-shadow: var(--shadow-lg); min-width: 200px;
+            padding: 8px 0; z-index: 1000; display: none; animation: slideDown 0.2s ease;
+        }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .user-dropdown.active { display: block; }
+        .user-dropdown a {
+            display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--gray-700);
+            text-decoration: none; font-size: 0.95rem; transition: var(--transition-fast);
+        }
+        .user-dropdown a:hover { background: var(--gray-50); color: var(--primary-blue); }
+        .user-dropdown a i { width: 20px; text-align: center; color: var(--gray-400); }
+        .user-dropdown .divider { height: 1px; background: var(--gray-200); margin: 4px 0; }
+        .user-dropdown .logout { color: var(--error); }
+        .user-dropdown .logout i { color: var(--error); }
+    </style>
 </head>
 <body>
+    <!-- Loading Screen -->
     <div id="loader" class="loader">
         <div class="loader-content">
             <div class="loader-spinner"></div>
-            <p class="loader-text">กำลังโหลด...</p>
+            <p class="loader-text" data-th="กำลังโหลด..." data-en="Loading...">กำลังโหลด...</p>
         </div>
     </div>
 
+    <!-- Auth Modal -->
+    <div id="authModal" class="auth-modal">
+        <div class="auth-modal-content">
+            <button class="auth-modal-close" id="authModalClose"><i class="fas fa-times"></i></button>
+            <div class="auth-modal-header">
+                <h3 id="authModalTitle">เข้าสู่ระบบ</h3>
+                <p id="authModalDesc">ยินดีต้อนรับกลับ! กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</p>
+            </div>
+            <div class="auth-modal-body">
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form auth-form-view active">
+                    <div id="loginMessage" class="auth-message"></div>
+                    <div class="form-group">
+                        <label for="loginEmail">อีเมล</label>
+                        <input type="email" id="loginEmail" required placeholder="example@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">รหัสผ่าน</label>
+                        <input type="password" id="loginPassword" required placeholder="••••••••">
+                    </div>
+                    <div class="form-options">
+                        <label><input type="checkbox" id="loginRemember"> จดจำฉัน</label>
+                        <a href="#" id="showForgotPassword">ลืมรหัสผ่าน?</a>
+                    </div>
+                    <button type="submit" class="btn-auth" id="loginBtn"><span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i></button>
+                </form>
+                <!-- Sign Up Form -->
+                <form id="signupForm" class="auth-form auth-form-view">
+                    <div id="signupMessage" class="auth-message"></div>
+                    <div class="form-group">
+                        <label for="signupName">ชื่อ-นามสกุล</label>
+                        <input type="text" id="signupName" required placeholder="สมชาย ใจดี">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">อีเมล</label>
+                        <input type="email" id="signupEmail" required placeholder="example@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">รหัสผ่าน</label>
+                        <input type="password" id="signupPassword" required placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6">
+                        <small style="color: var(--gray-500); font-size: 0.8rem;">ต้องมีความยาวอย่างน้อย 6 ตัวอักษร</small>
+                    </div>
+                    <div class="form-group">
+                        <label><input type="checkbox" id="signupTerms" required>
+                        <span>ฉันยอมรับ <a href="#" style="color: var(--primary-blue);">เงื่อนไขการใช้งาน</a> และ <a href="#" style="color: var(--primary-blue);">นโยบายความเป็นส่วนตัว</a></span></label>
+                    </div>
+                    <button type="submit" class="btn-auth" id="signupBtn"><span>สมัครสมาชิก</span><i class="fas fa-user-plus"></i></button>
+                </form>
+                <!-- Forgot Password Form -->
+                <form id="forgotPasswordForm" class="auth-form auth-form-view">
+                    <div id="forgotMessage" class="auth-message"></div>
+                    <p style="color: var(--gray-600); font-size: 0.95rem; margin-bottom: 20px;">กรอกอีเมลของคุณเพื่อรับลิงก์รีเซ็ตรหัสผ่าน</p>
+                    <div class="form-group">
+                        <label for="forgotEmail">อีเมล</label>
+                        <input type="email" id="forgotEmail" required placeholder="example@email.com">
+                    </div>
+                    <button type="submit" class="btn-auth" id="forgotBtn"><span>ส่งลิงก์รีเซ็ต</span><i class="fas fa-paper-plane"></i></button>
+                    <div class="auth-toggle"><a href="#" id="backToLogin">← กลับสู่หน้าเข้าสู่ระบบ</a></div>
+                </form>
+                <div class="auth-divider"><span>หรือ</span></div>
+                <div class="auth-toggle" id="authToggleText">
+                    <span id="authTogglePrompt">ยังไม่มีบัญชี?</span>
+                    <a href="#" id="authToggleLink">สมัครสมาชิก</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
     <nav id="navbar" class="navbar">
         <div class="container">
             <div class="nav-wrapper">
@@ -30,9 +196,8 @@
                     <ul class="nav-list">
                         <li><a href="../index.html" class="nav-link" data-th="หน้าหลัก" data-en="Home">หน้าหลัก</a></li>
                         <li><a href="services.html" class="nav-link active" data-th="บริการ" data-en="Services">บริการ</a></li>
-                        <li><a href="pages/ai-courses.html" class="nav-link">หลักสูตร AI</a></li>
+                        <li><a href="ai-courses.html" class="nav-link" data-th="หลักสูตร AI" data-en="AI Courses">หลักสูตร AI</a></li>
                         <li><a href="about.html" class="nav-link" data-th="เกี่ยวกับเรา" data-en="About">เกี่ยวกับเรา</a></li>
-                        <li><a href="contact.html" class="nav-link" data-th="ติดต่อ" data-en="Contact">ติดต่อ</a></li>
                     </ul>
                 </div>
                 <div class="nav-actions">
@@ -41,12 +206,14 @@
                         <span class="lang-divider">|</span>
                         <button class="lang-btn" data-lang="en">EN</button>
                     </div>
+                    <div class="user-menu" id="userMenu"></div>
                     <button class="mobile-toggle" id="mobileToggle"><span class="hamburger"></span></button>
                 </div>
             </div>
         </div>
     </nav>
 
+    <!-- Page Header -->
     <section class="page-header">
         <div class="container">
             <h1 data-th="ประกันชีวิต" data-en="Life Insurance">ประกันชีวิต</h1>
@@ -54,6 +221,7 @@
         </div>
     </section>
 
+    <!-- Insurance Plans Section -->
     <section class="services" style="padding-top: 80px;">
         <div class="container">
             <div class="services-grid">
@@ -65,7 +233,7 @@
                         <li><i class="fas fa-check"></i> <span data-th="คุ้มครองตลอดชีพ" data-en="Lifetime coverage">คุ้มครองตลอดชีพ</span></li>
                         <li><i class="fas fa-check"></i> <span data-th="รับเงินคืนเมื่อครบกำหนด" data-en="Maturity benefit">รับเงินคืนเมื่อครบกำหนด</span></li>
                     </ul>
-                    <a href="contact.html" class="btn btn-primary btn-full">
+                    <a href="../pages/contact.html" class="btn btn-primary btn-full">
                         <span data-th="ปรึกษาฟรี" data-en="Free Consultation">ปรึกษาฟรี</span>
                     </a>
                 </div>
@@ -79,7 +247,7 @@
                         <li><i class="fas fa-check"></i> <span data-th="คุ้มครองค่ารักษา" data-en="Medical coverage">คุ้มครองค่ารักษา</span></li>
                         <li><i class="fas fa-check"></i> <span data-th="โรงพยาบาลเครือข่ายทั่วประเทศ" data-en="Nationwide hospital network">โรงพยาบาลเครือข่ายทั่วประเทศ</span></li>
                     </ul>
-                    <a href="contact.html" class="btn btn-primary btn-full">
+                    <a href="../pages/contact.html" class="btn btn-primary btn-full">
                         <span data-th="ปรึกษาฟรี" data-en="Free Consultation">ปรึกษาฟรี</span>
                     </a>
                 </div>
@@ -92,7 +260,7 @@
                         <li><i class="fas fa-check"></i> <span data-th="เบี้ยประกันต่ำ" data-en="Low premiums">เบี้ยประกันต่ำ</span></li>
                         <li><i class="fas fa-check"></i> <span data-th="คุ้มครองสูง" data-en="High coverage">คุ้มครองสูง</span></li>
                     </ul>
-                    <a href="contact.html" class="btn btn-primary btn-full">
+                    <a href="../pages/contact.html" class="btn btn-primary btn-full">
                         <span data-th="ปรึกษาฟรี" data-en="Free Consultation">ปรึกษาฟรี</span>
                     </a>
                 </div>
@@ -100,6 +268,7 @@
         </div>
     </section>
 
+    <!-- Why Choose Us Section -->
     <section class="about" style="background: var(--sky-blue);">
         <div class="container">
             <div class="section-header">
@@ -132,6 +301,7 @@
         </div>
     </section>
 
+    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-bottom">
@@ -140,12 +310,157 @@
         </div>
     </footer>
 
-    <div class="admin-link">
-        <a href="../admin/login.html" title="Admin Panel"><i class="fas fa-cog"></i></a>
+    <!-- Admin Link (ซ่อนไว้ก่อน จะแสดงด้วย JS ถ้าเป็น Admin) -->
+    <div class="admin-link" id="adminLink" style="display: none;">
+        <a href="../admin/index.html" title="Admin Panel"><i class="fas fa-cog"></i></a>
     </div>
 
+    <!-- Scripts -->
     <script src="../assets/js/language.js"></script>
     <script src="../assets/js/animations.js"></script>
     <script src="../assets/js/main.js"></script>
+    
+    <!-- Auth Script -->
+    <script type="module">
+        try {
+            const { config } = await import('../lib/config.js');
+            const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+
+            const authModal = document.getElementById('authModal');
+            const authModalClose = document.getElementById('authModalClose');
+            const userMenu = document.getElementById('userMenu');
+            const adminLink = document.getElementById('adminLink');
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+            
+            let currentView = 'login';
+
+            function openAuthModal(view = 'login') {
+                authModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                switchAuthView(view);
+            }
+            function closeAuthModal() {
+                authModal.classList.remove('active');
+                document.body.style.overflow = '';
+                resetForms();
+            }
+            function switchAuthView(view) {
+                currentView = view;
+                document.querySelectorAll('.auth-form-view').forEach(f => f.classList.remove('active'));
+                document.querySelectorAll('.auth-message').forEach(m => { m.style.display = 'none'; m.textContent = ''; });
+                if (view === 'login') {
+                    document.getElementById('loginForm').classList.add('active');
+                    document.getElementById('authModalTitle').textContent = 'เข้าสู่ระบบ';
+                    document.getElementById('authTogglePrompt').textContent = 'ยังไม่มีบัญชี?';
+                    document.getElementById('authToggleLink').textContent = 'สมัครสมาชิก';
+                } else if (view === 'signup') {
+                    document.getElementById('signupForm').classList.add('active');
+                    document.getElementById('authModalTitle').textContent = 'สมัครสมาชิก';
+                    document.getElementById('authTogglePrompt').textContent = 'มีบัญชีแล้ว?';
+                    document.getElementById('authToggleLink').textContent = 'เข้าสู่ระบบ';
+                }
+            }
+            function resetForms() { loginForm.reset(); signupForm.reset(); forgotPasswordForm.reset(); switchAuthView('login'); }
+
+            function renderUserMenu(user) {
+                if (user) {
+                    const initials = user.email?.charAt(0).toUpperCase() || 'U';
+                    userMenu.innerHTML = `
+                        <div class="user-info" id="userInfo">
+                            <div class="user-avatar">${initials}</div>
+                            <span class="user-name">${user.email?.split('@')[0]}</span>
+                            <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: var(--gray-500);"></i>
+                        </div>
+                        <div class="user-dropdown" id="userDropdown">
+                            <a href="../pages/profile.html"><i class="fas fa-user-edit"></i> แก้ไขโปรไฟล์</a>
+                            <a href="../pages/my-courses.html"><i class="fas fa-graduation-cap"></i> ประวัติการเรียน</a>
+                            <div class="divider"></div>
+                            <a href="#" id="logoutBtn" class="logout"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+                        </div>`;
+                    document.getElementById('userInfo').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('active'); });
+                    document.getElementById('logoutBtn')?.addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); renderUserMenu(null); updateAdminLink(null); });
+                } else {
+                    userMenu.innerHTML = `<div class="user-auth-buttons"><button class="btn btn-secondary btn-sm" id="openLoginBtn">เข้าสู่ระบบ</button><button class="btn btn-primary btn-sm" id="openSignupBtn">สมัครสมาชิก</button></div>`;
+                    document.getElementById('openLoginBtn')?.addEventListener('click', () => openAuthModal('login'));
+                    document.getElementById('openSignupBtn')?.addEventListener('click', () => openAuthModal('signup'));
+                }
+            }
+
+            // 🔐 ฟังก์ชันแสดง/ซ่อนลิงก์แอดมิน
+            function updateAdminLink(user) {
+                if (!adminLink) return;
+                const adminEmails = Array.isArray(config.adminEmail) ? config.adminEmail : [config.adminEmail].filter(e => e);
+                const isAdmin = adminEmails.length > 0 && user?.email && adminEmails.includes(user.email);
+                adminLink.style.display = isAdmin ? 'block' : 'none';
+            }
+
+            async function handleLogin(email, password) {
+                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+            }
+            async function handleSignup(email, password, name) {
+                const { error } = await supabase.auth.signUp({ email, password, options: { data: { name } } });
+                if (error) throw error;
+            }
+            async function handleForgotPassword(email) {
+                const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/pages/auth.html#update-password` });
+                if (error) throw error;
+            }
+            async function handleLogout() { await supabase.auth.signOut(); renderUserMenu(null); updateAdminLink(null); closeAuthModal(); }
+            async function checkAuth() {
+                try {
+                    const { data } = await supabase.auth.getSession();
+                    const user = data?.session?.user || null;
+                    renderUserMenu(user);
+                    updateAdminLink(user);
+                    return data?.session;
+                } catch (error) { console.error('Auth check error:', error); renderUserMenu(null); updateAdminLink(null); return null; }
+            }
+
+            // Event Listeners
+            authModalClose.addEventListener('click', closeAuthModal);
+            authModal.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
+            document.getElementById('authToggleLink').addEventListener('click', (e) => { e.preventDefault(); switchAuthView(currentView === 'login' ? 'signup' : 'login'); });
+            document.getElementById('showForgotPassword')?.addEventListener('click', (e) => { e.preventDefault(); alert('กรุณาติดต่อผู้ดูแลระบบเพื่อรีเซ็ตรหัสผ่าน'); });
+            document.getElementById('backToLogin')?.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('login'); });
+
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                const btn = document.getElementById('loginBtn');
+                btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังเข้าสู่ระบบ...';
+                try {
+                    await handleLogin(email, password);
+                    closeAuthModal(); await checkAuth(); alert('เข้าสู่ระบบสำเร็จ!');
+                } catch (error) { alert('เข้าสู่ระบบไม่สำเร็จ: ' + error.message); }
+                finally { btn.disabled = false; btn.innerHTML = '<span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i>'; }
+            });
+
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('signupName').value;
+                const email = document.getElementById('signupEmail').value;
+                const password = document.getElementById('signupPassword').value;
+                const btn = document.getElementById('signupBtn');
+                if (password.length < 6) { alert('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร'); return; }
+                btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังสมัคร...';
+                try {
+                    await handleSignup(email, password, name);
+                    alert('สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี'); closeAuthModal();
+                } catch (error) { alert('สมัครสมาชิกไม่สำเร็จ: ' + error.message); }
+                finally { btn.disabled = false; btn.innerHTML = '<span>สมัครสมาชิก</span><i class="fas fa-user-plus"></i>'; }
+            });
+
+            // Init
+            (async () => { await checkAuth(); supabase.auth.onAuthStateChange((event, session) => { renderUserMenu(session?.user || null); updateAdminLink(session?.user || null); }); })();
+
+        } catch (error) {
+            console.error('Auth initialization error:', error);
+            document.getElementById('userMenu').innerHTML = `<div class="user-auth-buttons"><button class="btn btn-secondary btn-sm" onclick="alert('ระบบเข้าสู่ระบบกำลังมีปัญหา')">เข้าสู่ระบบ</button><button class="btn btn-primary btn-sm" onclick="alert('ระบบสมัครสมาชิกกำลังมีปัญหา')">สมัครสมาชิก</button></div>`;
+        }
+    </script>
 </body>
 </html>
