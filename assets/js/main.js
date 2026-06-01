@@ -296,3 +296,69 @@ document.addEventListener('DOMContentLoaded', () => {
     checkUserSession();
     // ... ฟังก์ชันอื่นๆ ที่มีอยู่แล้ว
 });
+/**
+ * Hide .html extensions from URLs
+ * Usage: <a href="index.html"> → shows as /index in browser
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // 🔹 1. Rewrite all internal links to hide .html
+    document.querySelectorAll('a[href]').forEach(link => {
+        const href = link.getAttribute('href');
+        
+        // Skip external links, anchors, mailto, tel, etc.
+        if (href.startsWith('http') || href.startsWith('#') || 
+            href.startsWith('mailto:') || href.startsWith('tel:')) {
+            return;
+        }
+        
+        // Remove .html from display but keep functionality
+        if (href.endsWith('.html')) {
+            const cleanHref = href.replace('.html', '');
+            link.setAttribute('data-real-href', href); // Store real href
+            link.setAttribute('href', cleanHref); // Display clean URL
+            
+            // Intercept click to navigate to real file
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const realHref = this.getAttribute('data-real-href');
+                
+                // Handle relative paths
+                const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+                const targetPath = realHref.startsWith('../') ? 
+                    basePath + realHref : 
+                    (realHref.startsWith('/') ? realHref : basePath + realHref);
+                
+                window.location.href = targetPath;
+            });
+        }
+    });
+    
+    // 🔹 2. Handle browser back/forward buttons (History API)
+    window.addEventListener('popstate', function() {
+        // Optional: Add logic here if using SPA-style navigation
+    });
+    
+    // 🔹 3. Optional: Redirect clean URLs to .html files (for direct access)
+    // Note: This requires server configuration for full support
+    // For static hosting, add this to your hosting config:
+    
+    /* 
+    === Netlify (_redirects file) ===
+    /*    /index    /index.html   200
+    /*    /about    /pages/about.html   200
+    
+    === Vercel (vercel.json) ===
+    {
+      "rewrites": [
+        { "source": "/:path*", "destination": "/:path*.html" }
+      ]
+    }
+    
+    === Apache (.htaccess) ===
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^([^\.]+)$ $1.html [NC,L]
+    */
+});
