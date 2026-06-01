@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Djohparichat - เรียนรู้ AI และประกันชีวิตกับมืออาชีพ">
+    <meta name="keywords" content="AI, ประกันชีวิต, สอนใช้ AI, ไทยประกันชีวิต, ChatGPT">
+    <meta name="author" content="Djohparichat">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://djohparichat.site/">
+    <meta property="og:title" content="Djohparichat | เรียนรู้ AI และประกันชีวิต">
+    <meta property="og:description" content="ผู้เชี่ยวชาญด้าน AI และประกันชีวิต">
+    <meta property="og:image" content="assets/images/og-image.jpg">
+    
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+    <title>Djohparichat | เรียนรู้ AI และประกันชีวิต</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="assets/css/animations.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loader" class="loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p class="loader-text" data-th="กำลังโหลด..." data-en="Loading...">กำลังโหลด...</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="navbar">
+        <div class="container">
+            <div class="nav-wrapper">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon"><i class="fas fa-graduation-cap"></i></span>
+                    <span class="logo-text">Djohparichat</span>
+                </a>
+                
+                <div class="nav-menu" id="navMenu">
+                    <ul class="nav-list">
+                        <li><a href="index.html" class="nav-link active" data-th="หน้าหลัก" data-en="Home">หน้าหลัก</a></li>
+                        <li><a href="pages/services.html" class="nav-link" data-th="บริการ" data-en="Services">บริการ</a></li>
+                        <li><a href="pages/ai-courses.html" class="nav-link" data-th="หลักสูตร AI" data-en="AI Courses">หลักสูตร AI</a></li>
+                        <li><a href="pages/about.html" class="nav-link" data-th="เกี่ยวกับเรา" data-en="About">เกี่ยวกับเรา</a></li>
+                        <li><a href="pages/contact.html" class="nav-link" data-th="ติดต่อ" data-en="Contact">ติดต่อ</a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-actions">
+                    <div class="language-switcher">
+                        <button class="lang-btn active" data-lang="th">TH</button>
+                        <span class="lang-divider">|</span>
+                        <button class="lang-btn" data-lang="en">EN</button>
+                    </div>
+                    
+                    <button class="mobile-toggle" id="mobileToggle">
+                        <span class="hamburger"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-bg-animation">
+            <div class="floating-shape shape-1"></div>
+            <div class="floating-shape shape-2"></div>
+            <div class="floating-shape shape-3"></div>
+        </div>
+        
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <div class="hero-badge">
+                        <i class="fas fa-star"></i>
+                        <span data-th="ผู้เชี่ยวชาญด้าน AI และประกัน" data-en="AI & Insurance Expert">ผู้เชี่ยวชาญด้าน AI และประกัน</span>
+                    </div>
+                    <h1 class="hero-title">
+                        <span data-th="เรียนรู้ AI ใช้งานจริง" data-en="Learn Practical AI">เรียนรู้ AI ใช้งานจริง</span><br>
+                        <span class="highlight" data-th="กับมืออาชีพ" data-en="with Professionals">กับมืออาชีพ</span>
+                    </h1>
+                    <p class="hero-description" data-th="พัฒนาทักษะของคุณด้วยคอร์สสอนใช้ AI ที่เข้าใจง่าย พร้อมที่ปรึกษาประกันชีวิตมืออาชีพ ดูแลคุณและครอบครัว" data-en="Develop your skills with easy-to-understand AI courses, plus professional life insurance consultation to take care of you and your family">พัฒนาทักษะของคุณด้วยคอร์สสอนใช้ AI ที่เข้าใจง่าย พร้อมที่ปรึกษาประกันชีวิตมืออาชีพ ดูแลคุณและครอบครัว</p>
+                    
+                    <div class="hero-buttons">
+                        <a href="pages/services.html" class="btn btn-primary">
+                            <span data-th="เริ่มเรียนรู้" data-en="Start Learning">เริ่มเรียนรู้</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                        <a href="pages/contact.html" class="btn btn-secondary">
+                            <span data-th="ติดต่อสอบถาม" data-en="Contact Us">ติดต่อสอบถาม</span>
+                        </a>
+                    </div>
+
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" data-count="500">0</div>
+                            <div class="stat-label" data-th="นักเรียน" data-en="Students">นักเรียน</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" data-count="50">0</div>
+                            <div class="stat-label" data-th="คอร์สเรียน" data-en="Courses">คอร์สเรียน</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" data-count="10">0</div>
+                            <div class="stat-label" data-th="ปีประสบการณ์" data-en="Years Experience">ปีประสบการณ์</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hero-image">
+                    <div class="image-wrapper">
+                        <div class="image-placeholder">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="floating-card card-1">
+                            <i class="fas fa-robot"></i>
+                            <span>AI Expert</span>
+                        </div>
+                        <div class="floating-card card-2">
+                            <i class="fas fa-shield-alt"></i>
+                            <span data-th="ประกันชีวิต" data-en="Life Insurance">ประกันชีวิต</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scroll-indicator">
+            <div class="mouse"><div class="wheel"></div></div>
+            <p data-th="เลื่อนลง" data-en="Scroll Down">เลื่อนลง</p>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-subtitle" data-th="สิ่งที่เราให้บริการ" data-en="What We Offer">สิ่งที่เราให้บริการ</span>
+                <h2 class="section-title" data-th="บริการของเรา" data-en="Our Services">บริการของเรา</h2>
+                <p class="section-description" data-th="เราพร้อมดูแลคุณด้วยบริการคุณภาพในหลากหลายด้าน" data-en="We are ready to take care of you with quality services in various areas">เราพร้อมดูแลคุณด้วยบริการคุณภาพในหลากหลายด้าน</p>
+            </div>
+
+            <div class="services-grid">
+                <div class="service-card fade-in-up">
+                    <div class="service-icon"><i class="fas fa-brain"></i></div>
+                    <h3 class="service-title" data-th="สอนใช้ AI" data-en="AI Training">สอนใช้ AI</h3>
+                    <p class="service-description" data-th="เรียนรู้การใช้งาน AI เครื่องมือต่างๆ อย่าง ChatGPT, Midjourney, และอื่นๆ เพื่อเพิ่มประสิทธิภาพในการทำงาน" data-en="Learn to use various AI tools like ChatGPT, Midjourney, and others to increase work efficiency">เรียนรู้การใช้งาน AI เครื่องมือต่างๆ อย่าง ChatGPT, Midjourney, และอื่นๆ เพื่อเพิ่มประสิทธิภาพในการทำงาน</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> <span data-th="สอนแบบตัวต่อตัว" data-en="One-on-one teaching">สอนแบบตัวต่อตัว</span></li>
+                        <li><i class="fas fa-check"></i> <span data-th="เนื้อหาอัปเดตล่าสุด" data-en="Latest content">เนื้อหาอัปเดตล่าสุด</span></li>
+                        <li><i class="fas fa-check"></i> <span data-th="ฝึกปฏิบัติจริง" data-en="Hands-on practice">ฝึกปฏิบัติจริง</span></li>
+                    </ul>
+                    <a href="pages/ai-courses.html" class="service-link">
+                        <span data-th="ดูรายละเอียด" data-en="Learn More">ดูรายละเอียด</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="service-card featured fade-in-up">
+                    <div class="service-badge" data-th="ยอดนิยม" data-en="Popular">ยอดนิยม</div>
+                    <div class="service-icon"><i class="fas fa-shield-heart"></i></div>
+                    <h3 class="service-title" data-th="ประกันชีวิต" data-en="Life Insurance">ประกันชีวิต</h3>
+                    <p class="service-description" data-th="ที่ปรึกษาประกันชีวิตจากไทยประกันชีวิต ดูแลคุณและครอบครัวด้วยความห่วงใย พร้อมแผนประกันที่หลากหลาย" data-en="Life insurance consultant from Thai Life Insurance, taking care of you and your family with various insurance plans">ที่ปรึกษาประกันชีวิตจากไทยประกันชีวิต ดูแลคุณและครอบครัวด้วยความห่วงใย พร้อมแผนประกันที่หลากหลาย</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> <span data-th="ปรึกษาฟรี" data-en="Free consultation">ปรึกษาฟรี</span></li>
+                        <li><i class="fas fa-check"></i> <span data-th="แผนประกันหลากหลาย" data-en="Various plans">แผนประกันหลากหลาย</span></li>
+                        <li><i class="fas fa-check"></i> <span data-th="บริการหลังการขาย" data-en="After-sales service">บริการหลังการขาย</span></li>
+                    </ul>
+                    <a href="pages/insurance.html" class="service-link">
+                        <span data-th="ดูรายละเอียด" data-en="Learn More">ดูรายละเอียด</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="service-card fade-in-up">
+                    <div class="service-icon"><i class="fas fa-briefcase"></i></div>
+                    <h3 class="service-title" data-th="ผลงานและโครงการ" data-en="Projects & Portfolio">ผลงานและโครงการ</h3>
+                    <p class="service-description" data-th="ติดตามผลงานและโครงการต่างๆ ที่เราได้ทำ พร้อมกรณีศึกษาที่น่าสนใจ" data-en="Follow our works and various projects with interesting case studies">ติดตามผลงานและโครงการต่างๆ ที่เราได้ทำ พร้อมกรณีศึกษาที่น่าสนใจ</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> <span data-th="กรณีจริง" data-en="Real cases">กรณีจริง</span></li>
+                        <li><i class="fas fa-check"></i> <span data-th="อัปเดตสม่ำเสมอ" data-en="Regular updates">อัปเดตสม่ำเสมอ</span></li>
+                        <li><i class="fas fa-check"></i> <span data-th="เรียนรู้จากประสบการณ์" data-en="Learn from experience">เรียนรู้จากประสบการณ์</span></li>
+                    </ul>
+                    <a href="pages/portfolio.html" class="service-link">
+                        <span data-th="ดูรายละเอียด" data-en="Learn More">ดูรายละเอียด</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section class="portfolio" id="portfolio">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-subtitle" data-th="หลักสูตร AI" data-en="AI courses">AI courses</span>
+                <h2 class="section-title" data-th="คอร์สของเรา" data-en="our courses">คอร์สของเรา</h2>
+                <p class="section-description" data-th="พัฒนาทักษะของคุณด้วยคอร์สสอนใช้ AI ที่เข้าใจง่าย" data-en="Develop your skills with easy-to-understand AI training courses.">พัฒนาทักษะของคุณด้วยคอร์สสอนใช้ AI ที่เข้าใจง่าย</p>
+            </div>
+
+            <div class="portfolio-filter">
+                <button class="filter-btn active" data-filter="all" data-th="ทั้งหมด" data-en="All">ทั้งหมด</button>
+                <button class="filter-btn" data-filter="ai" data-th="AI & เทคโนโลยี" data-en="AI & Tech">AI & เทคโนโลยี</button>
+                <button class="filter-btn" data-filter="insurance" data-th="ประกัน" data-en="Insurance">ประกัน</button>
+                <button class="filter-btn" data-filter="training" data-th="การอบรม" data-en="Training">การอบรม</button>
+            </div>
+
+            <div class="portfolio-grid">
+                <div class="portfolio-item" data-category="ai">
+                    <div class="portfolio-image">
+                        <div class="image-placeholder"><i class="fas fa-robot"></i></div>
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-info">
+                                <h3 data-th="คอร์ส AI สำหรับผู้เริ่มต้น" data-en="AI Course for Beginners">คอร์ส AI สำหรับผู้เริ่มต้น</h3>
+                                <p data-th="เรียนรู้พื้นฐานการใช้งาน AI" data-en="Learn AI basics">เรียนรู้พื้นฐานการใช้งาน AI</p>
+                            </div>
+                            <a href="pages/ai-courses.html" class="portfolio-link"><i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portfolio-item" data-category="training">
+                    <div class="portfolio-image">
+                        <div class="image-placeholder"><i class="fas fa-chalkboard-teacher"></i></div>
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-info">
+                                <h3 data-th="อบรมการใช้ ChatGPT" data-en="ChatGPT Training">อบรมการใช้ ChatGPT</h3>
+                                <p data-th="เทคนิคการใช้ ChatGPT อย่างมืออาชีพ" data-en="Professional ChatGPT techniques">เทคนิคการใช้ ChatGPT อย่างมืออาชีพ</p>
+                            </div>
+                            <a href="#" class="portfolio-link"><i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portfolio-item" data-category="insurance">
+                    <div class="portfolio-image">
+                        <div class="image-placeholder"><i class="fas fa-hand-holding-heart"></i></div>
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-info">
+                                <h3 data-th="ประกันชีวิตสำหรับครอบครัว" data-en="Family Life Insurance">ประกันชีวิตสำหรับครอบครัว</h3>
+                                <p data-th="คุ้มครองคนที่รักด้วยแผนประกันที่เหมาะสม" data-en="Protect loved ones with suitable plans">คุ้มครองคนที่รักด้วยแผนประกันที่เหมาะสม</p>
+                            </div>
+                            <a href="#" class="portfolio-link"><i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portfolio-load-more">
+                <a href="pages/portfolio.html" class="btn btn-outline">
+                    <span data-th="ดูผลงานเพิ่มเติม" data-en="View More Portfolio">ดูผลงานเพิ่มเติม</span>
+                    <i class="fas fa-plus"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-wrapper">
+                <div class="about-image">
+                    <div class="image-wrapper">
+                        <div class="image-placeholder main"><i class="fas fa-user-tie"></i></div>
+                        <div class="experience-badge">
+                            <span class="years">10+</span>
+                            <span class="text" data-th="ปีประสบการณ์" data-en="Years Experience">ปีประสบการณ์</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-content">
+                    <span class="section-subtitle" data-th="เกี่ยวกับเรา" data-en="About Us">เกี่ยวกับเรา</span>
+                    <h2 class="section-title" data-th="ผู้เชี่ยวชาญด้าน AI และประกันชีวิต" data-en="AI & Life Insurance Expert">ผู้เชี่ยวชาญด้าน AI และประกันชีวิต</h2>
+                    <p class="about-text" data-th="ด้วยความมุ่งมั่นที่จะพัฒนาทักษะของคนไทยให้ทันกับเทคโนโลยี AI ที่เปลี่ยนแปลงอย่างรวดเร็ว พร้อมเป็นที่ปรึกษาประกันชีวิตจากไทยประกันชีวิต ดูแลคุณและครอบครัวด้วยความจริงใจ" data-en="With a commitment to develop Thai people's skills to keep up with rapidly changing AI technology, plus being a life insurance consultant from Thai Life Insurance, taking care of you and your family with sincerity">ด้วยความมุ่งมั่นที่จะพัฒนาทักษะของคนไทยให้ทันกับเทคโนโลยี AI ที่เปลี่ยนแปลงอย่างรวดเร็ว พร้อมเป็นที่ปรึกษาประกันชีวิตจากไทยประกันชีวิต ดูแลคุณและครอบครัวด้วยความจริงใจ</p>
+                    
+                    <div class="about-features">
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-certificate"></i></div>
+                            <div class="feature-content">
+                                <h4 data-th="ได้รับการรับรอง" data-en="Certified">ได้รับการรับรอง</h4>
+                                <p data-th="ผู้เชี่ยวชาญด้าน AI และประกัน" data-en="AI & Insurance expert">ผู้เชี่ยวชาญด้าน AI และประกัน</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-heart"></i></div>
+                            <div class="feature-content">
+                                <h4 data-th="ใส่ใจทุก细节" data-en="Attention to detail">ใส่ใจทุก细节</h4>
+                                <p data-th="ดูแลด้วยความห่วงใย" data-en="Care with concern">ดูแลด้วยความห่วงใย</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-sync-alt"></i></div>
+                            <div class="feature-content">
+                                <h4 data-th="อัปเดตความรู้เสมอ" data-en="Always updated">อัปเดตความรู้เสมอ</h4>
+                                <p data-th="ติดตามเทคโนโลยีล่าสุด" data-en="Follow latest technology">ติดตามเทคโนโลยีล่าสุด</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="about-cta">
+                        <a href="pages/contact.html" class="btn btn-primary">
+                            <span data-th="ติดต่อเราวันนี้" data-en="Contact Us Today">ติดต่อเราวันนี้</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-subtitle" data-th="ติดต่อเรา" data-en="Contact Us">ติดต่อเรา</span>
+                <h2 class="section-title" data-th="พร้อมช่วยเหลือคุณ" data-en="Ready to Help You">พร้อมช่วยเหลือคุณ</h2>
+                <p class="section-description" data-th="มีคำถาม? ติดต่อเราได้เลย เรายินดีช่วยเหลือ" data-en="Have questions? Contact us, we're happy to help">มีคำถาม? ติดต่อเราได้เลย เรายินดีช่วยเหลือ</p>
+            </div>
+
+            <div class="contact-wrapper">
+                <div class="contact-info">
+                    <div class="info-card">
+                        <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
+                        <div class="info-content">
+                            <h3 data-th="โทรศัพท์" data-en="Phone">โทรศัพท์</h3>
+                            <p>+66 XX XXX XXXX</p>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                        <div class="info-content">
+                            <h3 data-th="อีเมล" data-en="Email">อีเมล</h3>
+                            <p>contact@djohparichat.site</p>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="info-content">
+                            <h3 data-th="ที่อยู่" data-en="Address">ที่อยู่</h3>
+                            <p data-th="กรุงเทพมหานคร, ประเทศไทย" data-en="Bangkok, Thailand">กรุงเทพมหานคร, ประเทศไทย</p>
+                        </div>
+                    </div>
+
+                    <div class="social-links">
+                        <h3 data-th="ติดตามเรา" data-en="Follow Us">ติดตามเรา</h3>
+                        <div class="social-icons">
+                            <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-icon"><i class="fab fa-line"></i></a>
+                            <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                            <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-form-wrapper">
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-group">
+                            <label for="name" data-th="ชื่อ-นามสกุล" data-en="Full Name">ชื่อ-นามสกุล</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" data-th="อีเมล" data-en="Email">อีเมล</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone" data-th="เบอร์โทรศัพท์" data-en="Phone Number">เบอร์โทรศัพท์</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject" data-th="หัวข้อ" data-en="Subject">หัวข้อ</label>
+                            <select id="subject" name="subject" required>
+                                <option value="" data-th="เลือกหัวข้อ" data-en="Select subject">เลือกหัวข้อ</option>
+                                <option value="ai" data-th="สนใจคอร์ส AI" data-en="Interested in AI course">สนใจคอร์ส AI</option>
+                                <option value="insurance" data-th="สนใจประกันชีวิต" data-en="Interested in life insurance">สนใจประกันชีวิต</option>
+                                <option value="other" data-th="อื่นๆ" data-en="Other">อื่นๆ</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message" data-th="ข้อความ" data-en="Message">ข้อความ</label>
+                            <textarea id="message" name="message" rows="5" required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-full">
+                            <span data-th="ส่งข้อความ" data-en="Send Message">ส่งข้อความ</span>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <span class="logo-icon"><i class="fas fa-graduation-cap"></i></span>
+                        <span class="logo-text">Djohparichat</span>
+                    </a>
+                    <p data-th="เรียนรู้ AI และประกันชีวิตกับมืออาชีพ" data-en="Learn AI and life insurance with professionals">เรียนรู้ AI และประกันชีวิตกับมืออาชีพ</p>
+                </div>
+
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4 data-th="ลิงก์ด่วน" data-en="Quick Links">ลิงก์ด่วน</h4>
+                        <ul>
+                            <li><a href="index.html" data-th="หน้าหลัก" data-en="Home">หน้าหลัก</a></li>
+                            <li><a href="pages/services.html" data-th="บริการ" data-en="Services">บริการ</a></li>
+                            <li><a href="pages/ai-courses.html" data-th="หลักสูตร AI" data-en="AI Courses">หลักสูตร AI</a></li>
+                            <li><a href="pages/about.html" data-th="เกี่ยวกับเรา" data-en="About">เกี่ยวกับเรา</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-column">
+                        <h4 data-th="บริการ" data-en="Services">บริการ</h4>
+                        <ul>
+                            <li><a href="pages/ai-courses.html" data-th="สอนใช้ AI" data-en="AI Training">สอนใช้ AI</a></li>
+                            <li><a href="pages/insurance.html" data-th="ประกันชีวิต" data-en="Life Insurance">ประกันชีวิต</a></li>
+                            <li><a href="pages/contact.html" data-th="ที่ปรึกษา" data-en="Consultation">ที่ปรึกษา</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-column">
+                        <h4 data-th="ติดต่อ" data-en="Contact">ติดต่อ</h4>
+                        <ul>
+                            <li><a href="tel:+66XXXXXXXXXX">+66 XX XXX XXXX</a></li>
+                            <li><a href="mailto:contact@djohparichat.site">contact@djohparichat.site</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 Djohparichat. <span data-th="สงวนลิขสิทธิ์ทุกประการ" data-en="All rights reserved">สงวนลิขสิทธิ์ทุกประการ</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="admin-link">
+        <a href="admin/login.html" title="Admin Panel"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <script src="assets/js/language.js"></script>
+    <script src="assets/js/animations.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

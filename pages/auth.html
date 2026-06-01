@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ | Djohparichat</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <!-- เพิ่ม Supabase CDN เพื่อใช้ Auth ได้เลยโดยไม่ต้องพึ่ง API เยอะ -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="login-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2>เข้าสู่ระบบ / สมัครสมาชิก</h2>
+            
+            <form id="authForm">
+                <input type="email" id="email" placeholder="อีเมล" required>
+                <input type="password" id="password" placeholder="รหัสผ่าน" required>
+                
+                <button type="submit" id="submitBtn">เข้าสู่ระบบ</button>
+            </form>
+            
+            <div class="toggle-auth">
+                <p>ยังไม่มีบัญชี? <a href="#" id="toggleMode">สมัครสมาชิก</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. เชื่อมต่อ Supabase โดยตรงจากหน้าเว็บ (Client-side)
+        const supabase = window.supabase.createClient(
+            'YOUR_PROJECT_URL', // ใส่ URL จาก .env.local
+            'YOUR_ANON_KEY'     // ใส่ Anon Key จาก .env.local
+        );
+
+        let isLoginMode = true;
+
+        // สลับโหมด Login/Sign Up
+        document.getElementById('toggleMode').addEventListener('click', (e) => {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+            document.querySelector('#submitBtn').textContent = isLoginMode ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+            document.querySelector('#toggleMode').textContent = isLoginMode ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ';
+            document.querySelector('.toggle-auth p').textContent = isLoginMode ? 'ยังไม่มีบัญชี? ' : 'มีบัญชีแล้ว? ';
+            document.querySelector('.toggle-auth a').textContent = isLoginMode ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ';
+        });
+
+        // จัดการ Form Submit
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('submitBtn');
+
+            btn.textContent = 'กำลังดำเนินการ...';
+            btn.disabled = true;
+
+            let result;
+            if (isLoginMode) {
+                // เข้าสู่ระบบ
+                result = await supabase.auth.signInWithPassword({ email, password });
+            } else {
+                // สมัครสมาชิก
+                result = await supabase.auth.signUp({ email, password });
+            }
+
+            if (result.error) {
+                alert(result.error.message);
+                btn.textContent = isLoginMode ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+                btn.disabled = false;
+            } else {
+                alert(isLoginMode ? 'เข้าสู่ระบบสำเร็จ!' : 'สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมล');
+                if(isLoginMode) window.location.href = '../index.html'; // กลับหน้าหลัก
+            }
+        });
+    </script>
+</body>
+</html>

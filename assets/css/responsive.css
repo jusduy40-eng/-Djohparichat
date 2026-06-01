@@ -1,0 +1,210 @@
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+/* Large Desktop (1400px+) */
+@media (min-width: 1400px) {
+    .container { max-width: 1320px; }
+    .hero-title { font-size: 4rem; }
+    .section-title { font-size: 3rem; }
+}
+
+/* Desktop (1200px) */
+@media (max-width: 1200px) {
+    .container { max-width: 1000px; }
+    .hero-content { gap: 40px; }
+    .about-wrapper { gap: 60px; }
+}
+
+/* Tablet Landscape (1024px) */
+@media (max-width: 1024px) {
+    .hero-content { grid-template-columns: 1fr; text-align: center; }
+    .hero-description { margin: 0 auto 32px; }
+    .hero-buttons { justify-content: center; }
+    .hero-stats { justify-content: center; }
+    .hero-image { order: -1; max-width: 400px; margin: 0 auto; }
+    .about-wrapper { grid-template-columns: 1fr; text-align: center; }
+    .about-content .section-subtitle, .about-content .section-title { text-align: center; }
+    .about-features { max-width: 500px; margin: 0 auto 40px; }
+    .about-cta { text-align: center; }
+    .contact-wrapper { grid-template-columns: 1fr; }
+    .footer-top { grid-template-columns: 1fr; text-align: center; }
+    .footer-brand { margin-bottom: 40px; }
+    .footer-brand p { margin: 0 auto; }
+    .footer-links { justify-content: center; }
+    .nav-list { gap: 25px; }
+}
+
+/* Tablet Portrait (768px) */
+@media (max-width: 768px) {
+    section { padding: 60px 0; }
+    h1 { font-size: 2.2rem; }
+    h2 { font-size: 1.8rem; }
+    h3 { font-size: 1.4rem; }
+    
+    /* Navigation */
+    .nav-menu {
+        position: fixed;
+        top: 80px;
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 80px);
+        background: var(--white);
+        transition: var(--transition-normal);
+        padding: 40px 20px;
+        overflow-y: auto;
+    }
+    .nav-menu.active { left: 0; }
+    .nav-list {
+        flex-direction: column;
+        gap: 0;
+    }
+    .nav-list li {
+        border-bottom: 1px solid var(--gray-200);
+    }
+    .nav-list li:last-child { border-bottom: none; }
+    .nav-list li a {
+        display: block;
+        padding: 16px 0;
+    }
+    .nav-link::after { display: none; }
+    .mobile-toggle { display: flex; }
+    
+    /* Hero */
+    .hero { padding: 120px 0 60px; min-height: auto; }
+    .hero-title { font-size: 2rem; }
+    .hero-title .highlight::after { height: 5px; }
+    .hero-description { font-size: 1rem; }
+    .hero-buttons { flex-direction: column; align-items: center; }
+    .hero-stats { flex-wrap: wrap; gap: 20px; }
+    .stat-number { font-size: 2rem; }
+    .image-placeholder { height: 300px; font-size: 5rem; }
+    .floating-card { display: none; }
+    
+    /* Services */
+    .services-grid { grid-template-columns: 1fr; }
+    .service-card { padding: 30px 20px; }
+    
+    /* Portfolio */
+    .portfolio-grid { grid-template-columns: 1fr; }
+    .portfolio-filter { gap: 8px; }
+    .filter-btn { padding: 8px 16px; font-size: 0.85rem; }
+    
+    /* About */
+    .about-image .image-placeholder.main { height: 400px; }
+    .experience-badge { right: 10px; bottom: 10px; padding: 15px; }
+    .experience-badge .years { font-size: 2rem; }
+    .experience-badge .text { font-size: 0.8rem; }
+    
+    /* Contact */
+    .contact-form-wrapper { padding: 24px; }
+    .contact-info { gap: 16px; }
+    .info-card { padding: 16px; }
+    
+    /* Footer */
+    .footer-links { grid-template-columns: 1fr; gap: 30px; }
+    .footer-column h4 { margin-bottom: 16px; }
+    
+    /* Page Header */
+    .page-header { padding: 140px 0 60px; }
+    .page-header h1 { font-size: 2rem; }
+    .page-header p { font-size: 1rem; }
+    
+    /* Admin Link */
+    .admin-link { bottom: 20px; right: 20px; }
+    .admin-link a { width: 45px; height: 45px; font-size: 1.1rem; }
+    
+    /* Section Header */
+    .section-header { margin-bottom: 40px; }
+    .section-title { font-size: 1.6rem; }
+    .section-description { font-size: 0.95rem; }
+}
+
+/* Mobile Large (480px) */
+@media (max-width: 480px) {
+    .container { padding: 0 16px; }
+    
+    h1 { font-size: 1.8rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.2rem; }
+    
+    /* Hero */
+    .hero { padding: 100px 0 40px; }
+    .hero-title { font-size: 1.6rem; line-height: 1.3; }
+    .hero-description { font-size: 0.9rem; margin-bottom: 24px; }
+    .hero-badge { font-size: 0.85rem; padding: 6px 16px; }
+    .hero-stats { gap: 15px; }
+    .stat-number { font-size: 1.8rem; }
+    .stat-label { font-size: 0.8rem; }
+    
+    /* Buttons */
+    .btn { padding: 12px 24px; font-size: 0.9rem; }
+    
+    /* Services */
+    .service-card { padding: 24px 16px; }
+    .service-icon { width: 60px; height: 60px; font-size: 1.5rem; }
+    .service-title { font-size: 1.3rem; }
+    
+    /* Portfolio */
+    .portfolio-image { height: 220px; }
+    .portfolio-overlay { padding: 20px; }
+    .portfolio-info h3 { font-size: 1.2rem; }
+    
+    /* Contact */
+    .contact-form-wrapper { padding: 20px; }
+    .form-group input, .form-group select, .form-group textarea { padding: 12px 14px; font-size: 0.9rem; }
+    
+    /* Footer */
+    .footer { padding: 60px 0 20px; }
+    .footer-top { gap: 40px; }
+    
+    /* Notification */
+    .notification {
+        top: 80px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+
+/* Mobile Small (360px) */
+@media (max-width: 360px) {
+    .container { padding: 0 12px; }
+    
+    .hero-title { font-size: 1.4rem; }
+    .section-title { font-size: 1.4rem; }
+    
+    .btn { padding: 10px 20px; font-size: 0.85rem; }
+    
+    .nav-wrapper { padding: 15px 0; }
+    .logo { font-size: 1.2rem; }
+    .logo-icon { width: 35px; height: 35px; font-size: 1rem; }
+}
+
+/* Print Styles */
+@media print {
+    .navbar, .scroll-indicator, .admin-link, .floating-shape, .floating-card {
+        display: none !important;
+    }
+    body { background: white; }
+    section { page-break-inside: avoid; }
+    .hero { min-height: auto; padding: 40px 0; }
+    a { color: var(--primary-blue) !important; }
+}
+
+/* High Resolution Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .image-placeholder { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    .floating-shape { animation: none; }
+    .floating-card { animation: none; }
+    .scroll-indicator { animation: none; }
+}

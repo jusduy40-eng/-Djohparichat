@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ประกันชีวิต | Djohparichat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    <link rel="stylesheet" href="../assets/css/animations.css">
+</head>
+<body>
+    <div id="loader" class="loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p class="loader-text">กำลังโหลด...</p>
+        </div>
+    </div>
+
+    <nav id="navbar" class="navbar">
+        <div class="container">
+            <div class="nav-wrapper">
+                <a href="../index.html" class="logo">
+                    <span class="logo-icon"><i class="fas fa-graduation-cap"></i></span>
+                    <span class="logo-text">Djohparichat</span>
+                </a>
+                <div class="nav-menu" id="navMenu">
+                    <ul class="nav-list">
+                        <li><a href="../index.html" class="nav-link" data-th="หน้าหลัก" data-en="Home">หน้าหลัก</a></li>
+                        <li><a href="services.html" class="nav-link active" data-th="บริการ" data-en="Services">บริการ</a></li>
+                        <li><a href="pages/ai-courses.html" class="nav-link">หลักสูตร AI</a></li>
+                        <li><a href="about.html" class="nav-link" data-th="เกี่ยวกับเรา" data-en="About">เกี่ยวกับเรา</a></li>
+                        <li><a href="contact.html" class="nav-link" data-th="ติดต่อ" data-en="Contact">ติดต่อ</a></li>
+                    </ul>
+                </div>
+                <div class="nav-actions">
+                    <div class="language-switcher">
+                        <button class="lang-btn active" data-lang="th">TH</button>
+                        <span class="lang-divider">|</span>
+                        <button class="lang-btn" data-lang="en">EN</button>
+                    </div>
+                    <button class="mobile-toggle" id="mobileToggle"><span class="hamburger"></span></button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="page-header">
+        <div class="container">
+            <h1 data-th="ประกันชีวิต" data-en="Life Insurance">ประกันชีวิต</h1>
+            <p data-th="ที่ปรึกษาประกันชีวิตจากไทยประกันชีวิต" data-en="Life insurance consultant from Thai Life Insurance">ที่ปรึกษาประกันชีวิตจากไทยประกันชีวิต</p>
+        </div>
+    </section>
+
+    <section class="services" style="padding-top: 80px;">
+        <div class="container">
+            <div class="services-grid">
+                <div class="service-card fade-in-up">
+                    <div class="service-icon"><i class="fas fa-heart"></i></div>
+                    <h3 class="service-title" data-th="ประกันชีวิตแบบตลอดชีพ" data-en="Whole Life Insurance">ประกันชีวิตแบบตลอดชีพ</h3>
+                    <p class="service-description" data-th="คุ้มครองตลอดชีวิต มั่นใจในทุกสถานการณ์" data-en="Lifetime protection, confident in every situation">คุ้มครองตลอดชีวิต มั่นใจในทุกสถานการณ์</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> <span data-th="คุ้มครองตลอดชีพ" data-en="Lifetime coverage">คุ้มครองตลอดชีพ</span></li>
+                        <li><i class="fas fa-check"></i> <span data-th="รับเงินคืนเมื่อครบกำหนด" data-en="Maturity benefit">รับเงินคืนเมื่อครบกำหนด</span></li>
+                    </ul>
+                    <a href="contact.html" class="btn btn-primary btn-full">
+                        <span data-th="ปรึกษาฟรี" data-en="Free Consultation">ปรึกษาฟรี</span>
+                    </a>
+                </div>
+
+                <div class="service-card featured fade-in-up">
+                    <div class="service-badge" data-th="แนะนำ" data-en="Recommended">แนะนำ</div>
+                    <div class="service-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3 class="service-title" data-th="ประกันสุขภาพ" data-en="Health Insurance">ประกันสุขภาพ</h3>
+                    <p class="service-description" data-th="คุ้มครองค่ารักษาพยาบาลอย่างเต็มที่" data-en="Full medical expense coverage">คุ้มครองค่ารักษาพยาบาลอย่างเต็มที่</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> <span data-th="คุ้มครองค่ารักษา" data-en="Medical coverage">คุ้มครองค่ารักษา</span></li>
+                        <li><i class="fas fa-check"></i> <span data-th="โรงพยาบาลเครือข่ายทั่วประเทศ" data-en="Nationwide hospital network">โรงพยาบาลเครือข่ายทั่วประเทศ</span></li>
+                    </ul>
+                    <a href="contact.html" class="btn btn-primary btn-full">
+                        <span data-th="ปรึกษาฟรี" data-en="Free Consultation">ปรึกษาฟรี</span>
+                    </a>
+                </div>
+
+                <div class="service-card fade-in-up">
+                    <div class="service-icon"><i class="fas fa-umbrella"></i></div>
+                    <h3 class="service-title" data-th="ประกันชีวิตแบบชั่วระยะเวลา" data-en="Term Life Insurance">ประกันชีวิตแบบชั่วระยะเวลา</h3>
+                    <p class="service-description" data-th="คุ้มครองในช่วงเวลาที่กำหนด เบี้ยประกันประหยัด" data-en="Coverage for a specified period, affordable premiums">คุ้มครองในช่วงเวลาที่กำหนด เบี้ยประกันประหยัด</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> <span data-th="เบี้ยประกันต่ำ" data-en="Low premiums">เบี้ยประกันต่ำ</span></li>
+                        <li><i class="fas fa-check"></i> <span data-th="คุ้มครองสูง" data-en="High coverage">คุ้มครองสูง</span></li>
+                    </ul>
+                    <a href="contact.html" class="btn btn-primary btn-full">
+                        <span data-th="ปรึกษาฟรี" data-en="Free Consultation">ปรึกษาฟรี</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="about" style="background: var(--sky-blue);">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-subtitle" data-th="ทำไมต้องเลือกเรา" data-en="Why Choose Us">ทำไมต้องเลือกเรา</span>
+                <h2 class="section-title" data-th="เหตุผลที่ควรเลือก Djohparichat" data-en="Reasons to Choose Djohparichat">เหตุผลที่ควรเลือก Djohparichat</h2>
+            </div>
+            <div class="about-features" style="max-width: 800px; margin: 0 auto;">
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-award"></i></div>
+                    <div class="feature-content">
+                        <h4 data-th="ตัวแทนจากไทยประกันชีวิต" data-en="Thai Life Insurance Agent">ตัวแทนจากไทยประกันชีวิต</h4>
+                        <p data-th="ได้รับการรับรองและเป็นตัวแทนอย่างเป็นทางการ" data-en="Certified and official representative">ได้รับการรับรองและเป็นตัวแทนอย่างเป็นทางการ</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-handshake"></i></div>
+                    <div class="feature-content">
+                        <h4 data-th="ให้คำปรึกษาอย่างจริงใจ" data-en="Sincere consultation">ให้คำปรึกษาอย่างจริงใจ</h4>
+                        <p data-th="แนะนำแผนประกันที่เหมาะสมกับความต้องการของคุณ" data-en="Recommend plans that suit your needs">แนะนำแผนประกันที่เหมาะสมกับความต้องการของคุณ</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-headset"></i></div>
+                    <div class="feature-content">
+                        <h4 data-th="บริการหลังการขาย" data-en="After-sales service">บริการหลังการขาย</h4>
+                        <p data-th="ดูแลคุณตลอดอายุกรมธรรม์" data-en="Take care of you throughout the policy">ดูแลคุณตลอดอายุกรมธรรม์</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 Djohparichat. <span data-th="สงวนลิขสิทธิ์ทุกประการ" data-en="All rights reserved">สงวนลิขสิทธิ์ทุกประการ</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="admin-link">
+        <a href="../admin/login.html" title="Admin Panel"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <script src="../assets/js/language.js"></script>
+    <script src="../assets/js/animations.js"></script>
+    <script src="../assets/js/main.js"></script>
+</body>
+</html>

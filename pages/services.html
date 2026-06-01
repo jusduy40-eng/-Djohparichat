@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บริการ | Djohparichat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    <link rel="stylesheet" href="../assets/css/animations.css">
+</head>
+<body>
+    <div id="loader" class="loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p class="loader-text">กำลังโหลด...</p>
+        </div>
+    </div>
+
+    <nav id="navbar" class="navbar">
+        <div class="container">
+            <div class="nav-wrapper">
+                <a href="../index.html" class="logo">
+                    <span class="logo-icon"><i class="fas fa-graduation-cap"></i></span>
+                    <span class="logo-text">Djohparichat</span>
+                </a>
+                <div class="nav-menu" id="navMenu">
+                    <ul class="nav-list">
+                        <li><a href="../index.html" class="nav-link" data-th="หน้าหลัก" data-en="Home">หน้าหลัก</a></li>
+                        <li><a href="services.html" class="nav-link active" data-th="บริการ" data-en="Services">บริการ</a></li>
+                        <li><a href="ai-courses.html" class="nav-link" data-th="หลักสูตร AI" data-en="AI Courses">หลักสูตร AI</a></li>
+                        <li><a href="about.html" class="nav-link" data-th="เกี่ยวกับเรา" data-en="About">เกี่ยวกับเรา</a></li>
+                        <li><a href="contact.html" class="nav-link" data-th="ติดต่อ" data-en="Contact">ติดต่อ</a></li>
+                    </ul>
+                </div>
+                <div class="nav-actions">
+                    <div class="language-switcher">
+                        <button class="lang-btn active" data-lang="th">TH</button>
+                        <span class="lang-divider">|</span>
+                        <button class="lang-btn" data-lang="en">EN</button>
+                    </div>
+                    <button class="mobile-toggle" id="mobileToggle"><span class="hamburger"></span></button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="page-header">
+        <div class="container">
+            <h1 data-th="บริการของเรา" data-en="Our Services">บริการของเรา</h1>
+            <p data-th="เราพร้อมดูแลคุณด้วยบริการคุณภาพ" data-en="We are ready to take care of you with quality services">เราพร้อมดูแลคุณด้วยบริการคุณภาพ</p>
+        </div>
+    </section>
+
+    <section class="services" style="padding-top: 80px;">
+        <div class="container">
+            <div class="services-grid">
+                <div class="service-card fade-in-up">
+                    <div class="service-icon"><i class="fas fa-brain"></i></div>
+                    <h3 class="service-title" data-th="สอนใช้ AI" data-en="AI Training">สอนใช้ AI</h3>
+                    <p class="service-description" data-th="เรียนรู้การใช้งาน AI เครื่องมือต่างๆ อย่าง ChatGPT, และอื่นๆ" data-en="Learn to use various AI tools like ChatGPT, Midjourney, and others">เรียนรู้การใช้งาน AI เครื่องมือต่างๆ อย่าง ChatGPT และอื่นๆ</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> <span data-th="สอนแบบตัวต่อตัว" data-en="One-on-one teaching">สอนแบบตัวต่อตัว</span></li>
+                        <li><i class="fas fa-check"></i> <span data-th="เนื้อหาอัปเดตล่าสุด" data-en="Latest content">เนื้อหาอัปเดตล่าสุด</span></li>
+                        <li><i class="fas fa-check"></i> <span data-th="ฝึกปฏิบัติจริง" data-en="Hands-on practice">ฝึกปฏิบัติจริง</span></li>
+                    </ul>
+                    <a href="ai-courses.html" class="service-link">
+                        <span data-th="ดูรายละเอียด" data-en="Learn More">ดูรายละเอียด</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="service-card featured fade-in-up">
+                    <div class="service-badge" data-th="ยอดนิยม" data-en="Popular">ยอดนิยม</div>
+                    <div class="service-icon"><i class="fas fa-shield-heart"></i></div>
+                    <h3 class="service-title" data-th="ประกันชีวิต" data-en="Life Insurance">ประกันชีวิต</h3>
+                    <p class="service-description" data-th="ที่ปรึกษาประกันชีวิตจากไทยประกันชีวิต" data-en="Life insurance consultant from Thai Life Insurance">ที่ปรึกษาประกันชีวิตจากไทยประกันชีวิต</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> <span data-th="ปรึกษาฟรี" data-en="Free consultation">ปรึกษาฟรี</span></li>
+                        <li><i class="fas fa-check"></i> <span data-th="แผนประกันหลากหลาย" data-en="Various plans">แผนประกันหลากหลาย</span></li>
+                        <li><i class="fas fa-check"></i> <span data-th="บริการหลังการขาย" data-en="After-sales service">บริการหลังการขาย</span></li>
+                    </ul>
+                    <a href="insurance.html" class="service-link">
+                        <span data-th="ดูรายละเอียด" data-en="Learn More">ดูรายละเอียด</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 Djohparichat. <span data-th="สงวนลิขสิทธิ์ทุกประการ" data-en="All rights reserved">สงวนลิขสิทธิ์ทุกประการ</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="admin-link">
+        <a href="../admin/login.html" title="Admin Panel"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <script src="../assets/js/language.js"></script>
+    <script src="../assets/js/animations.js"></script>
+    <script src="../assets/js/main.js"></script>
+</body>
+</html>

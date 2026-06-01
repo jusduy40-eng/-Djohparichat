@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ติดต่อเรา | Djohparichat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    <link rel="stylesheet" href="../assets/css/animations.css">
+</head>
+<body>
+    <div id="loader" class="loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p class="loader-text">กำลังโหลด...</p>
+        </div>
+    </div>
+
+    <nav id="navbar" class="navbar">
+        <div class="container">
+            <div class="nav-wrapper">
+                <a href="../index.html" class="logo">
+                    <span class="logo-icon"><i class="fas fa-graduation-cap"></i></span>
+                    <span class="logo-text">Djohparichat</span>
+                </a>
+                <div class="nav-menu" id="navMenu">
+                    <ul class="nav-list">
+                        <li><a href="../index.html" class="nav-link" data-th="หน้าหลัก" data-en="Home">หน้าหลัก</a></li>
+                        <li><a href="services.html" class="nav-link" data-th="บริการ" data-en="Services">บริการ</a></li>
+                        <li><a href="ai-courses.html" class="nav-link" data-th="หลักสูตร AI" data-en="AI Courses">หลักสูตร AI</a></li>
+                        <li><a href="about.html" class="nav-link" data-th="เกี่ยวกับเรา" data-en="About">เกี่ยวกับเรา</a></li>
+                        <li><a href="contact.html" class="nav-link active" data-th="ติดต่อ" data-en="Contact">ติดต่อ</a></li>
+                    </ul>
+                </div>
+                <div class="nav-actions">
+                    <div class="language-switcher">
+                        <button class="lang-btn active" data-lang="th">TH</button>
+                        <span class="lang-divider">|</span>
+                        <button class="lang-btn" data-lang="en">EN</button>
+                    </div>
+                    <button class="mobile-toggle" id="mobileToggle"><span class="hamburger"></span></button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="page-header">
+        <div class="container">
+            <h1 data-th="ติดต่อเรา" data-en="Contact Us">ติดต่อเรา</h1>
+            <p data-th="พร้อมช่วยเหลือคุณ" data-en="Ready to help you">พร้อมช่วยเหลือคุณ</p>
+        </div>
+    </section>
+
+    <section class="contact" style="padding-top: 80px;">
+        <div class="container">
+            <div class="contact-wrapper">
+                <div class="contact-info">
+                    <div class="info-card">
+                        <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
+                        <div class="info-content">
+                            <h3 data-th="โทรศัพท์" data-en="Phone">โทรศัพท์</h3>
+                            <p>+66 XX XXX XXXX</p>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                        <div class="info-content">
+                            <h3 data-th="อีเมล" data-en="Email">อีเมล</h3>
+                            <p>contact@djohparichat.site</p>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="info-content">
+                            <h3 data-th="ที่อยู่" data-en="Address">ที่อยู่</h3>
+                            <p data-th="กรุงเทพมหานคร, ประเทศไทย" data-en="Bangkok, Thailand">กรุงเทพมหานคร, ประเทศไทย</p>
+                        </div>
+                    </div>
+                    <div class="social-links">
+                        <h3 data-th="ติดตามเรา" data-en="Follow Us">ติดตามเรา</h3>
+                        <div class="social-icons">
+                            <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-icon"><i class="fab fa-line"></i></a>
+                            <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                            <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-form-wrapper">
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-group">
+                            <label for="name" data-th="ชื่อ-นามสกุล" data-en="Full Name">ชื่อ-นามสกุล</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" data-th="อีเมล" data-en="Email">อีเมล</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone" data-th="เบอร์โทรศัพท์" data-en="Phone Number">เบอร์โทรศัพท์</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="subject" data-th="หัวข้อ" data-en="Subject">หัวข้อ</label>
+                            <select id="subject" name="subject" required>
+                                <option value="" data-th="เลือกหัวข้อ" data-en="Select subject">เลือกหัวข้อ</option>
+                                <option value="ai" data-th="สนใจคอร์ส AI" data-en="Interested in AI course">สนใจคอร์ส AI</option>
+                                <option value="insurance" data-th="สนใจประกันชีวิต" data-en="Interested in life insurance">สนใจประกันชีวิต</option>
+                                <option value="other" data-th="อื่นๆ" data-en="Other">อื่นๆ</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="message" data-th="ข้อความ" data-en="Message">ข้อความ</label>
+                            <textarea id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full">
+                            <span data-th="ส่งข้อความ" data-en="Send Message">ส่งข้อความ</span>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 Djohparichat. <span data-th="สงวนลิขสิทธิ์ทุกประการ" data-en="All rights reserved">สงวนลิขสิทธิ์ทุกประการ</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="admin-link">
+        <a href="../admin/login.html" title="Admin Panel"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <script src="../assets/js/language.js"></script>
+    <script src="../assets/js/animations.js"></script>
+    <script src="../assets/js/main.js"></script>
+
+    <!-- Content Modal -->
+<div id="contentModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">เพิ่มเนื้อหาใหม่</h3>
+            <button class="modal-close" onclick="closeContentModal()">&times;</button>
+        </div>
+        <form class="admin-form" id="contentForm">
+            <input type="hidden" name="id" id="contentId">
+            
+            <div class="admin-form-group">
+                <label>หัวข้อ (ไทย)</label>
+                <input type="text" name="title_th" required>
+            </div>
+            
+            <div class="admin-form-group">
+                <label>หัวข้อ (อังกฤษ)</label>
+                <input type="text" name="title_en">
+            </div>
+            
+            <div class="admin-form-group">
+                <label>หมวดหมู่</label>
+                <select name="category" required>
+                    <option value="ai">AI & เทคโนโลยี</option>
+                    <option value="insurance">ประกัน</option>
+                    <option value="training">การอบรม</option>
+                    <option value="portfolio">ผลงาน</option>
+                </select>
+            </div>
+            
+            <div class="admin-form-group">
+                <label>เนื้อหา (ไทย)</label>
+                <textarea name="content_th" rows="4"></textarea>
+            </div>
+            
+            <div class="admin-form-group">
+                <label>เผยแพร่</label>
+                <label style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" name="published" value="true">
+                    <span>เผยแพร่ทันที</span>
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">บันทึก</button>
+        </form>
+    </div>
+</div>
+
+<style>
+.modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+.modal-content {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+}
+</style>
+
+<script>
+// ปิด Modal
+function closeContentModal() {
+    document.getElementById('contentModal').style.display = 'none';
+}
+
+// เปิด Modal เมื่อคลิกปุ่มเพิ่ม
+document.getElementById('addContentBtn')?.addEventListener('click', () => {
+    document.getElementById('contentModal').style.display = 'flex';
+    document.getElementById('contentForm').reset();
+    document.getElementById('contentId').value = '';
+    document.getElementById('modalTitle').textContent = 'เพิ่มเนื้อหาใหม่';
+});
+</script>
+</body>
+</html>

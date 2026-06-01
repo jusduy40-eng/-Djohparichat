@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ | Admin - Djohparichat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+    <section class="login-page">
+        <div class="login-card">
+            <div class="login-header">
+                <a href="../index.html" class="logo">
+                    <span class="logo-icon"><i class="fas fa-graduation-cap"></i></span>
+                    <span class="logo-text">Djohparichat</span>
+                </a>
+                <h2 data-th="เข้าสู่ระบบ" data-en="Login">เข้าสู่ระบบ</h2>
+                <p data-th="เข้าสู่ระบบจัดการเว็บไซต์" data-en="Access website management">เข้าสู่ระบบจัดการเว็บไซต์</p>
+            </div>
+            <form id="loginForm" class="admin-form">
+                <div class="admin-form-group">
+                    <label for="email" data-th="อีเมล" data-en="Email">อีเมล</label>
+                    <input type="email" id="email" name="email" required placeholder="admin@djohparichat.site">
+                </div>
+                <div class="admin-form-group">
+                    <label for="password" data-th="รหัสผ่าน" data-en="Password">รหัสผ่าน</label>
+                    <input type="password" id="password" name="password" required placeholder="••••••••">
+                </div>
+                <div class="admin-form-group">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" name="remember">
+                        <span data-th="จดจำฉัน" data-en="Remember me">จดจำฉัน</span>
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">
+                    <span data-th="เข้าสู่ระบบ" data-en="Login">เข้าสู่ระบบ</span>
+                    <i class="fas fa-sign-in-alt"></i>
+                </button>
+            </form>
+            <p style="text-align: center; margin-top: 20px;">
+                <a href="../index.html" style="color: var(--primary-blue);">
+                    <i class="fas fa-arrow-left"></i>
+                    <span data-th="กลับหน้าหลัก" data-en="Back to Home">กลับหน้าหลัก</span>
+                </a>
+            </p>
+        </div>
+    </section>
+
+    <script src="../assets/js/admin.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>
