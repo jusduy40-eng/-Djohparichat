@@ -29,7 +29,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        /* Auth Modal Styles */
+        /* ========== AUTH & USER MENU (คงเดิม) ========== */
         .auth-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center;
@@ -88,7 +88,6 @@
         .auth-form-view { display: none; }
         .auth-form-view.active { display: block; }
         
-        /* User Menu */
         .user-menu { position: relative; display: flex; align-items: center; gap: 12px; }
         .user-auth-buttons { display: flex; gap: 8px; }
         .user-auth-buttons .btn { padding: 8px 16px; font-size: 0.9rem; }
@@ -116,7 +115,6 @@
         .user-dropdown .logout { color: var(--error); }
         .user-dropdown .logout i { color: var(--error); }
         
-        /* Footer Social Links */
         .social-links-footer {
             display: flex; gap: 12px; margin-top: 16px; justify-content: center;
         }
@@ -147,7 +145,6 @@
             gap: 12px;
         }
         
-        /* Chat Toggle Button */
         .chat-toggle {
             width: 60px;
             height: 60px;
@@ -194,7 +191,6 @@
             50% { transform: scale(1.2); }
         }
         
-        /* Chat Window */
         .chat-window {
             width: 380px;
             max-width: calc(100vw - 48px);
@@ -217,7 +213,6 @@
             transform: translateY(0) scale(1);
         }
         
-        /* Chat Header */
         .chat-header {
             padding: 16px 20px;
             background: var(--gradient-primary);
@@ -284,7 +279,6 @@
         }
         .chat-header-btn:hover { background: rgba(255,255,255,0.3); }
         
-        /* Chat Messages */
         .chat-messages {
             flex: 1;
             overflow-y: auto;
@@ -346,7 +340,6 @@
             color: rgba(255,255,255,0.8);
         }
         
-        /* Chat Input */
         .chat-input {
             padding: 12px 20px;
             background: var(--white);
@@ -396,7 +389,6 @@
             cursor: not-allowed;
         }
         
-        /* Empty State */
         .chat-empty {
             text-align: center;
             padding: 40px 20px;
@@ -406,6 +398,21 @@
             font-size: 3rem;
             margin-bottom: 16px;
             opacity: 0.5;
+        }
+        
+        /* Chat Reset Notification */
+        .chat-reset-notice {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            text-align: center;
+            margin: 8px 0;
+            font-size: 0.9rem;
+            animation: slideIn 0.3s ease;
+        }
+        .chat-reset-notice i {
+            margin-right: 8px;
         }
         
         /* Typing Indicator */
@@ -434,6 +441,29 @@
         @keyframes typing {
             0%, 60%, 100% { transform: translateY(0); }
             30% { transform: translateY(-8px); }
+        }
+        
+        /* New Chat Button */
+        .new-chat-btn {
+            display: none;
+            width: 100%;
+            padding: 12px;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            margin: 16px 20px;
+        }
+        .new-chat-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .new-chat-btn.active {
+            display: block;
         }
         
         /* Mobile Responsive */
@@ -841,6 +871,11 @@
                 </div>
             </div>
             
+            <!-- New Chat Button (แสดงเมื่อแชทถูกล้าง) -->
+            <button class="new-chat-btn" id="newChatBtn">
+                <i class="fas fa-plus"></i> เริ่มแชทใหม่
+            </button>
+            
             <!-- Chat Input -->
             <div class="chat-input">
                 <textarea id="chatInput" placeholder="พิมพ์ข้อความ..." rows="1"></textarea>
@@ -882,11 +917,13 @@
             const chatSend = document.getElementById('chatSend');
             const chatBadge = document.getElementById('chatBadge');
             const typingIndicator = document.getElementById('typingIndicator');
+            const newChatBtn = document.getElementById('newChatBtn');
             
             let currentUser = null;
             let isAdmin = false;
             let unreadCount = 0;
             let realtimeSubscription = null;
+            let chatResetNotified = false;
 
             // ========================================
             // AUTH FUNCTIONS
@@ -1044,6 +1081,19 @@
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
             
+            function showResetNotice() {
+                const notice = document.createElement('div');
+                notice.className = 'chat-reset-notice';
+                notice.innerHTML = `<i class="fas fa-rotate"></i> แอดมินได้รีเซ็ตแชทนี้แล้ว - เริ่มสนทนาใหม่ได้เลย`;
+                chatMessages.appendChild(notice);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Show new chat button
+                newChatBtn.classList.add('active');
+                chatInput.disabled = true;
+                chatSend.disabled = true;
+            }
+            
             function escapeHtml(text) {
                 const div = document.createElement('div');
                 div.textContent = text;
@@ -1073,6 +1123,11 @@
                     chatInput.value = '';
                     chatInput.style.height = 'auto';
                     
+                    // Hide reset notice and enable input if shown
+                    newChatBtn.classList.remove('active');
+                    chatInput.disabled = false;
+                    chatSend.disabled = false;
+                    
                 } catch (error) {
                     console.error('Send error:', error);
                     alert('ส่งข้อความไม่สำเร็จ กรุณาลองใหม่');
@@ -1088,20 +1143,39 @@
                     const { data, error } = await supabase
                         .from('support_tickets')
                         .select('*')
-                        .or(`user_id.eq.${currentUser.id},is_admin.eq.true`)
+                        .eq('user_id', currentUser.id)
                         .order('created_at', { ascending: true })
                         .limit(50);
                     
                     if (error) throw error;
                     
                     chatMessages.innerHTML = '';
+                    
                     if (!data || data.length === 0) {
                         chatEmpty.style.display = 'block';
+                        newChatBtn.classList.remove('active');
+                        chatInput.disabled = false;
+                        chatSend.disabled = false;
                         return;
                     }
                     
                     chatEmpty.style.display = 'none';
-                    data.forEach(msg => appendMessage(msg, !msg.is_admin));
+                    
+                    // Check if chat was reset (admin deleted all messages)
+                    const hasMessages = data.some(msg => !msg.is_admin || msg.deleted !== true);
+                    if (!hasMessages) {
+                        showResetNotice();
+                        return;
+                    }
+                    
+                    data.forEach(msg => {
+                        if (msg.deleted !== true) {
+                            appendMessage(msg, !msg.is_admin);
+                        }
+                    });
+                    
+                    // Scroll to bottom
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
                     
                 } catch (error) {
                     console.error('Load error:', error);
@@ -1114,26 +1188,42 @@
                 }
                 
                 realtimeSubscription = supabase
-                    .channel('support_tickets')
+                    .channel(`chat_${currentUser?.id}`)
                     .on('postgres_changes', {
-                        event: 'INSERT',
+                        event: '*',
                         schema: 'public',
-                        table: 'support_tickets'
+                        table: 'support_tickets',
+                        filter: `user_id=eq.${currentUser?.id}`
                     }, (payload) => {
-                        const newMsg = payload.new;
+                        const change = payload.new || payload.old;
                         
-                        // Show typing indicator briefly for admin messages
-                        if (newMsg.is_admin) {
-                            typingIndicator.classList.add('active');
-                            setTimeout(() => typingIndicator.classList.remove('active'), 1000);
+                        if (!change || change.user_id !== currentUser?.id) return;
+                        
+                        // Handle DELETE event (admin deleted chat)
+                        if (payload.eventType === 'DELETE') {
+                            showResetNotice();
+                            return;
                         }
                         
-                        // Append message if relevant
-                        if (currentUser && (newMsg.user_id === currentUser.id || newMsg.is_admin)) {
-                            appendMessage(newMsg, !newMsg.is_admin);
+                        // Handle UPDATE event (admin marked as deleted)
+                        if (payload.eventType === 'UPDATE' && change.deleted === true) {
+                            showResetNotice();
+                            return;
+                        }
+                        
+                        // Handle INSERT event (new message)
+                        if (payload.eventType === 'INSERT' && change.deleted !== true) {
+                            // Show typing indicator briefly for admin messages
+                            if (change.is_admin) {
+                                typingIndicator.classList.add('active');
+                                setTimeout(() => typingIndicator.classList.remove('active'), 1000);
+                            }
+                            
+                            // Append message
+                            appendMessage(change, !change.is_admin);
                             
                             // Update badge if chat is closed
-                            if (!chatWindow.classList.contains('active') && !newMsg.is_admin) {
+                            if (!chatWindow.classList.contains('active') && !change.is_admin) {
                                 unreadCount++;
                                 chatBadge.textContent = unreadCount;
                                 chatBadge.style.display = 'flex';
@@ -1163,7 +1253,29 @@
                 }
             }
             
-            // Chat Event Listeners
+            // ========================================
+            // NEW CHAT BUTTON
+            // ========================================
+            
+            newChatBtn.addEventListener('click', () => {
+                // Clear chat display
+                chatMessages.innerHTML = '';
+                chatEmpty.style.display = 'block';
+                
+                // Hide reset notice and enable input
+                newChatBtn.classList.remove('active');
+                chatInput.disabled = false;
+                chatSend.disabled = false;
+                chatInput.focus();
+                
+                // Optional: Send a system message to admin that user started new chat
+                // (Can be implemented if needed)
+            });
+            
+            // ========================================
+            // CHAT EVENT LISTENERS
+            // ========================================
+            
             chatToggle.addEventListener('click', toggleChat);
             chatClose.addEventListener('click', () => chatWindow.classList.remove('active'));
             chatMinimize.addEventListener('click', () => chatWindow.classList.remove('active'));
