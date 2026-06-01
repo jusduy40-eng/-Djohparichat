@@ -4,47 +4,265 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการเนื้อหา | Admin - Djohparichat</title>
+    
+    <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            box-shadow: var(--shadow-xl);
+        }
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--gray-100);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-600);
+            transition: var(--transition-fast);
+            z-index: 10;
+        }
+        .modal-close:hover {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: var(--gray-900);
+        }
+        .modal-body {
+            padding: 24px;
+        }
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        /* Form Styles */
+        .admin-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-weight: 500;
+            color: var(--gray-700);
+            font-size: 0.9rem;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            transition: var(--transition-fast);
+            outline: none;
+            font-family: inherit;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+        }
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 640px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status-badge.published {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status-badge.draft {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-500);
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+    </style>
 </head>
 <body class="admin-body">
-    <aside class="admin-sidebar">
-        <div class="admin-logo"><h2>Djohparichat</h2></div>
+    
+    <!-- Loading Overlay -->
+    <div id="adminLoader" class="admin-loader">
+        <div class="loader-spinner"></div>
+        <p>กำลังโหลดข้อมูล...</p>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="admin-logo">
+            <a href="../index.html">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Djohparichat</span>
+            </a>
+        </div>
         <nav class="admin-nav">
             <ul>
-                <li><a href="index.html"><i class="fas fa-dashboard"></i> <span data-th="แดชบอร์ด" data-en="Dashboard">แดชบอร์ด</span></a></li>
-                <li><a href="contents.html" class="active"><i class="fas fa-file-alt"></i> <span data-th="จัดการเนื้อหา" data-en="Contents">จัดการเนื้อหา</span></a></li>
-                <li><a href="portfolio.html"><i class="fas fa-briefcase"></i> <span data-th="จัดการผลงาน" data-en="Portfolio">จัดการผลงาน</span></a></li>
-                <li><a href="messages.html"><i class="fas fa-envelope"></i> <span data-th="ข้อความติดต่อ" data-en="Messages">ข้อความติดต่อ</span></a></li>
-                <li><a href="settings.html"><i class="fas fa-cog"></i> <span data-th="การตั้งค่า" data-en="Settings">การตั้งค่า</span></a></li>
-                <li><a href="../index.html" target="_blank"><i class="fas fa-external-link-alt"></i> <span data-th="เปิดเว็บไซต์" data-en="View Website">เปิดเว็บไซต์</span></a></li>
-                <li><a href="login.html" class="logout"><i class="fas fa-sign-out-alt"></i> <span data-th="ออกจากระบบ" data-en="Logout">ออกจากระบบ</span></a></li>
+                <li><a href="index.html" data-page="dashboard">
+                    <i class="fas fa-dashboard"></i> <span data-th="แดชบอร์ด" data-en="Dashboard">แดชบอร์ด</span>
+                </a></li>
+                <li><a href="contents.html" class="active" data-page="contents">
+                    <i class="fas fa-file-alt"></i> <span data-th="จัดการเนื้อหา" data-en="Contents">จัดการเนื้อหา</span>
+                </a></li>
+                <li><a href="courses.html" data-page="courses">
+                    <i class="fas fa-brain"></i> <span data-th="จัดการคอร์ส" data-en="Courses">จัดการคอร์ส</span>
+                </a></li>
+                <li><a href="enrollments.html" data-page="enrollments">
+                    <i class="fas fa-users"></i> <span data-th="ผู้สมัครเรียน" data-en="Enrollments">ผู้สมัครเรียน</span>
+                </a></li>
+                <li><a href="messages.html" data-page="messages">
+                    <i class="fas fa-envelope"></i> <span data-th="ข้อความติดต่อ" data-en="Messages">ข้อความติดต่อ</span>
+                </a></li>
+                <li><a href="settings.html" data-page="settings">
+                    <i class="fas fa-cog"></i> <span data-th="การตั้งค่า" data-en="Settings">การตั้งค่า</span>
+                </a></li>
+                <li><a href="../index.html" target="_blank">
+                    <i class="fas fa-external-link-alt"></i> <span data-th="เปิดเว็บไซต์" data-en="View Website">เปิดเว็บไซต์</span>
+                </a></li>
+                <li><a href="#" id="logoutBtn" class="logout">
+                    <i class="fas fa-sign-out-alt"></i> <span data-th="ออกจากระบบ" data-en="Logout">ออกจากระบบ</span>
+                </a></li>
             </ul>
         </nav>
     </aside>
 
+    <!-- Main Content -->
     <main class="admin-main">
+        <!-- Header -->
         <header class="admin-header">
-            <h1 data-th="จัดการเนื้อหา" data-en="Manage Contents">จัดการเนื้อหา</h1>
+            <div class="header-left">
+                <button class="admin-mobile-toggle" id="mobileToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 data-th="จัดการเนื้อหา" data-en="Manage Contents">จัดการเนื้อหา</h1>
+            </div>
             <div class="admin-user">
-                <span data-th="ผู้ดูแลระบบ" data-en="Admin">ผู้ดูแลระบบ</span>
-                <div style="width: 40px; height: 40px; background: var(--primary-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;"><i class="fas fa-user"></i></div>
+                <span id="adminEmail">admin@djohparichat.site</span>
+                <div class="admin-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
             </div>
         </header>
 
-        <div class="admin-content">
+        <!-- Content Management -->
+        <div class="admin-content" id="contentsContent">
+            
             <div class="admin-section">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 style="margin: 0; border: none; padding: 0;" data-th="เนื้อหาทั้งหมด" data-en="All Contents">เนื้อหาทั้งหมด</h2>
+                <div class="section-header">
+                    <h2 data-th="เนื้อหาทั้งหมด" data-en="All Contents">เนื้อหาทั้งหมด</h2>
                     <button class="btn btn-primary" id="addContentBtn">
                         <i class="fas fa-plus"></i>
                         <span data-th="เพิ่มเนื้อหา" data-en="Add Content">เพิ่มเนื้อหา</span>
                     </button>
                 </div>
 
+                <!-- Filter -->
+                <div style="margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
+                    <select id="filterType" class="form-control" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--gray-300);">
+                        <option value="all" data-th="ทั้งหมด" data-en="All">ทั้งหมด</option>
+                        <option value="course" data-th="คอร์สเรียน" data-en="Course">คอร์สเรียน</option>
+                        <option value="training" data-th="การอบรม" data-en="Training">การอบรม</option>
+                        <option value="article" data-th="บทความ" data-en="Article">บทความ</option>
+                    </select>
+                    <select id="filterStatus" class="form-control" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--gray-300);">
+                        <option value="all" data-th="ทุกสถานะ" data-en="All Status">ทุกสถานะ</option>
+                        <option value="published" data-th="เผยแพร่" data-en="Published">เผยแพร่</option>
+                        <option value="draft" data-th="ร่าง" data-en="Draft">ร่าง</option>
+                    </select>
+                </div>
+
+                <!-- Table -->
                 <div class="table-container">
                     <table class="admin-table">
                         <thead>
@@ -56,35 +274,491 @@
                                 <th data-th="การจัดการ" data-en="Actions">การจัดการ</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="contentsTableBody">
                             <tr>
-                                <td data-th="คอร์ส AI สำหรับผู้เริ่มต้น" data-en="AI Course for Beginners">คอร์ส AI สำหรับผู้เริ่มต้น</td>
-                                <td data-th="คอร์สเรียน" data-en="Course">คอร์สเรียน</td>
-                                <td>1 มิ.ย. 2026</td>
-                                <td><span class="status published" data-th="เผยแพร่" data-en="Published">เผยแพร่</span></td>
-                                <td>
-                                    <button class="btn-icon edit"><i class="fas fa-edit"></i></button>
-                                    <button class="btn-icon delete"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-th="อบรม ChatGPT สำหรับธุรกิจ" data-en="ChatGPT for Business">อบรม ChatGPT สำหรับธุรกิจ</td>
-                                <td data-th="การอบรม" data-en="Training">การอบรม</td>
-                                <td>28 พ.ค. 2026</td>
-                                <td><span class="status draft" data-th="ร่าง" data-en="Draft">ร่าง</span></td>
-                                <td>
-                                    <button class="btn-icon edit"><i class="fas fa-edit"></i></button>
-                                    <button class="btn-icon delete"><i class="fas fa-trash"></i></button>
+                                <td colspan="5" class="text-center">
+                                    <i class="fas fa-spinner fa-spin"></i> <span data-th="กำลังโหลด..." data-en="Loading...">กำลังโหลด...</span>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Empty State (ซ่อนไว้ก่อน) -->
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fas fa-file-alt"></i>
+                    <p data-th="ยังไม่มีเนื้อหา" data-en="No contents yet">ยังไม่มีเนื้อหา</p>
+                    <button class="btn btn-primary" id="addFirstContentBtn">
+                        <i class="fas fa-plus"></i>
+                        <span data-th="เพิ่มเนื้อหาแรก" data-en="Add First Content">เพิ่มเนื้อหาแรก</span>
+                    </button>
+                </div>
             </div>
         </div>
     </main>
 
-    <button class="admin-mobile-toggle"><i class="fas fa-bars"></i></button>
-    <script src="../assets/js/admin.js"></script>
+    <!-- Content Modal -->
+    <div id="contentModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="modal-header">
+                <h3 id="modalTitle">เพิ่มเนื้อหาใหม่</h3>
+            </div>
+            
+            <div class="modal-body">
+                <form id="contentForm" class="admin-form">
+                    <input type="hidden" id="contentId">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="titleTh">หัวข้อ (ไทย) *</label>
+                            <input type="text" id="titleTh" name="title_th" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="titleEn">หัวข้อ (อังกฤษ)</label>
+                            <input type="text" id="titleEn" name="title_en">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contentType">ประเภท *</label>
+                            <select id="contentType" name="type" required>
+                                <option value="course" data-th="คอร์สเรียน" data-en="Course">คอร์สเรียน</option>
+                                <option value="training" data-th="การอบรม" data-en="Training">การอบรม</option>
+                                <option value="article" data-th="บทความ" data-en="Article">บทความ</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="contentStatus">สถานะ *</label>
+                            <select id="contentStatus" name="status" required>
+                                <option value="published" data-th="เผยแพร่" data-en="Published">เผยแพร่</option>
+                                <option value="draft" data-th="ร่าง" data-en="Draft">ร่าง</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="descriptionTh">คำอธิบาย (ไทย)</label>
+                        <textarea id="descriptionTh" name="description_th" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="descriptionEn">คำอธิบาย (อังกฤษ)</label>
+                        <textarea id="descriptionEn" name="description_en" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contentUrl">ลิงก์เนื้อหา (ถ้ามี)</label>
+                        <input type="url" id="contentUrl" name="url" placeholder="https://...">
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="modalCancel" data-th="ยกเลิก" data-en="Cancel">ยกเลิก</button>
+                <button class="btn btn-primary" id="modalSave">
+                    <i class="fas fa-save"></i>
+                    <span data-th="บันทึก" data-en="Save">บันทึก</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <!-- Scripts -->
+    <script type="module">
+        // Import config
+        import { config } from '../lib/config.js';
+        
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(
+            config.supabaseUrl,
+            config.supabaseAnonKey
+        );
+
+        // ========================================
+        // 🔐 ADMIN PERMISSION CHECK
+        // ========================================
+        
+        async function checkAdminPermission() {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!session) {
+                alert('กรุณาเข้าสู่ระบบเพื่อเข้าถึงหน้านี้');
+                window.location.href = '../pages/auth.html';
+                return false;
+            }
+            
+            const userEmail = session.user.email;
+            const adminEmails = Array.isArray(config.adminEmail) 
+                ? config.adminEmail 
+                : [config.adminEmail].filter(e => e);
+            
+            const isAdmin = adminEmails.length > 0 
+                ? adminEmails.includes(userEmail)
+                : true;
+            
+            if (!isAdmin) {
+                alert('⛔ คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (เฉพาะผู้ดูแลระบบเท่านั้น)');
+                window.location.href = '../index.html';
+                return false;
+            }
+            
+            document.getElementById('adminEmail').textContent = userEmail;
+            return true;
+        }
+
+        // ========================================
+        // LOAD CONTENTS
+        // ========================================
+        
+        async function loadContents() {
+            const tbody = document.getElementById('contentsTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const tableContainer = document.querySelector('.table-container');
+            
+            try {
+                let query = supabase.from('contents').select('*').order('created_at', { ascending: false });
+                
+                // Apply filters
+                const filterType = document.getElementById('filterType').value;
+                const filterStatus = document.getElementById('filterStatus').value;
+                
+                if (filterType !== 'all') {
+                    query = query.eq('type', filterType);
+                }
+                if (filterStatus !== 'all') {
+                    query = query.eq('status', filterStatus);
+                }
+                
+                const { data, error } = await query;
+                
+                if (error) throw error;
+                
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '';
+                    tableContainer.style.display = 'none';
+                    emptyState.style.display = 'block';
+                    return;
+                }
+                
+                tableContainer.style.display = 'block';
+                emptyState.style.display = 'none';
+                
+                const isTH = document.documentElement.lang === 'th';
+                
+                tbody.innerHTML = data.map(content => {
+                    const typeLabel = {
+                        'course': isTH ? 'คอร์สเรียน' : 'Course',
+                        'training': isTH ? 'การอบรม' : 'Training',
+                        'article': isTH ? 'บทความ' : 'Article'
+                    }[content.type] || content.type;
+                    
+                    const statusClass = content.status === 'published' ? 'published' : 'draft';
+                    const statusLabel = content.status === 'published'
+                        ? (isTH ? 'เผยแพร่' : 'Published')
+                        : (isTH ? 'ร่าง' : 'Draft');
+                    
+                    const title = isTH ? content.title_th : content.title_en || content.title_th;
+                    
+                    return `
+                        <tr data-id="${content.id}">
+                            <td>
+                                <strong>${title}</strong>
+                                ${content.description_th ? `<br><small class="text-muted">${content.description_th.substring(0, 50)}...</small>` : ''}
+                            </td>
+                            <td><span class="badge badge-blue">${typeLabel}</span></td>
+                            <td>${formatDate(content.created_at)}</td>
+                            <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+                            <td>
+                                <button class="btn-icon edit" onclick="editContent('${content.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon delete" onclick="deleteContent('${content.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading contents:', error);
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-error">โหลดข้อมูลไม่สำเร็จ</td></tr>`;
+                showNotification('error', 'ไม่สามารถโหลดข้อมูลได้');
+            }
+        }
+
+        // ========================================
+        // MODAL FUNCTIONS
+        // ========================================
+        
+        function openModal(mode = 'add', content = null) {
+            const modal = document.getElementById('contentModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const form = document.getElementById('contentForm');
+            
+            if (mode === 'add') {
+                modalTitle.textContent = 'เพิ่มเนื้อหาใหม่';
+                form.reset();
+                document.getElementById('contentId').value = '';
+            } else if (mode === 'edit' && content) {
+                modalTitle.textContent = 'แก้ไขเนื้อหา';
+                document.getElementById('contentId').value = content.id;
+                document.getElementById('titleTh').value = content.title_th || '';
+                document.getElementById('titleEn').value = content.title_en || '';
+                document.getElementById('contentType').value = content.type || 'course';
+                document.getElementById('contentStatus').value = content.status || 'draft';
+                document.getElementById('descriptionTh').value = content.description_th || '';
+                document.getElementById('descriptionEn').value = content.description_en || '';
+                document.getElementById('contentUrl').value = content.url || '';
+            }
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeModal() {
+            document.getElementById('contentModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // ========================================
+        // SAVE CONTENT
+        // ========================================
+        
+        async function saveContent(e) {
+            e.preventDefault();
+            
+            const contentId = document.getElementById('contentId').value;
+            const contentData = {
+                title_th: document.getElementById('titleTh').value,
+                title_en: document.getElementById('titleEn').value,
+                type: document.getElementById('contentType').value,
+                status: document.getElementById('contentStatus').value,
+                description_th: document.getElementById('descriptionTh').value,
+                description_en: document.getElementById('descriptionEn').value,
+                url: document.getElementById('contentUrl').value,
+                updated_at: new Date().toISOString()
+            };
+            
+            const saveBtn = document.getElementById('modalSave');
+            const originalBtnText = saveBtn.innerHTML;
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
+            
+            try {
+                if (contentId) {
+                    // Update existing
+                    const { error } = await supabase
+                        .from('contents')
+                        .update(contentData)
+                        .eq('id', contentId);
+                    
+                    if (error) throw error;
+                    showNotification('success', 'อัปเดตเนื้อหาสำเร็จ');
+                } else {
+                    // Insert new
+                    contentData.created_at = new Date().toISOString();
+                    const { error } = await supabase
+                        .from('contents')
+                        .insert([contentData]);
+                    
+                    if (error) throw error;
+                    showNotification('success', 'เพิ่มเนื้อหาสำเร็จ');
+                }
+                
+                closeModal();
+                loadContents();
+                
+            } catch (error) {
+                console.error('Save error:', error);
+                showNotification('error', 'บันทึกไม่สำเร็จ: ' + error.message);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = originalBtnText;
+            }
+        }
+
+        // ========================================
+        // DELETE CONTENT
+        // ========================================
+        
+        async function deleteContent(contentId) {
+            if (!confirm('คุณแน่ใจหรือไม่ที่จะลบเนื้อหานี้?')) return;
+            
+            try {
+                const { error } = await supabase
+                    .from('contents')
+                    .delete()
+                    .eq('id', contentId);
+                
+                if (error) throw error;
+                
+                showNotification('success', 'ลบเนื้อหาสำเร็จ');
+                loadContents();
+                
+            } catch (error) {
+                console.error('Delete error:', error);
+                showNotification('error', 'ลบเนื้อหาไม่สำเร็จ');
+            }
+        }
+
+        // ========================================
+        // UTILITY FUNCTIONS
+        // ========================================
+        
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            return new Date(dateString).toLocaleString('th-TH', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function showNotification(type, message) {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = `admin-notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+
+        // ========================================
+        // SIDEBAR & MOBILE
+        // ========================================
+        
+        function initSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            const mobileToggle = document.getElementById('mobileToggle');
+            
+            mobileToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768 && 
+                    sidebar.classList.contains('open') && 
+                    !sidebar.contains(e.target) && 
+                    !mobileToggle.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        }
+
+        // ========================================
+        // LOGOUT
+        // ========================================
+        
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
+                await supabase.auth.signOut();
+                window.location.href = '../index.html';
+            }
+        });
+
+        // ========================================
+        // LANGUAGE SWITCHER
+        // ========================================
+        
+        function initLanguage() {
+            const savedLang = localStorage.getItem('admin_language') || 'th';
+            setAdminLanguage(savedLang);
+        }
+        
+        function setAdminLanguage(lang) {
+            document.documentElement.lang = lang;
+            localStorage.setItem('admin_language', lang);
+            
+            document.querySelectorAll('[data-th][data-en]').forEach(el => {
+                const text = el.getAttribute(`data-${lang}`);
+                if (text) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
+                        el.placeholder = text;
+                    } else {
+                        el.textContent = text;
+                    }
+                }
+            });
+        }
+
+        // ========================================
+        // FILTER EVENTS
+        // ========================================
+        
+        document.getElementById('filterType')?.addEventListener('change', loadContents);
+        document.getElementById('filterStatus')?.addEventListener('change', loadContents);
+
+        // ========================================
+        // INIT
+        // ========================================
+        
+        async function init() {
+            // 🔐 Check admin permission first
+            const isAdmin = await checkAdminPermission();
+            if (!isAdmin) return;
+            
+            // Initialize
+            initLanguage();
+            initSidebar();
+            
+            // Load contents
+            await loadContents();
+            
+            // Hide loader
+            document.getElementById('adminLoader').style.display = 'none';
+            
+            // Event listeners
+            document.getElementById('addContentBtn')?.addEventListener('click', () => openModal('add'));
+            document.getElementById('addFirstContentBtn')?.addEventListener('click', () => openModal('add'));
+            document.getElementById('modalClose')?.addEventListener('click', closeModal);
+            document.getElementById('modalCancel')?.addEventListener('click', closeModal);
+            document.getElementById('contentForm')?.addEventListener('submit', saveContent);
+            
+            // Close modal on outside click
+            document.getElementById('contentModal')?.addEventListener('click', (e) => {
+                if (e.target.id === 'contentModal') closeModal();
+            });
+        }
+
+        // Make functions global for onclick handlers
+        window.editContent = function(contentId) {
+            // Fetch content details and open modal
+            supabase.from('contents').select('*').eq('id', contentId).single()
+                .then(({ data, error }) => {
+                    if (error) throw error;
+                    openModal('edit', data);
+                })
+                .catch(err => {
+                    console.error('Fetch content error:', err);
+                    showNotification('error', 'ไม่สามารถโหลดข้อมูลเนื้อหาได้');
+                });
+        };
+        
+        window.deleteContent = deleteContent;
+
+        // Run init
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
 </body>
 </html>
