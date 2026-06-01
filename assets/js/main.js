@@ -362,3 +362,20 @@ document.addEventListener('DOMContentLoaded', function() {
     RewriteRule ^([^\.]+)$ $1.html [NC,L]
     */
 });
+// Hide .html from URLs
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('a[href]').forEach(link => {
+        const href = link.getAttribute('href');
+        
+        if (href.endsWith('.html') && !href.startsWith('http')) {
+            const cleanHref = href.replace('.html', '');
+            link.setAttribute('data-real-href', href);
+            link.setAttribute('href', cleanHref);
+            
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = this.getAttribute('data-real-href');
+            });
+        }
+    });
+});
