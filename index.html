@@ -134,6 +134,331 @@
         .social-link.tiktok:hover { background: #333; }
         .social-link.facebook { background: #1877f2; color: white; }
         .social-link.facebook:hover { background: #145dbf; }
+
+        /* ========== CHAT WIDGET STYLES ========== */
+        .chat-widget {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+        }
+        
+        /* Chat Toggle Button */
+        .chat-toggle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition-normal);
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+        .chat-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-xl);
+        }
+        .chat-toggle .badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            background: var(--error);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: bounce 0.5s ease;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(30, 136, 229, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(30, 136, 229, 0); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        /* Chat Window */
+        .chat-window {
+            width: 380px;
+            max-width: calc(100vw - 48px);
+            height: 520px;
+            max-height: calc(100vh - 120px);
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.3s ease;
+        }
+        .chat-window.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        
+        /* Chat Header */
+        .chat-header {
+            padding: 16px 20px;
+            background: var(--gradient-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        .chat-header-info h4 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .chat-header-info .status {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .chat-header-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-fast);
+        }
+        .chat-header-btn:hover { background: rgba(255,255,255,0.3); }
+        
+        /* Chat Messages */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: var(--gray-50);
+        }
+        .chat-message {
+            display: flex;
+            gap: 10px;
+            max-width: 85%;
+            animation: slideIn 0.2s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chat-message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        .chat-message .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .chat-message.user .avatar {
+            background: var(--gradient-primary);
+        }
+        .chat-bubble {
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            background: var(--white);
+            box-shadow: var(--shadow-sm);
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        .chat-message.user .chat-bubble {
+            background: var(--primary-blue);
+            color: white;
+        }
+        .chat-time {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 4px;
+            display: block;
+        }
+        .chat-message.user .chat-time {
+            text-align: right;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        /* Chat Input */
+        .chat-input {
+            padding: 12px 20px;
+            background: var(--white);
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        .chat-input textarea {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+            font-family: inherit;
+            transition: var(--transition-fast);
+        }
+        .chat-input textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+        }
+        .chat-send {
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: var(--transition-fast);
+            flex-shrink: 0;
+        }
+        .chat-send:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .chat-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Empty State */
+        .chat-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-500);
+        }
+        .chat-empty i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        /* Typing Indicator */
+        .typing-indicator {
+            display: none;
+            padding: 12px 16px;
+            background: var(--white);
+            border-radius: var(--radius-md);
+            width: fit-content;
+            box-shadow: var(--shadow-sm);
+        }
+        .typing-indicator.active { display: block; }
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: var(--gray-400);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-8px); }
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 480px) {
+            .chat-widget {
+                bottom: 16px;
+                right: 16px;
+            }
+            .chat-toggle {
+                width: 56px;
+                height: 56px;
+                font-size: 1.3rem;
+            }
+            .chat-window {
+                width: calc(100vw - 32px);
+                height: calc(100vh - 100px);
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(0.95);
+            }
+            .chat-window.active {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
     </style>
 </head>
 <body>
@@ -418,7 +743,7 @@
         </div>
     </section>
 
-    <!-- Footer (อัปเดตใหม่ - มีปุ่มโซเชียล) -->
+    <!-- Footer -->
     <footer class="footer" id="social-footer">
         <div class="container">
             <div class="footer-top">
@@ -469,9 +794,61 @@
         </div>
     </footer>
 
-    <!-- Admin Link (ซ่อนไว้ก่อน จะแสดงด้วย JS ถ้าเป็น Admin) -->
+    <!-- Admin Link -->
     <div class="admin-link" id="adminLink" style="display: none;">
         <a href="admin/index.html" title="Admin Panel"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <!-- ========== CHAT WIDGET ========== -->
+    <div class="chat-widget">
+        <!-- Chat Toggle Button -->
+        <button class="chat-toggle" id="chatToggle" title="แชทกับเรา">
+            <i class="fas fa-comments"></i>
+            <span class="badge" id="chatBadge" style="display: none;">0</span>
+        </button>
+        
+        <!-- Chat Window -->
+        <div class="chat-window" id="chatWindow">
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <div class="chat-header-left">
+                    <div class="chat-avatar"><i class="fas fa-headset"></i></div>
+                    <div class="chat-header-info">
+                        <h4>ฝ่ายสนับสนุน</h4>
+                        <span class="status"><span class="status-dot"></span> <span id="chatStatusText">ออนไลน์</span></span>
+                    </div>
+                </div>
+                <div class="chat-header-actions">
+                    <button class="chat-header-btn" id="chatMinimize" title="ย่อ"><i class="fas fa-minus"></i></button>
+                    <button class="chat-header-btn" id="chatClose" title="ปิด"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            
+            <!-- Chat Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-empty" id="chatEmpty">
+                    <i class="fas fa-comment-dots"></i>
+                    <p>ยังไม่มีข้อความ</p>
+                    <small>เริ่มสนทนาโดยพิมพ์ข้อความด้านล่าง</small>
+                </div>
+                <!-- Messages will be inserted here -->
+            </div>
+            
+            <!-- Typing Indicator -->
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+            
+            <!-- Chat Input -->
+            <div class="chat-input">
+                <textarea id="chatInput" placeholder="พิมพ์ข้อความ..." rows="1"></textarea>
+                <button class="chat-send" id="chatSend" title="ส่ง">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts -->
@@ -479,12 +856,13 @@
     <script src="assets/js/animations.js"></script>
     <script src="assets/js/main.js"></script>
     
-    <!-- Auth Script -->
+    <!-- Auth & Chat Script -->
     <script type="module">
         try {
             const { config } = await import('./lib/config.js');
             const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
 
+            // DOM Elements
             const authModal = document.getElementById('authModal');
             const authModalClose = document.getElementById('authModalClose');
             const userMenu = document.getElementById('userMenu');
@@ -493,8 +871,28 @@
             const signupForm = document.getElementById('signupForm');
             const forgotPasswordForm = document.getElementById('forgotPasswordForm');
             
-            let currentView = 'login';
+            // Chat Elements
+            const chatToggle = document.getElementById('chatToggle');
+            const chatWindow = document.getElementById('chatWindow');
+            const chatClose = document.getElementById('chatClose');
+            const chatMinimize = document.getElementById('chatMinimize');
+            const chatMessages = document.getElementById('chatMessages');
+            const chatEmpty = document.getElementById('chatEmpty');
+            const chatInput = document.getElementById('chatInput');
+            const chatSend = document.getElementById('chatSend');
+            const chatBadge = document.getElementById('chatBadge');
+            const typingIndicator = document.getElementById('typingIndicator');
+            
+            let currentUser = null;
+            let isAdmin = false;
+            let unreadCount = 0;
+            let realtimeSubscription = null;
 
+            // ========================================
+            // AUTH FUNCTIONS
+            // ========================================
+            
+            let currentView = 'login';
             function openAuthModal(view = 'login') {
                 authModal.classList.add('active');
                 document.body.style.overflow = 'hidden';
@@ -533,12 +931,13 @@
                             <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: var(--gray-500);"></i>
                         </div>
                         <div class="user-dropdown" id="userDropdown">
-                            <a href="admin/index.html"><i class="fas fa-tachometer-alt"></i> แดชบอร์ด</a>
+                            <a href="pages/profile.html"><i class="fas fa-user-edit"></i> แก้ไขโปรไฟล์</a>
+                            <a href="pages/my-courses.html"><i class="fas fa-graduation-cap"></i> ประวัติการเรียน</a>
                             <div class="divider"></div>
                             <a href="#" id="logoutBtn" class="logout"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
                         </div>`;
                     document.getElementById('userInfo').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('active'); });
-                    document.getElementById('logoutBtn')?.addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); renderUserMenu(null); updateAdminLink(null); });
+                    document.getElementById('logoutBtn')?.addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); renderUserMenu(null); updateAdminLink(null); initChat(null); });
                 } else {
                     userMenu.innerHTML = `<div class="user-auth-buttons"><button class="btn btn-secondary btn-sm" id="openLoginBtn">เข้าสู่ระบบ</button><button class="btn btn-primary btn-sm" id="openSignupBtn">สมัครสมาชิก</button></div>`;
                     document.getElementById('openLoginBtn')?.addEventListener('click', () => openAuthModal('login'));
@@ -546,11 +945,10 @@
                 }
             }
 
-            // 🔐 ฟังก์ชันแสดง/ซ่อนลิงก์แอดมิน
             function updateAdminLink(user) {
                 if (!adminLink) return;
                 const adminEmails = Array.isArray(config.adminEmail) ? config.adminEmail : [config.adminEmail].filter(e => e);
-                const isAdmin = adminEmails.length > 0 && user?.email && adminEmails.includes(user.email);
+                isAdmin = adminEmails.length > 0 && user?.email && adminEmails.includes(user.email);
                 adminLink.style.display = isAdmin ? 'block' : 'none';
             }
 
@@ -566,22 +964,23 @@
                 const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/pages/auth.html#update-password` });
                 if (error) throw error;
             }
-            async function handleLogout() { await supabase.auth.signOut(); renderUserMenu(null); updateAdminLink(null); closeAuthModal(); }
+            async function handleLogout() { await supabase.auth.signOut(); renderUserMenu(null); updateAdminLink(null); initChat(null); closeAuthModal(); }
             async function checkAuth() {
                 try {
                     const { data } = await supabase.auth.getSession();
-                    const user = data?.session?.user || null;
-                    renderUserMenu(user);
-                    updateAdminLink(user); // ✅ เช็คสิทธิ์แอดมิน
+                    currentUser = data?.session?.user || null;
+                    renderUserMenu(currentUser);
+                    updateAdminLink(currentUser);
+                    initChat(currentUser);
                     return data?.session;
                 } catch (error) { console.error('Auth check error:', error); renderUserMenu(null); updateAdminLink(null); return null; }
             }
 
-            // Event Listeners
+            // Auth Event Listeners
             authModalClose.addEventListener('click', closeAuthModal);
             authModal.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
             document.getElementById('authToggleLink').addEventListener('click', (e) => { e.preventDefault(); switchAuthView(currentView === 'login' ? 'signup' : 'login'); });
-            document.getElementById('showForgotPassword')?.addEventListener('click', (e) => { e.preventDefault(); /* TODO: Implement forgot */ alert('กรุณาติดต่อผู้ดูแลระบบเพื่อรีเซ็ตรหัสผ่าน'); });
+            document.getElementById('showForgotPassword')?.addEventListener('click', (e) => { e.preventDefault(); alert('กรุณาติดต่อผู้ดูแลระบบเพื่อรีเซ็ตรหัสผ่าน'); });
             document.getElementById('backToLogin')?.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('login'); });
 
             loginForm.addEventListener('submit', async (e) => {
@@ -612,12 +1011,204 @@
                 finally { btn.disabled = false; btn.innerHTML = '<span>สมัครสมาชิก</span><i class="fas fa-user-plus"></i>'; }
             });
 
-            // Init
-            (async () => { await checkAuth(); supabase.auth.onAuthStateChange((event, session) => { renderUserMenu(session?.user || null); updateAdminLink(session?.user || null); }); })();
+            // ========================================
+            // CHAT FUNCTIONS
+            // ========================================
+            
+            function toggleChat() {
+                chatWindow.classList.toggle('active');
+                if (chatWindow.classList.contains('active')) {
+                    chatBadge.style.display = 'none';
+                    unreadCount = 0;
+                    chatInput.focus();
+                }
+            }
+            
+            function formatTime(date) {
+                return new Date(date).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+            }
+            
+            function appendMessage(message, isUser) {
+                chatEmpty.style.display = 'none';
+                
+                const msgEl = document.createElement('div');
+                msgEl.className = `chat-message ${isUser ? 'user' : ''}`;
+                msgEl.innerHTML = `
+                    <div class="avatar">${isUser ? (currentUser?.email?.charAt(0).toUpperCase() || 'U') : '<i class="fas fa-headset"></i>'}</div>
+                    <div>
+                        <div class="chat-bubble">${escapeHtml(message.message)}</div>
+                        <span class="chat-time">${formatTime(message.created_at)}</span>
+                    </div>
+                `;
+                chatMessages.appendChild(msgEl);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            async function sendMessage() {
+                const text = chatInput.value.trim();
+                if (!text || !currentUser) return;
+                
+                chatSend.disabled = true;
+                
+                try {
+                    // Save to database
+                    const { error } = await supabase.from('support_tickets').insert([{
+                        user_id: currentUser.id,
+                        user_email: currentUser.email,
+                        message: text,
+                        is_admin: false,
+                        status: 'open'
+                    }]);
+                    
+                    if (error) throw error;
+                    
+                    // Show locally
+                    appendMessage({ message: text, created_at: new Date().toISOString() }, true);
+                    chatInput.value = '';
+                    chatInput.style.height = 'auto';
+                    
+                } catch (error) {
+                    console.error('Send error:', error);
+                    alert('ส่งข้อความไม่สำเร็จ กรุณาลองใหม่');
+                } finally {
+                    chatSend.disabled = false;
+                }
+            }
+            
+            async function loadMessages() {
+                if (!currentUser) return;
+                
+                try {
+                    const { data, error } = await supabase
+                        .from('support_tickets')
+                        .select('*')
+                        .or(`user_id.eq.${currentUser.id},is_admin.eq.true`)
+                        .order('created_at', { ascending: true })
+                        .limit(50);
+                    
+                    if (error) throw error;
+                    
+                    chatMessages.innerHTML = '';
+                    if (!data || data.length === 0) {
+                        chatEmpty.style.display = 'block';
+                        return;
+                    }
+                    
+                    chatEmpty.style.display = 'none';
+                    data.forEach(msg => appendMessage(msg, !msg.is_admin));
+                    
+                } catch (error) {
+                    console.error('Load error:', error);
+                }
+            }
+            
+            function setupRealtime() {
+                if (realtimeSubscription) {
+                    supabase.removeChannel(realtimeSubscription);
+                }
+                
+                realtimeSubscription = supabase
+                    .channel('support_tickets')
+                    .on('postgres_changes', {
+                        event: 'INSERT',
+                        schema: 'public',
+                        table: 'support_tickets'
+                    }, (payload) => {
+                        const newMsg = payload.new;
+                        
+                        // Show typing indicator briefly for admin messages
+                        if (newMsg.is_admin) {
+                            typingIndicator.classList.add('active');
+                            setTimeout(() => typingIndicator.classList.remove('active'), 1000);
+                        }
+                        
+                        // Append message if relevant
+                        if (currentUser && (newMsg.user_id === currentUser.id || newMsg.is_admin)) {
+                            appendMessage(newMsg, !newMsg.is_admin);
+                            
+                            // Update badge if chat is closed
+                            if (!chatWindow.classList.contains('active') && !newMsg.is_admin) {
+                                unreadCount++;
+                                chatBadge.textContent = unreadCount;
+                                chatBadge.style.display = 'flex';
+                            }
+                        }
+                    })
+                    .subscribe();
+            }
+            
+            function initChat(user) {
+                currentUser = user;
+                
+                if (user) {
+                    // Load and setup realtime
+                    loadMessages();
+                    setupRealtime();
+                    
+                    // Show chat toggle
+                    chatToggle.style.display = 'flex';
+                } else {
+                    // Hide chat for non-logged users
+                    chatToggle.style.display = 'none';
+                    if (realtimeSubscription) {
+                        supabase.removeChannel(realtimeSubscription);
+                        realtimeSubscription = null;
+                    }
+                }
+            }
+            
+            // Chat Event Listeners
+            chatToggle.addEventListener('click', toggleChat);
+            chatClose.addEventListener('click', () => chatWindow.classList.remove('active'));
+            chatMinimize.addEventListener('click', () => chatWindow.classList.remove('active'));
+            
+            chatSend.addEventListener('click', sendMessage);
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            // Auto-resize textarea
+            chatInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+            
+            // Close chat when clicking outside on mobile
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 480 && 
+                    chatWindow.classList.contains('active') && 
+                    !chatWindow.contains(e.target) && 
+                    !chatToggle.contains(e.target)) {
+                    chatWindow.classList.remove('active');
+                }
+            });
+
+            // ========================================
+            // INIT
+            // ========================================
+            
+            (async () => {
+                await checkAuth();
+                supabase.auth.onAuthStateChange((event, session) => {
+                    currentUser = session?.user || null;
+                    renderUserMenu(currentUser);
+                    updateAdminLink(currentUser);
+                    initChat(currentUser);
+                });
+            })();
 
         } catch (error) {
-            console.error('Auth initialization error:', error);
-            document.getElementById('userMenu').innerHTML = `<div class="user-auth-buttons"><button class="btn btn-secondary btn-sm" onclick="alert('ระบบเข้าสู่ระบบกำลังมีปัญหา')">เข้าสู่ระบบ</button><button class="btn btn-primary btn-sm" onclick="alert('ระบบสมัครสมาชิกกำลังมีปัญหา')">สมัครสมาชิก</button></div>`;
+            console.error('Initialization error:', error);
+            document.getElementById('userMenu').innerHTML = `<div class="user-auth-buttons"><button class="btn btn-secondary btn-sm" onclick="alert('ระบบกำลังมีปัญหา')">เข้าสู่ระบบ</button><button class="btn btn-primary btn-sm" onclick="alert('ระบบกำลังมีปัญหา')">สมัครสมาชิก</button></div>`;
         }
     </script>
 </body>
