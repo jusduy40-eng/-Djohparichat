@@ -4,40 +4,167 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ข้อความติดต่อ | Admin - Djohparichat</title>
+    
+    <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* Modal Styles */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center;
+            z-index: 10000; opacity: 0; visibility: hidden; transition: all 0.3s ease; padding: 20px;
+        }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-content {
+            background: var(--white); border-radius: var(--radius-lg); width: 100%;
+            max-width: 600px; max-height: 90vh; overflow-y: auto; position: relative;
+            transform: translateY(20px); transition: transform 0.3s ease; box-shadow: var(--shadow-xl);
+        }
+        .modal.active .modal-content { transform: translateY(0); }
+        .modal-close {
+            position: absolute; top: 16px; right: 16px; width: 36px; height: 36px;
+            border: none; background: var(--gray-100); border-radius: var(--radius-full);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            color: var(--gray-600); transition: var(--transition-fast); z-index: 10;
+        }
+        .modal-close:hover { background: var(--gray-200); color: var(--gray-900); }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); }
+        .modal-header h3 { margin: 0; font-size: 1.3rem; color: var(--gray-900); }
+        .modal-body { padding: 24px; }
+        .modal-footer { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 12px; }
+        
+        /* Message Detail */
+        .message-detail { display: flex; flex-direction: column; gap: 16px; }
+        .message-field { display: flex; flex-direction: column; gap: 6px; }
+        .message-field label { font-weight: 500; color: var(--gray-600); font-size: 0.9rem; }
+        .message-field .value { color: var(--gray-900); font-size: 1rem; line-height: 1.5; }
+        .message-field .value pre { 
+            white-space: pre-wrap; word-wrap: break-word; 
+            background: var(--gray-50); padding: 12px; border-radius: var(--radius-md); 
+            font-family: inherit; margin: 0;
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            display: inline-block; padding: 4px 12px; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 600;
+        }
+        .status-badge.new { background: #fee2e2; color: #dc2626; }
+        .status-badge.read { background: #dbeafe; color: #1d4ed8; }
+        .status-badge.replied { background: #d1fae5; color: #059669; }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center; padding: 40px 20px; color: var(--gray-500);
+        }
+        .empty-state i { font-size: 3rem; margin-bottom: 16px; opacity: 0.5; }
+        
+        /* Filter */
+        .filter-bar {
+            display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .filter-bar select, .filter-bar input {
+            padding: 8px 12px; border: 1px solid var(--gray-300);
+            border-radius: 6px; font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body class="admin-body">
-    <aside class="admin-sidebar">
-        <div class="admin-logo"><h2>Djohparichat</h2></div>
+    
+    <!-- Loading Overlay -->
+    <div id="adminLoader" class="admin-loader">
+        <div class="loader-spinner"></div>
+        <p>กำลังโหลดข้อมูล...</p>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="admin-logo">
+            <a href="../index.html">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Djohparichat</span>
+            </a>
+        </div>
         <nav class="admin-nav">
             <ul>
-                <li><a href="index.html"><i class="fas fa-dashboard"></i> <span data-th="แดชบอร์ด" data-en="Dashboard">แดชบอร์ด</span></a></li>
-                <li><a href="contents.html"><i class="fas fa-file-alt"></i> <span data-th="จัดการเนื้อหา" data-en="Contents">จัดการเนื้อหา</span></a></li>
-                <li><a href="portfolio.html"><i class="fas fa-briefcase"></i> <span data-th="จัดการผลงาน" data-en="Portfolio">จัดการผลงาน</span></a></li>
-                <li><a href="messages.html" class="active"><i class="fas fa-envelope"></i> <span data-th="ข้อความติดต่อ" data-en="Messages">ข้อความติดต่อ</span></a></li>
-                <li><a href="settings.html"><i class="fas fa-cog"></i> <span data-th="การตั้งค่า" data-en="Settings">การตั้งค่า</span></a></li>
-                <li><a href="../index.html" target="_blank"><i class="fas fa-external-link-alt"></i> <span data-th="เปิดเว็บไซต์" data-en="View Website">เปิดเว็บไซต์</span></a></li>
-                <li><a href="login.html" class="logout"><i class="fas fa-sign-out-alt"></i> <span data-th="ออกจากระบบ" data-en="Logout">ออกจากระบบ</span></a></li>
+                <li><a href="index.html" data-page="dashboard">
+                    <i class="fas fa-dashboard"></i> <span data-th="แดชบอร์ด" data-en="Dashboard">แดชบอร์ด</span>
+                </a></li>
+                <li><a href="contents.html" data-page="contents">
+                    <i class="fas fa-file-alt"></i> <span data-th="จัดการเนื้อหา" data-en="Contents">จัดการเนื้อหา</span>
+                </a></li>
+                <li><a href="courses.html" data-page="courses">
+                    <i class="fas fa-brain"></i> <span data-th="จัดการคอร์ส" data-en="Courses">จัดการคอร์ส</span>
+                </a></li>
+                <li><a href="enrollments.html" data-page="enrollments">
+                    <i class="fas fa-users"></i> <span data-th="ผู้สมัครเรียน" data-en="Enrollments">ผู้สมัครเรียน</span>
+                </a></li>
+                <li><a href="messages.html" class="active" data-page="messages">
+                    <i class="fas fa-envelope"></i> <span data-th="ข้อความติดต่อ" data-en="Messages">ข้อความติดต่อ</span>
+                </a></li>
+                <li><a href="settings.html" data-page="settings">
+                    <i class="fas fa-cog"></i> <span data-th="การตั้งค่า" data-en="Settings">การตั้งค่า</span>
+                </a></li>
+                <li><a href="../index.html" target="_blank">
+                    <i class="fas fa-external-link-alt"></i> <span data-th="เปิดเว็บไซต์" data-en="View Website">เปิดเว็บไซต์</span>
+                </a></li>
+                <li><a href="#" id="logoutBtn" class="logout">
+                    <i class="fas fa-sign-out-alt"></i> <span data-th="ออกจากระบบ" data-en="Logout">ออกจากระบบ</span>
+                </a></li>
             </ul>
         </nav>
     </aside>
 
+    <!-- Main Content -->
     <main class="admin-main">
+        <!-- Header -->
         <header class="admin-header">
-            <h1 data-th="ข้อความติดต่อ" data-en="Messages">ข้อความติดต่อ</h1>
+            <div class="header-left">
+                <button class="admin-mobile-toggle" id="mobileToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 data-th="ข้อความติดต่อ" data-en="Messages">ข้อความติดต่อ</h1>
+            </div>
             <div class="admin-user">
-                <span data-th="ผู้ดูแลระบบ" data-en="Admin">ผู้ดูแลระบบ</span>
-                <div style="width: 40px; height: 40px; background: var(--primary-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;"><i class="fas fa-user"></i></div>
+                <span id="adminEmail">admin@djohparichat.site</span>
+                <div class="admin-avatar"><i class="fas fa-user"></i></div>
             </div>
         </header>
 
-        <div class="admin-content">
+        <!-- Messages Management -->
+        <div class="admin-content" id="messagesContent">
+            
             <div class="admin-section">
-                <h2 data-th="ข้อความล่าสุด" data-en="Recent Messages">ข้อความล่าสุด</h2>
+                <div class="section-header">
+                    <h2 data-th="ข้อความล่าสุด" data-en="Recent Messages">ข้อความล่าสุด</h2>
+                    <button class="btn btn-outline" id="refreshBtn">
+                        <i class="fas fa-sync-alt"></i>
+                        <span data-th="รีเฟรช" data-en="Refresh">รีเฟรช</span>
+                    </button>
+                </div>
+
+                <!-- Filter -->
+                <div class="filter-bar">
+                    <select id="filterStatus">
+                        <option value="all" data-th="ทุกสถานะ" data-en="All Status">ทุกสถานะ</option>
+                        <option value="new" data-th="ใหม่" data-en="New">ใหม่</option>
+                        <option value="read" data-th="อ่านแล้ว" data-en="Read">อ่านแล้ว</option>
+                        <option value="replied" data-th="ตอบแล้ว" data-en="Replied">ตอบแล้ว</option>
+                    </select>
+                    <input type="text" id="searchInput" placeholder="ค้นหาชื่อหรืออีเมล..." style="flex: 1; min-width: 200px;">
+                </div>
+
+                <!-- Table -->
                 <div class="table-container">
                     <table class="admin-table">
                         <thead>
@@ -50,37 +177,466 @@
                                 <th data-th="การจัดการ" data-en="Actions">การจัดการ</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="messagesTableBody">
                             <tr>
-                                <td>สมชาย ใจดี</td>
-                                <td>somchai@email.com</td>
-                                <td data-th="สนใจคอร์ส AI" data-en="Interested in AI course">สนใจคอร์ส AI</td>
-                                <td>1 มิ.ย. 2026</td>
-                                <td><span class="status new" data-th="ใหม่" data-en="New">ใหม่</span></td>
-                                <td>
-                                    <button class="btn-icon edit"><i class="fas fa-eye"></i></button>
-                                    <button class="btn-icon delete"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>สมหญิง รักเรียน</td>
-                                <td>somying@email.com</td>
-                                <td data-th="สนใจประกันชีวิต" data-en="Interested in insurance">สนใจประกันชีวิต</td>
-                                <td>30 พ.ค. 2026</td>
-                                <td><span class="status read" data-th="อ่านแล้ว" data-en="Read">อ่านแล้ว</span></td>
-                                <td>
-                                    <button class="btn-icon edit"><i class="fas fa-eye"></i></button>
-                                    <button class="btn-icon delete"><i class="fas fa-trash"></i></button>
+                                <td colspan="6" class="text-center">
+                                    <i class="fas fa-spinner fa-spin"></i> <span data-th="กำลังโหลด..." data-en="Loading...">กำลังโหลด...</span>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fas fa-inbox"></i>
+                    <p data-th="ยังไม่มีข้อความ" data-en="No messages yet">ยังไม่มีข้อความ</p>
+                </div>
             </div>
         </div>
     </main>
 
-    <button class="admin-mobile-toggle"><i class="fas fa-bars"></i></button>
-    <script src="../assets/js/admin.js"></script>
+    <!-- Message Detail Modal -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+            <div class="modal-header">
+                <h3 id="modalTitle">รายละเอียดข้อความ</h3>
+            </div>
+            <div class="modal-body">
+                <div id="messageDetail" class="message-detail"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="markReadBtn">
+                    <i class="fas fa-check"></i>
+                    <span data-th="ทำเครื่องหมายว่าอ่านแล้ว" data-en="Mark as Read">ทำเครื่องหมายว่าอ่านแล้ว</span>
+                </button>
+                <button class="btn btn-primary" id="replyBtn">
+                    <i class="fas fa-reply"></i>
+                    <span data-th="ตอบกลับ" data-en="Reply">ตอบกลับ</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <!-- Scripts -->
+    <script type="module">
+        // Import config
+        import { config } from '../lib/config.js';
+        
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(
+            config.supabaseUrl,
+            config.supabaseAnonKey
+        );
+
+        // ========================================
+        // 🔐 ADMIN PERMISSION CHECK
+        // ========================================
+        
+        async function checkAdminPermission() {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!session) {
+                alert('กรุณาเข้าสู่ระบบเพื่อเข้าถึงหน้านี้');
+                window.location.href = '../pages/auth.html';
+                return false;
+            }
+            
+            const userEmail = session.user.email;
+            const adminEmails = Array.isArray(config.adminEmail) 
+                ? config.adminEmail 
+                : [config.adminEmail].filter(e => e);
+            
+            const isAdmin = adminEmails.length > 0 
+                ? adminEmails.includes(userEmail)
+                : true;
+            
+            if (!isAdmin) {
+                alert('⛔ คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (เฉพาะผู้ดูแลระบบเท่านั้น)');
+                window.location.href = '../index.html';
+                return false;
+            }
+            
+            document.getElementById('adminEmail').textContent = userEmail;
+            return true;
+        }
+
+        // ========================================
+        // LOAD MESSAGES
+        // ========================================
+        
+        async function loadMessages() {
+            const tbody = document.getElementById('messagesTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const tableContainer = document.querySelector('.table-container');
+            
+            try {
+                let query = supabase.from('contact_messages').select('*').order('created_at', { ascending: false });
+                
+                // Apply status filter
+                const filterStatus = document.getElementById('filterStatus').value;
+                if (filterStatus !== 'all') {
+                    query = query.eq('status', filterStatus);
+                }
+                
+                const { data, error } = await query;
+                
+                if (error) throw error;
+                
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '';
+                    tableContainer.style.display = 'none';
+                    emptyState.style.display = 'block';
+                    return;
+                }
+                
+                tableContainer.style.display = 'block';
+                emptyState.style.display = 'none';
+                
+                const isTH = document.documentElement.lang === 'th';
+                
+                tbody.innerHTML = data.map(msg => {
+                    const statusBadge = {
+                        'new': { text: isTH ? 'ใหม่' : 'New', class: 'new' },
+                        'read': { text: isTH ? 'อ่านแล้ว' : 'Read', class: 'read' },
+                        'replied': { text: isTH ? 'ตอบแล้ว' : 'Replied', class: 'replied' }
+                    }[msg.status] || { text: msg.status, class: 'read' };
+                    
+                    return `
+                        <tr data-id="${msg.id}">
+                            <td><strong>${msg.name}</strong></td>
+                            <td>${msg.email}</td>
+                            <td>${msg.subject || '-'}</td>
+                            <td>${formatDate(msg.created_at)}</td>
+                            <td><span class="status-badge ${statusBadge.class}">${statusBadge.text}</span></td>
+                            <td>
+                                <button class="btn-icon view" onclick="viewMessage('${msg.id}')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-icon delete" onclick="deleteMessage('${msg.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-error">โหลดข้อมูลไม่สำเร็จ</td></tr>`;
+                showNotification('error', 'ไม่สามารถโหลดข้อความได้');
+            }
+        }
+
+        // ========================================
+        // VIEW MESSAGE DETAIL
+        // ========================================
+        
+        async function viewMessage(messageId) {
+            try {
+                const { data: msg, error } = await supabase
+                    .from('contact_messages')
+                    .select('*')
+                    .eq('id', messageId)
+                    .single();
+                
+                if (error) throw error;
+                
+                const isTH = document.documentElement.lang === 'th';
+                const statusText = {
+                    'new': isTH ? 'ใหม่' : 'New',
+                    'read': isTH ? 'อ่านแล้ว' : 'Read',
+                    'replied': isTH ? 'ตอบแล้ว' : 'Replied'
+                }[msg.status] || msg.status;
+                
+                document.getElementById('messageDetail').innerHTML = `
+                    <div class="message-field">
+                        <label data-th="ชื่อ" data-en="Name">ชื่อ</label>
+                        <div class="value">${msg.name}</div>
+                    </div>
+                    <div class="message-field">
+                        <label data-th="อีเมล" data-en="Email">อีเมล</label>
+                        <div class="value"><a href="mailto:${msg.email}">${msg.email}</a></div>
+                    </div>
+                    ${msg.phone ? `
+                    <div class="message-field">
+                        <label data-th="เบอร์โทรศัพท์" data-en="Phone">เบอร์โทรศัพท์</label>
+                        <div class="value"><a href="tel:${msg.phone}">${msg.phone}</a></div>
+                    </div>` : ''}
+                    <div class="message-field">
+                        <label data-th="หัวข้อ" data-en="Subject">หัวข้อ</label>
+                        <div class="value">${msg.subject || '-'}</div>
+                    </div>
+                    <div class="message-field">
+                        <label data-th="ข้อความ" data-en="Message">ข้อความ</label>
+                        <div class="value"><pre>${msg.message}</pre></div>
+                    </div>
+                    <div class="message-field">
+                        <label data-th="วันที่" data-en="Date">วันที่</label>
+                        <div class="value">${formatDate(msg.created_at)}</div>
+                    </div>
+                    <div class="message-field">
+                        <label data-th="สถานะ" data-en="Status">สถานะ</label>
+                        <div class="value"><span class="status-badge ${msg.status}">${statusText}</span></div>
+                    </div>
+                `;
+                
+                // Store current message ID for actions
+                document.getElementById('messageModal').dataset.messageId = messageId;
+                
+                // Update mark read button state
+                const markReadBtn = document.getElementById('markReadBtn');
+                if (msg.status === 'new') {
+                    markReadBtn.style.display = 'flex';
+                    markReadBtn.disabled = false;
+                } else {
+                    markReadBtn.style.display = 'none';
+                }
+                
+                // Show modal
+                document.getElementById('messageModal').classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
+                // If message is new, mark as read automatically when viewed
+                if (msg.status === 'new') {
+                    await supabase.from('contact_messages').update({ status: 'read' }).eq('id', messageId);
+                    loadMessages(); // Refresh table
+                }
+                
+            } catch (error) {
+                console.error('View message error:', error);
+                showNotification('error', 'ไม่สามารถโหลดรายละเอียดข้อความได้');
+            }
+        }
+
+        // ========================================
+        // MARK AS READ
+        // ========================================
+        
+        async function markAsRead(messageId) {
+            try {
+                const { error } = await supabase
+                    .from('contact_messages')
+                    .update({ status: 'read' })
+                    .eq('id', messageId);
+                
+                if (error) throw error;
+                
+                showNotification('success', 'ทำเครื่องหมายว่าอ่านแล้ว');
+                loadMessages();
+                
+                // Update modal button
+                document.getElementById('markReadBtn').style.display = 'none';
+                
+            } catch (error) {
+                console.error('Mark as read error:', error);
+                showNotification('error', 'ไม่สามารถอัปเดตสถานะได้');
+            }
+        }
+
+        // ========================================
+        // DELETE MESSAGE
+        // ========================================
+        
+        async function deleteMessage(messageId) {
+            if (!confirm('คุณแน่ใจหรือไม่ที่จะลบข้อความนี้?')) return;
+            
+            try {
+                const { error } = await supabase
+                    .from('contact_messages')
+                    .delete()
+                    .eq('id', messageId);
+                
+                if (error) throw error;
+                
+                showNotification('success', 'ลบข้อความสำเร็จ');
+                loadMessages();
+                
+                // Close modal if open
+                if (document.getElementById('messageModal').classList.contains('active')) {
+                    closeModal();
+                }
+                
+            } catch (error) {
+                console.error('Delete error:', error);
+                showNotification('error', 'ลบข้อความไม่สำเร็จ');
+            }
+        }
+
+        // ========================================
+        // MODAL FUNCTIONS
+        // ========================================
+        
+        function closeModal() {
+            document.getElementById('messageModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // ========================================
+        // UTILITY FUNCTIONS
+        // ========================================
+        
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            return new Date(dateString).toLocaleString('th-TH', {
+                year: 'numeric', month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        function showNotification(type, message) {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = `admin-notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+
+        // ========================================
+        // SIDEBAR & MOBILE
+        // ========================================
+        
+        function initSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            const mobileToggle = document.getElementById('mobileToggle');
+            
+            mobileToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768 && 
+                    sidebar.classList.contains('open') && 
+                    !sidebar.contains(e.target) && 
+                    !mobileToggle.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        }
+
+        // ========================================
+        // LOGOUT
+        // ========================================
+        
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
+                await supabase.auth.signOut();
+                window.location.href = '../index.html';
+            }
+        });
+
+        // ========================================
+        // LANGUAGE SWITCHER
+        // ========================================
+        
+        function initLanguage() {
+            const savedLang = localStorage.getItem('admin_language') || 'th';
+            setAdminLanguage(savedLang);
+        }
+        
+        function setAdminLanguage(lang) {
+            document.documentElement.lang = lang;
+            localStorage.setItem('admin_language', lang);
+            
+            document.querySelectorAll('[data-th][data-en]').forEach(el => {
+                const text = el.getAttribute(`data-${lang}`);
+                if (text) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
+                        el.placeholder = text;
+                    } else {
+                        el.textContent = text;
+                    }
+                }
+            });
+        }
+
+        // ========================================
+        // FILTER & SEARCH
+        // ========================================
+        
+        document.getElementById('filterStatus')?.addEventListener('change', loadMessages);
+        
+        let searchTimeout;
+        document.getElementById('searchInput')?.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const keyword = e.target.value.toLowerCase();
+                document.querySelectorAll('#messagesTableBody tr[data-id]').forEach(row => {
+                    const name = row.cells[0]?.textContent.toLowerCase() || '';
+                    const email = row.cells[1]?.textContent.toLowerCase() || '';
+                    const subject = row.cells[2]?.textContent.toLowerCase() || '';
+                    
+                    if (name.includes(keyword) || email.includes(keyword) || subject.includes(keyword)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }, 300);
+        });
+
+        // ========================================
+        // INIT
+        // ========================================
+        
+        async function init() {
+            // 🔐 Check admin permission first
+            const isAdmin = await checkAdminPermission();
+            if (!isAdmin) return;
+            
+            // Initialize
+            initLanguage();
+            initSidebar();
+            
+            // Load messages
+            await loadMessages();
+            
+            // Hide loader
+            document.getElementById('adminLoader').style.display = 'none';
+            
+            // Event listeners
+            document.getElementById('refreshBtn')?.addEventListener('click', loadMessages);
+            document.getElementById('modalClose')?.addEventListener('click', closeModal);
+            document.getElementById('markReadBtn')?.addEventListener('click', () => {
+                const messageId = document.getElementById('messageModal').dataset.messageId;
+                if (messageId) markAsRead(messageId);
+            });
+            document.getElementById('replyBtn')?.addEventListener('click', () => {
+                const email = document.querySelector('#messageDetail a[href^="mailto:"]')?.textContent;
+                if (email) {
+                    window.location.href = `mailto:${email}?subject=Re: ${document.getElementById('modalTitle').textContent}`;
+                }
+            });
+            
+            // Close modal on outside click
+            document.getElementById('messageModal')?.addEventListener('click', (e) => {
+                if (e.target.id === 'messageModal') closeModal();
+            });
+        }
+
+        // Make functions global for onclick handlers
+        window.viewMessage = viewMessage;
+        window.deleteMessage = deleteMessage;
+
+        // Run init
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
 </body>
 </html>
