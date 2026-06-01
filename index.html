@@ -29,7 +29,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        /* ========== AUTH & USER MENU (คงเดิม) ========== */
+        /* ========== AUTH & USER MENU ========== */
         .auth-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center;
@@ -446,7 +446,7 @@
         /* New Chat Button */
         .new-chat-btn {
             display: none;
-            width: 100%;
+            width: calc(100% - 40px);
             padding: 12px;
             background: var(--gradient-primary);
             color: white;
@@ -456,7 +456,7 @@
             font-weight: 500;
             cursor: pointer;
             transition: var(--transition-fast);
-            margin: 16px 20px;
+            margin: 16px 20px 20px;
         }
         .new-chat-btn:hover {
             transform: translateY(-2px);
@@ -923,7 +923,6 @@
             let isAdmin = false;
             let unreadCount = 0;
             let realtimeSubscription = null;
-            let chatResetNotified = false;
 
             // ========================================
             // AUTH FUNCTIONS
@@ -974,7 +973,13 @@
                             <a href="#" id="logoutBtn" class="logout"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
                         </div>`;
                     document.getElementById('userInfo').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('active'); });
-                    document.getElementById('logoutBtn')?.addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); renderUserMenu(null); updateAdminLink(null); initChat(null); });
+                    document.getElementById('logoutBtn')?.addEventListener('click', async (e) => { 
+                        e.preventDefault(); 
+                        await supabase.auth.signOut(); 
+                        renderUserMenu(null); 
+                        updateAdminLink(null); 
+                        initChat(null); 
+                    });
                 } else {
                     userMenu.innerHTML = `<div class="user-auth-buttons"><button class="btn btn-secondary btn-sm" id="openLoginBtn">เข้าสู่ระบบ</button><button class="btn btn-primary btn-sm" id="openSignupBtn">สมัครสมาชิก</button></div>`;
                     document.getElementById('openLoginBtn')?.addEventListener('click', () => openAuthModal('login'));
@@ -1001,7 +1006,13 @@
                 const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/pages/auth.html#update-password` });
                 if (error) throw error;
             }
-            async function handleLogout() { await supabase.auth.signOut(); renderUserMenu(null); updateAdminLink(null); initChat(null); closeAuthModal(); }
+            async function handleLogout() { 
+                await supabase.auth.signOut(); 
+                renderUserMenu(null); 
+                updateAdminLink(null); 
+                initChat(null); 
+                closeAuthModal(); 
+            }
             async function checkAuth() {
                 try {
                     const { data } = await supabase.auth.getSession();
@@ -1010,7 +1021,12 @@
                     updateAdminLink(currentUser);
                     initChat(currentUser);
                     return data?.session;
-                } catch (error) { console.error('Auth check error:', error); renderUserMenu(null); updateAdminLink(null); return null; }
+                } catch (error) { 
+                    console.error('Auth check error:', error); 
+                    renderUserMenu(null); 
+                    updateAdminLink(null); 
+                    return null; 
+                }
             }
 
             // Auth Event Listeners
@@ -1082,13 +1098,16 @@
             }
             
             function showResetNotice() {
+                // Clear existing messages first
+                chatMessages.innerHTML = '';
+                
                 const notice = document.createElement('div');
                 notice.className = 'chat-reset-notice';
                 notice.innerHTML = `<i class="fas fa-rotate"></i> แอดมินได้รีเซ็ตแชทนี้แล้ว - เริ่มสนทนาใหม่ได้เลย`;
                 chatMessages.appendChild(notice);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 
-                // Show new chat button
+                // Show new chat button and disable input
                 newChatBtn.classList.add('active');
                 chatInput.disabled = true;
                 chatSend.disabled = true;
@@ -1113,13 +1132,14 @@
                         user_email: currentUser.email,
                         message: text,
                         is_admin: false,
-                        status: 'open'
+                        status: 'open',
+                        deleted: false
                     }]);
                     
                     if (error) throw error;
                     
                     // Show locally
-                    appendMessage({ message: text, created_at: new Date().toISOString() }, true);
+                    appendMessage({ message: text, created_at: new Date().toISOString(), deleted: false }, true);
                     chatInput.value = '';
                     chatInput.style.height = 'auto';
                     
@@ -1144,6 +1164,7 @@
                         .from('support_tickets')
                         .select('*')
                         .eq('user_id', currentUser.id)
+                        .eq('deleted', false)
                         .order('created_at', { ascending: true })
                         .limit(50);
                     
@@ -1161,13 +1182,7 @@
                     
                     chatEmpty.style.display = 'none';
                     
-                    // Check if chat was reset (admin deleted all messages)
-                    const hasMessages = data.some(msg => !msg.is_admin || msg.deleted !== true);
-                    if (!hasMessages) {
-                        showResetNotice();
-                        return;
-                    }
-                    
+                    // Display messages that are not deleted
                     data.forEach(msg => {
                         if (msg.deleted !== true) {
                             appendMessage(msg, !msg.is_admin);
@@ -1190,7 +1205,7 @@
                 realtimeSubscription = supabase
                     .channel(`chat_${currentUser?.id}`)
                     .on('postgres_changes', {
-                        event: '*',
+                        event: '*',  // รับทุก event: INSERT, UPDATE, DELETE
                         schema: 'public',
                         table: 'support_tickets',
                         filter: `user_id=eq.${currentUser?.id}`
@@ -1199,13 +1214,13 @@
                         
                         if (!change || change.user_id !== currentUser?.id) return;
                         
-                        // Handle DELETE event (admin deleted chat)
+                        // 🔥 Handle DELETE event (admin deleted chat)
                         if (payload.eventType === 'DELETE') {
                             showResetNotice();
                             return;
                         }
                         
-                        // Handle UPDATE event (admin marked as deleted)
+                        // 🔥 Handle UPDATE event (admin marked as deleted)
                         if (payload.eventType === 'UPDATE' && change.deleted === true) {
                             showResetNotice();
                             return;
@@ -1267,9 +1282,6 @@
                 chatInput.disabled = false;
                 chatSend.disabled = false;
                 chatInput.focus();
-                
-                // Optional: Send a system message to admin that user started new chat
-                // (Can be implemented if needed)
             });
             
             // ========================================
