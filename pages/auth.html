@@ -4,73 +4,223 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>เข้าสู่ระบบ | Djohparichat</title>
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="../assets/css/style.css">
-    <!-- เพิ่ม Supabase CDN เพื่อใช้ Auth ได้เลยโดยไม่ต้องพึ่ง API เยอะ -->
+    <link rel="stylesheet" href="../assets/css/auth.css">
+    
+    <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="login-page">
-    <div class="auth-container">
-        <div class="auth-card">
-            <h2>เข้าสู่ระบบ / สมัครสมาชิก</h2>
-            
-            <form id="authForm">
-                <input type="email" id="email" placeholder="อีเมล" required>
-                <input type="password" id="password" placeholder="รหัสผ่าน" required>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <a href="../index.html" class="auth-logo">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Djohparichat</span>
+                    </a>
+                </div>
+
+                <h2 id="authTitle">เข้าสู่ระบบ</h2>
                 
-                <button type="submit" id="submitBtn">เข้าสู่ระบบ</button>
-            </form>
-            
-            <div class="toggle-auth">
-                <p>ยังไม่มีบัญชี? <a href="#" id="toggleMode">สมัครสมาชิก</a></p>
+                <div id="errorMsg" class="error-msg"></div>
+                <div id="successMsg" class="success-msg"></div>
+
+                <form id="authForm">
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i> อีเมล
+                        </label>
+                        <input type="email" id="email" required placeholder="example@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i> รหัสผ่าน
+                        </label>
+                        <input type="password" id="password" required placeholder="••••••••" minlength="6">
+                        <small class="password-hint">อย่างน้อย 6 ตัวอักษร</small>
+                    </div>
+
+                    <button type="submit" class="btn-auth" id="submitBtn">
+                        <span>เข้าสู่ระบบ</span>
+                        <i class="fas fa-sign-in-alt"></i>
+                    </button>
+                </form>
+
+                <div class="auth-divider">
+                    <span>หรือ</span>
+                </div>
+
+                <div class="toggle-auth">
+                    <p>
+                        <span id="toggleText">ยังไม่มีบัญชี?</span>
+                        <a href="#" id="toggleMode">สมัครสมาชิก</a>
+                    </p>
+                </div>
+
+                <div class="auth-footer">
+                    <a href="../index.html">
+                        <i class="fas fa-arrow-left"></i> กลับหน้าหลัก
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 
-    <script>
-        // 1. เชื่อมต่อ Supabase โดยตรงจากหน้าเว็บ (Client-side)
+    <script type="module">
+        // Import config
+        import { config } from '../lib/config.js';
+        
+        // Initialize Supabase
         const supabase = window.supabase.createClient(
-            'YOUR_PROJECT_URL', // ใส่ URL จาก .env.local
-            'YOUR_ANON_KEY'     // ใส่ Anon Key จาก .env.local
+            config.supabaseUrl,
+            config.supabaseAnonKey
         );
 
         let isLoginMode = true;
 
-        // สลับโหมด Login/Sign Up
+        // Toggle between Login and Sign Up
         document.getElementById('toggleMode').addEventListener('click', (e) => {
             e.preventDefault();
             isLoginMode = !isLoginMode;
-            document.querySelector('#submitBtn').textContent = isLoginMode ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
-            document.querySelector('#toggleMode').textContent = isLoginMode ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ';
-            document.querySelector('.toggle-auth p').textContent = isLoginMode ? 'ยังไม่มีบัญชี? ' : 'มีบัญชีแล้ว? ';
-            document.querySelector('.toggle-auth a').textContent = isLoginMode ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ';
+            
+            const authTitle = document.getElementById('authTitle');
+            const submitBtn = document.getElementById('submitBtn');
+            const toggleText = document.getElementById('toggleText');
+            const toggleLink = document.getElementById('toggleMode');
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
+
+            // Clear messages
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            errorMsg.textContent = '';
+
+            if (isLoginMode) {
+                authTitle.textContent = 'เข้าสู่ระบบ';
+                submitBtn.innerHTML = '<span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i>';
+                toggleText.textContent = 'ยังไม่มีบัญชี?';
+                toggleLink.textContent = 'สมัครสมาชิก';
+            } else {
+                authTitle.textContent = 'สมัครสมาชิก';
+                submitBtn.innerHTML = '<span>สมัครสมาชิก</span><i class="fas fa-user-plus"></i>';
+                toggleText.textContent = 'มีบัญชีแล้ว?';
+                toggleLink.textContent = 'เข้าสู่ระบบ';
+            }
         });
 
-        // จัดการ Form Submit
+        // Handle Form Submission
         document.getElementById('authForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
+            
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            const btn = document.getElementById('submitBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
 
-            btn.textContent = 'กำลังดำเนินการ...';
-            btn.disabled = true;
+            // Reset messages
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            errorMsg.textContent = '';
+            successMsg.textContent = '';
 
-            let result;
-            if (isLoginMode) {
-                // เข้าสู่ระบบ
-                result = await supabase.auth.signInWithPassword({ email, password });
-            } else {
-                // สมัครสมาชิก
-                result = await supabase.auth.signUp({ email, password });
+            // Loading state
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>กำลังดำเนินการ...</span>';
+            submitBtn.disabled = true;
+
+            try {
+                let result;
+                
+                if (isLoginMode) {
+                    // Sign In
+                    result = await supabase.auth.signInWithPassword({ 
+                        email, 
+                        password 
+                    });
+                } else {
+                    // Sign Up
+                    result = await supabase.auth.signUp({ 
+                        email, 
+                        password,
+                        options: {
+                            emailRedirectTo: `${window.location.origin}/pages/auth.html`
+                        }
+                    });
+                }
+
+                if (result.error) {
+                    throw result.error;
+                }
+
+                // Success
+                if (isLoginMode) {
+                    successMsg.textContent = '✅ เข้าสู่ระบบสำเร็จ! กำลังเปลี่ยนหน้า...';
+                    successMsg.style.display = 'block';
+                    
+                    // Redirect after 1 second
+                    setTimeout(() => {
+                        window.location.href = '../index.html';
+                    }, 1000);
+                } else {
+                    if (result.data.user && !result.data.user.confirmed_at) {
+                        successMsg.textContent = '✅ สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยันตัวตน';
+                        successMsg.style.display = 'block';
+                        
+                        // Switch to login mode after 3 seconds
+                        setTimeout(() => {
+                            document.getElementById('toggleMode').click();
+                        }, 3000);
+                    } else {
+                        successMsg.textContent = '✅ สมัครสมาชิกสำเร็จ!';
+                        successMsg.style.display = 'block';
+                        
+                        setTimeout(() => {
+                            document.getElementById('toggleMode').click();
+                        }, 2000);
+                    }
+                }
+
+            } catch (error) {
+                // Handle errors
+                let errorMessage = 'เกิดข้อผิดพลาด กรุณาลองใหม่';
+                
+                switch(error.message) {
+                    case 'Invalid login credentials':
+                        errorMessage = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+                        break;
+                    case 'User already registered':
+                        errorMessage = 'อีเมลนี้ถูกใช้งานแล้ว กรุณาเข้าสู่ระบบ';
+                        break;
+                    case 'Email not confirmed':
+                        errorMessage = 'กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ';
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+                
+                errorMsg.textContent = '❌ ' + errorMessage;
+                errorMsg.style.display = 'block';
+                
+                // Reset button
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
             }
+        });
 
-            if (result.error) {
-                alert(result.error.message);
-                btn.textContent = isLoginMode ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
-                btn.disabled = false;
+        // Real-time validation
+        document.getElementById('email').addEventListener('blur', function() {
+            const email = this.value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (email && !emailRegex.test(email)) {
+                this.style.borderColor = 'var(--error)';
             } else {
-                alert(isLoginMode ? 'เข้าสู่ระบบสำเร็จ!' : 'สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมล');
-                if(isLoginMode) window.location.href = '../index.html'; // กลับหน้าหลัก
+                this.style.borderColor = '';
             }
         });
     </script>
