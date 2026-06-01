@@ -181,6 +181,15 @@
             border-radius: 6px; font-size: 0.9rem;
         }
         
+        /* Delete Chat Button */
+        .btn-delete-chat {
+            background: var(--error) !important;
+            color: white !important;
+        }
+        .btn-delete-chat:hover {
+            background: #dc2626 !important;
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .modal-content { max-width: calc(100vw - 32px); height: calc(100vh - 100px); }
@@ -367,6 +376,7 @@
         let currentAdmin = null;
         let realtimeSubscription = null;
         let currentChatUserId = null;
+        let currentChatUserEmail = null;
         
         async function checkAdminPermission() {
             const { data: { session } } = await supabase.auth.getSession();
@@ -407,10 +417,11 @@
             const tableContainer = document.querySelector('.table-container');
             
             try {
-                // Get unique users with their latest message
+                // Get unique users with their latest message (exclude deleted)
                 const { data: tickets, error } = await supabase
                     .from('support_tickets')
                     .select('*')
+                    .eq('deleted', false)
                     .order('created_at', { ascending: false });
                 
                 if (error) throw error;
@@ -418,7 +429,7 @@
                 // Group by user and get latest
                 const userThreads = {};
                 tickets?.forEach(ticket => {
-                    const key = ticket.user_id || ticket.user_email;
+                    const key = ticket.user_id;
                     if (!userThreads[key] || new Date(ticket.created_at) > new Date(userThreads[key].created_at)) {
                         userThreads[key] = ticket;
                     }
@@ -453,7 +464,7 @@
                     
                     // Find last admin reply
                     const lastAdminReply = tickets?.find(t => 
-                        t.user_id === thread.user_id && t.is_admin === true
+                        t.user_id === thread.user_id && t.is_admin === true && t.deleted !== true
                     );
                     
                     const repliedBy = lastAdminReply 
@@ -478,8 +489,8 @@
                                 <button class="btn-icon view" onclick="openChat('${thread.user_id}', '${thread.user_email}')">
                                     <i class="fas fa-comments"></i>
                                 </button>
-                                <button class="btn-icon delete" onclick="closeTicket('${thread.user_id}')">
-                                    <i class="fas fa-check"></i>
+                                <button class="btn-icon btn-delete-chat" onclick="deleteUserChat('${thread.user_id}', '${thread.user_email}')">
+                                    <i class="fas fa-trash"></i>
                                 </button>
                             </td>
                         </tr>
@@ -499,6 +510,7 @@
         
         async function openChat(userId, userEmail) {
             currentChatUserId = userId;
+            currentChatUserEmail = userEmail;
             
             // Update modal header
             document.getElementById('chatUserName').textContent = userEmail?.split('@')[0] || 'ผู้ใช้';
@@ -527,7 +539,8 @@
                 const { data: messages, error } = await supabase
                     .from('support_tickets')
                     .select('*')
-                    .or(`user_id.eq.${userId},user_email.eq.${currentChatUserId}`)
+                    .eq('user_id', userId)
+                    .eq('deleted', false)
                     .order('created_at', { ascending: true });
                 
                 if (error) throw error;
@@ -559,7 +572,6 @@
         function appendChatMessage(msg) {
             const chatMessages = document.getElementById('chatMessages');
             const isUser = !msg.is_admin;
-            const isTH = document.documentElement.lang === 'th';
             
             const msgEl = document.createElement('div');
             msgEl.className = `chat-message ${isUser ? 'user' : 'admin'}`;
@@ -622,12 +634,13 @@
                 // Save to database
                 const { error } = await supabase.from('support_tickets').insert([{
                     user_id: currentChatUserId,
-                    user_email: document.getElementById('chatUserEmail').textContent,
+                    user_email: currentChatUserEmail,
                     message: text,
                     is_admin: true,
                     admin_email: currentAdmin.email,
                     admin_id: currentAdmin.id,
-                    status: 'open'
+                    status: 'open',
+                    deleted: false
                 }]);
                 
                 if (error) throw error;
@@ -655,7 +668,38 @@
         }
 
         // ========================================
-        // CLOSE TICKET
+        // 🔥 DELETE USER CHAT (Reset Chat)
+        // ========================================
+        
+        async function deleteUserChat(userId, userEmail) {
+            const confirmMsg = `คุณแน่ใจหรือไม่ที่จะลบแชททั้งหมดของผู้ใช้ "${userEmail}"?\n\nการกระทำนี้จะไม่สามารถกู้คืนได้ และผู้ใช้จะเห็นข้อความ "แอดมินได้รีเซ็ตแชทนี้แล้ว"`;
+            if (!confirm(confirmMsg)) return;
+            
+            try {
+                // Mark all messages as deleted (soft delete)
+                const { error } = await supabase
+                    .from('support_tickets')
+                    .update({ deleted: true, updated_at: new Date().toISOString() })
+                    .eq('user_id', userId);
+                
+                if (error) throw error;
+                
+                showNotification('success', `ลบแชทของ ${userEmail} สำเร็จ`);
+                loadTickets();
+                
+                // Close modal if open
+                if (document.getElementById('chatModal').classList.contains('active')) {
+                    closeModal();
+                }
+                
+            } catch (error) {
+                console.error('Delete chat error:', error);
+                showNotification('error', 'ลบแชทไม่สำเร็จ');
+            }
+        }
+
+        // ========================================
+        // CLOSE TICKET (Change Status)
         // ========================================
         
         async function closeTicket(userId) {
@@ -697,7 +741,10 @@
                 }, (payload) => {
                     const newMsg = payload.new;
                     
-                    // Show typing indicator briefly
+                    // Skip if deleted or not relevant
+                    if (newMsg.deleted === true) return;
+                    
+                    // Show typing indicator briefly for admin messages
                     if (newMsg.is_admin) {
                         const typing = document.getElementById('typingIndicator');
                         typing.classList.add('active');
@@ -723,6 +770,7 @@
             document.getElementById('chatModal').classList.remove('active');
             document.body.style.overflow = '';
             currentChatUserId = null;
+            currentChatUserEmail = null;
             if (realtimeSubscription) {
                 supabase.removeChannel(realtimeSubscription);
                 realtimeSubscription = null;
@@ -895,6 +943,7 @@
 
         // Make functions global for onclick handlers
         window.openChat = openChat;
+        window.deleteUserChat = deleteUserChat;
         window.closeTicket = closeTicket;
 
         // Run init
