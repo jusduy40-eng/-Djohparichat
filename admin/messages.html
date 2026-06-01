@@ -18,7 +18,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        /* Modal Styles */
+        /* Chat Modal Styles */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center;
@@ -27,8 +27,9 @@
         .modal.active { opacity: 1; visibility: visible; }
         .modal-content {
             background: var(--white); border-radius: var(--radius-lg); width: 100%;
-            max-width: 600px; max-height: 90vh; overflow-y: auto; position: relative;
-            transform: translateY(20px); transition: transform 0.3s ease; box-shadow: var(--shadow-xl);
+            max-width: 700px; max-height: 90vh; display: flex; flex-direction: column;
+            position: relative; transform: translateY(20px); transition: transform 0.3s ease;
+            box-shadow: var(--shadow-xl);
         }
         .modal.active .modal-content { transform: translateY(0); }
         .modal-close {
@@ -38,44 +39,153 @@
             color: var(--gray-600); transition: var(--transition-fast); z-index: 10;
         }
         .modal-close:hover { background: var(--gray-200); color: var(--gray-900); }
-        .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); }
-        .modal-header h3 { margin: 0; font-size: 1.3rem; color: var(--gray-900); }
-        .modal-body { padding: 24px; }
-        .modal-footer { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 12px; }
         
-        /* Message Detail */
-        .message-detail { display: flex; flex-direction: column; gap: 16px; }
-        .message-field { display: flex; flex-direction: column; gap: 6px; }
-        .message-field label { font-weight: 500; color: var(--gray-600); font-size: 0.9rem; }
-        .message-field .value { color: var(--gray-900); font-size: 1rem; line-height: 1.5; }
-        .message-field .value pre { 
-            white-space: pre-wrap; word-wrap: break-word; 
-            background: var(--gray-50); padding: 12px; border-radius: var(--radius-md); 
-            font-family: inherit; margin: 0;
+        /* Chat Header */
+        .chat-modal-header {
+            padding: 16px 20px; border-bottom: 1px solid var(--gray-200);
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            background: var(--gray-50);
+        }
+        .chat-user-info { display: flex; align-items: center; gap: 12px; }
+        .chat-user-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--primary-blue); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 1rem;
+        }
+        .chat-user-details h4 { margin: 0; font-size: 1.1rem; color: var(--gray-900); }
+        .chat-user-details .email { font-size: 0.85rem; color: var(--gray-500); }
+        .chat-status {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.85rem; color: var(--gray-600);
+        }
+        .status-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #10b981; animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        /* Chat Messages Area */
+        .chat-messages {
+            flex: 1; overflow-y: auto; padding: 20px;
+            display: flex; flex-direction: column; gap: 16px;
+            background: var(--gray-50);
+        }
+        .chat-message {
+            display: flex; gap: 12px; max-width: 85%;
+            animation: slideIn 0.2s ease;
+        }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .chat-message.user { align-self: flex-start; }
+        .chat-message.admin { align-self: flex-end; flex-direction: row-reverse; }
+        
+        .message-avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 0.9rem; flex-shrink: 0;
+        }
+        .chat-message.user .message-avatar {
+            background: var(--primary-blue); color: white;
+        }
+        .chat-message.admin .message-avatar {
+            background: var(--gradient-gold); color: var(--gray-900);
         }
         
-        /* Status Badge */
+        .message-bubble {
+            padding: 12px 16px; border-radius: var(--radius-md);
+            background: var(--white); box-shadow: var(--shadow-sm);
+            font-size: 0.95rem; line-height: 1.4;
+        }
+        .chat-message.admin .message-bubble {
+            background: var(--primary-blue); color: white;
+        }
+        
+        .message-meta {
+            display: flex; align-items: center; gap: 8px;
+            margin-top: 6px; font-size: 0.75rem;
+        }
+        .chat-message.user .message-meta { color: var(--gray-500); }
+        .chat-message.admin .message-meta { 
+            color: rgba(255,255,255,0.8); justify-content: flex-end; 
+        }
+        .admin-name {
+            font-weight: 500; color: var(--primary-blue);
+        }
+        .chat-message.admin .admin-name { color: rgba(255,255,255,0.9); }
+        
+        /* Chat Input */
+        .chat-input-area {
+            padding: 16px 20px; border-top: 1px solid var(--gray-200);
+            background: var(--white); display: flex; gap: 12px; align-items: flex-end;
+        }
+        .chat-input-area textarea {
+            flex: 1; padding: 12px 16px; border: 2px solid var(--gray-200);
+            border-radius: var(--radius-md); font-size: 0.95rem; resize: none;
+            min-height: 44px; max-height: 120px; font-family: inherit;
+            transition: var(--transition-fast);
+        }
+        .chat-input-area textarea:focus {
+            outline: none; border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+        }
+        .chat-send {
+            width: 44px; height: 44px; border: none;
+            background: var(--gradient-primary); color: white;
+            border-radius: var(--radius-md); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; transition: var(--transition-fast); flex-shrink: 0;
+        }
+        .chat-send:hover:not(:disabled) {
+            transform: translateY(-2px); box-shadow: var(--shadow-md);
+        }
+        .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Typing Indicator */
+        .typing-indicator {
+            display: none; padding: 12px 16px; background: var(--white);
+            border-radius: var(--radius-md); width: fit-content;
+            box-shadow: var(--shadow-sm); margin-left: 48px;
+        }
+        .typing-indicator.active { display: block; }
+        .typing-dots { display: flex; gap: 4px; }
+        .typing-dots span {
+            width: 8px; height: 8px; background: var(--gray-400);
+            border-radius: 50%; animation: typing 1.4s infinite ease-in-out;
+        }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-8px); }
+        }
+        
+        /* Table Styles */
         .status-badge {
             display: inline-block; padding: 4px 12px; border-radius: 20px;
             font-size: 0.8rem; font-weight: 600;
         }
-        .status-badge.new { background: #fee2e2; color: #dc2626; }
-        .status-badge.read { background: #dbeafe; color: #1d4ed8; }
-        .status-badge.replied { background: #d1fae5; color: #059669; }
+        .status-badge.open { background: #fee2e2; color: #dc2626; }
+        .status-badge.closed { background: #dbeafe; color: #1d4ed8; }
+        .status-badge.resolved { background: #d1fae5; color: #059669; }
         
-        /* Empty State */
         .empty-state {
             text-align: center; padding: 40px 20px; color: var(--gray-500);
         }
         .empty-state i { font-size: 3rem; margin-bottom: 16px; opacity: 0.5; }
         
-        /* Filter */
         .filter-bar {
             display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
         }
         .filter-bar select, .filter-bar input {
             padding: 8px 12px; border: 1px solid var(--gray-300);
             border-radius: 6px; font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .modal-content { max-width: calc(100vw - 32px); height: calc(100vh - 100px); }
+            .chat-messages { padding: 16px; }
+            .chat-message { max-width: 95%; }
         }
     </style>
 </head>
@@ -146,7 +256,7 @@
             
             <div class="admin-section">
                 <div class="section-header">
-                    <h2 data-th="ข้อความล่าสุด" data-en="Recent Messages">ข้อความล่าสุด</h2>
+                    <h2 data-th="แชทสนับสนุน" data-en="Support Chats">แชทสนับสนุน</h2>
                     <button class="btn btn-outline" id="refreshBtn">
                         <i class="fas fa-sync-alt"></i>
                         <span data-th="รีเฟรช" data-en="Refresh">รีเฟรช</span>
@@ -157,9 +267,9 @@
                 <div class="filter-bar">
                     <select id="filterStatus">
                         <option value="all" data-th="ทุกสถานะ" data-en="All Status">ทุกสถานะ</option>
-                        <option value="new" data-th="ใหม่" data-en="New">ใหม่</option>
-                        <option value="read" data-th="อ่านแล้ว" data-en="Read">อ่านแล้ว</option>
-                        <option value="replied" data-th="ตอบแล้ว" data-en="Replied">ตอบแล้ว</option>
+                        <option value="open" data-th="เปิด" data-en="Open">เปิด</option>
+                        <option value="closed" data-th="ปิด" data-en="Closed">ปิด</option>
+                        <option value="resolved" data-th="แก้ไขแล้ว" data-en="Resolved">แก้ไขแล้ว</option>
                     </select>
                     <input type="text" id="searchInput" placeholder="ค้นหาชื่อหรืออีเมล..." style="flex: 1; min-width: 200px;">
                 </div>
@@ -169,9 +279,9 @@
                     <table class="admin-table">
                         <thead>
                             <tr>
-                                <th data-th="ชื่อ" data-en="Name">ชื่อ</th>
-                                <th data-th="อีเมล" data-en="Email">อีเมล</th>
-                                <th data-th="หัวข้อ" data-en="Subject">หัวข้อ</th>
+                                <th data-th="ผู้ใช้" data-en="User">ผู้ใช้</th>
+                                <th data-th="ข้อความล่าสุด" data-en="Last Message">ข้อความล่าสุด</th>
+                                <th data-th="ตอบโดย" data-en="Replied By">ตอบโดย</th>
                                 <th data-th="วันที่" data-en="Date">วันที่</th>
                                 <th data-th="สถานะ" data-en="Status">สถานะ</th>
                                 <th data-th="การจัดการ" data-en="Actions">การจัดการ</th>
@@ -196,24 +306,41 @@
         </div>
     </main>
 
-    <!-- Message Detail Modal -->
-    <div id="messageModal" class="modal">
+    <!-- Chat Modal -->
+    <div id="chatModal" class="modal">
         <div class="modal-content">
             <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
-            <div class="modal-header">
-                <h3 id="modalTitle">รายละเอียดข้อความ</h3>
+            
+            <!-- Chat Header -->
+            <div class="chat-modal-header">
+                <div class="chat-user-info">
+                    <div class="chat-user-avatar" id="chatUserAvatar">U</div>
+                    <div class="chat-user-details">
+                        <h4 id="chatUserName">ผู้ใช้</h4>
+                        <span class="email" id="chatUserEmail">user@email.com</span>
+                    </div>
+                </div>
+                <div class="chat-status">
+                    <span class="status-dot"></span>
+                    <span id="chatStatusText">ออนไลน์</span>
+                </div>
             </div>
-            <div class="modal-body">
-                <div id="messageDetail" class="message-detail"></div>
+            
+            <!-- Chat Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be inserted here -->
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" id="markReadBtn">
-                    <i class="fas fa-check"></i>
-                    <span data-th="ทำเครื่องหมายว่าอ่านแล้ว" data-en="Mark as Read">ทำเครื่องหมายว่าอ่านแล้ว</span>
-                </button>
-                <button class="btn btn-primary" id="replyBtn">
-                    <i class="fas fa-reply"></i>
-                    <span data-th="ตอบกลับ" data-en="Reply">ตอบกลับ</span>
+            
+            <!-- Typing Indicator -->
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots"><span></span><span></span><span></span></div>
+            </div>
+            
+            <!-- Chat Input -->
+            <div class="chat-input-area">
+                <textarea id="chatInput" placeholder="พิมพ์ข้อความตอบกลับ..." rows="1"></textarea>
+                <button class="chat-send" id="chatSend" title="ส่ง">
+                    <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
         </div>
@@ -236,6 +363,10 @@
         // ========================================
         // 🔐 ADMIN PERMISSION CHECK
         // ========================================
+        
+        let currentAdmin = null;
+        let realtimeSubscription = null;
+        let currentChatUserId = null;
         
         async function checkAdminPermission() {
             const { data: { session } } = await supabase.auth.getSession();
@@ -261,33 +392,47 @@
                 return false;
             }
             
+            currentAdmin = { email: userEmail, id: session.user.id };
             document.getElementById('adminEmail').textContent = userEmail;
             return true;
         }
 
         // ========================================
-        // LOAD MESSAGES
+        // LOAD SUPPORT TICKETS
         // ========================================
         
-        async function loadMessages() {
+        async function loadTickets() {
             const tbody = document.getElementById('messagesTableBody');
             const emptyState = document.getElementById('emptyState');
             const tableContainer = document.querySelector('.table-container');
             
             try {
-                let query = supabase.from('contact_messages').select('*').order('created_at', { ascending: false });
-                
-                // Apply status filter
-                const filterStatus = document.getElementById('filterStatus').value;
-                if (filterStatus !== 'all') {
-                    query = query.eq('status', filterStatus);
-                }
-                
-                const { data, error } = await query;
+                // Get unique users with their latest message
+                const { data: tickets, error } = await supabase
+                    .from('support_tickets')
+                    .select('*')
+                    .order('created_at', { ascending: false });
                 
                 if (error) throw error;
                 
-                if (!data || data.length === 0) {
+                // Group by user and get latest
+                const userThreads = {};
+                tickets?.forEach(ticket => {
+                    const key = ticket.user_id || ticket.user_email;
+                    if (!userThreads[key] || new Date(ticket.created_at) > new Date(userThreads[key].created_at)) {
+                        userThreads[key] = ticket;
+                    }
+                });
+                
+                const threads = Object.values(userThreads);
+                
+                // Apply filters
+                const filterStatus = document.getElementById('filterStatus').value;
+                const filteredThreads = filterStatus !== 'all' 
+                    ? threads.filter(t => t.status === filterStatus)
+                    : threads;
+                
+                if (!filteredThreads || filteredThreads.length === 0) {
                     tbody.innerHTML = '';
                     tableContainer.style.display = 'none';
                     emptyState.style.display = 'block';
@@ -299,26 +444,42 @@
                 
                 const isTH = document.documentElement.lang === 'th';
                 
-                tbody.innerHTML = data.map(msg => {
+                tbody.innerHTML = filteredThreads.map(thread => {
                     const statusBadge = {
-                        'new': { text: isTH ? 'ใหม่' : 'New', class: 'new' },
-                        'read': { text: isTH ? 'อ่านแล้ว' : 'Read', class: 'read' },
-                        'replied': { text: isTH ? 'ตอบแล้ว' : 'Replied', class: 'replied' }
-                    }[msg.status] || { text: msg.status, class: 'read' };
+                        'open': { text: isTH ? 'เปิด' : 'Open', class: 'open' },
+                        'closed': { text: isTH ? 'ปิด' : 'Closed', class: 'closed' },
+                        'resolved': { text: isTH ? 'แก้ไขแล้ว' : 'Resolved', class: 'resolved' }
+                    }[thread.status] || { text: thread.status, class: 'open' };
+                    
+                    // Find last admin reply
+                    const lastAdminReply = tickets?.find(t => 
+                        t.user_id === thread.user_id && t.is_admin === true
+                    );
+                    
+                    const repliedBy = lastAdminReply 
+                        ? `<span class="admin-name">${lastAdminReply.admin_email?.split('@')[0] || 'แอดมิน'}</span>`
+                        : '<span style="color: var(--gray-400)">-</span>';
                     
                     return `
-                        <tr data-id="${msg.id}">
-                            <td><strong>${msg.name}</strong></td>
-                            <td>${msg.email}</td>
-                            <td>${msg.subject || '-'}</td>
-                            <td>${formatDate(msg.created_at)}</td>
+                        <tr data-user-id="${thread.user_id}" data-user-email="${thread.user_email}">
+                            <td>
+                                <strong>${thread.user_email?.split('@')[0] || 'ผู้ใช้'}</strong>
+                                <br><small style="color: var(--gray-500)">${thread.user_email}</small>
+                            </td>
+                            <td style="max-width: 200px;">
+                                <span style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    ${thread.message?.substring(0, 40) || '-'}${thread.message?.length > 40 ? '...' : ''}
+                                </span>
+                            </td>
+                            <td>${repliedBy}</td>
+                            <td>${formatDate(thread.created_at)}</td>
                             <td><span class="status-badge ${statusBadge.class}">${statusBadge.text}</span></td>
                             <td>
-                                <button class="btn-icon view" onclick="viewMessage('${msg.id}')">
-                                    <i class="fas fa-eye"></i>
+                                <button class="btn-icon view" onclick="openChat('${thread.user_id}', '${thread.user_email}')">
+                                    <i class="fas fa-comments"></i>
                                 </button>
-                                <button class="btn-icon delete" onclick="deleteMessage('${msg.id}')">
-                                    <i class="fas fa-trash"></i>
+                                <button class="btn-icon delete" onclick="closeTicket('${thread.user_id}')">
+                                    <i class="fas fa-check"></i>
                                 </button>
                             </td>
                         </tr>
@@ -326,160 +487,111 @@
                 }).join('');
                 
             } catch (error) {
-                console.error('Error loading messages:', error);
+                console.error('Error loading tickets:', error);
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center text-error">โหลดข้อมูลไม่สำเร็จ</td></tr>`;
                 showNotification('error', 'ไม่สามารถโหลดข้อความได้');
             }
         }
 
         // ========================================
-        // VIEW MESSAGE DETAIL
+        // OPEN CHAT MODAL
         // ========================================
         
-        async function viewMessage(messageId) {
-            try {
-                const { data: msg, error } = await supabase
-                    .from('contact_messages')
-                    .select('*')
-                    .eq('id', messageId)
-                    .single();
-                
-                if (error) throw error;
-                
-                const isTH = document.documentElement.lang === 'th';
-                const statusText = {
-                    'new': isTH ? 'ใหม่' : 'New',
-                    'read': isTH ? 'อ่านแล้ว' : 'Read',
-                    'replied': isTH ? 'ตอบแล้ว' : 'Replied'
-                }[msg.status] || msg.status;
-                
-                document.getElementById('messageDetail').innerHTML = `
-                    <div class="message-field">
-                        <label data-th="ชื่อ" data-en="Name">ชื่อ</label>
-                        <div class="value">${msg.name}</div>
-                    </div>
-                    <div class="message-field">
-                        <label data-th="อีเมล" data-en="Email">อีเมล</label>
-                        <div class="value"><a href="mailto:${msg.email}">${msg.email}</a></div>
-                    </div>
-                    ${msg.phone ? `
-                    <div class="message-field">
-                        <label data-th="เบอร์โทรศัพท์" data-en="Phone">เบอร์โทรศัพท์</label>
-                        <div class="value"><a href="tel:${msg.phone}">${msg.phone}</a></div>
-                    </div>` : ''}
-                    <div class="message-field">
-                        <label data-th="หัวข้อ" data-en="Subject">หัวข้อ</label>
-                        <div class="value">${msg.subject || '-'}</div>
-                    </div>
-                    <div class="message-field">
-                        <label data-th="ข้อความ" data-en="Message">ข้อความ</label>
-                        <div class="value"><pre>${msg.message}</pre></div>
-                    </div>
-                    <div class="message-field">
-                        <label data-th="วันที่" data-en="Date">วันที่</label>
-                        <div class="value">${formatDate(msg.created_at)}</div>
-                    </div>
-                    <div class="message-field">
-                        <label data-th="สถานะ" data-en="Status">สถานะ</label>
-                        <div class="value"><span class="status-badge ${msg.status}">${statusText}</span></div>
-                    </div>
-                `;
-                
-                // Store current message ID for actions
-                document.getElementById('messageModal').dataset.messageId = messageId;
-                
-                // Update mark read button state
-                const markReadBtn = document.getElementById('markReadBtn');
-                if (msg.status === 'new') {
-                    markReadBtn.style.display = 'flex';
-                    markReadBtn.disabled = false;
-                } else {
-                    markReadBtn.style.display = 'none';
-                }
-                
-                // Show modal
-                document.getElementById('messageModal').classList.add('active');
-                document.body.style.overflow = 'hidden';
-                
-                // If message is new, mark as read automatically when viewed
-                if (msg.status === 'new') {
-                    await supabase.from('contact_messages').update({ status: 'read' }).eq('id', messageId);
-                    loadMessages(); // Refresh table
-                }
-                
-            } catch (error) {
-                console.error('View message error:', error);
-                showNotification('error', 'ไม่สามารถโหลดรายละเอียดข้อความได้');
-            }
+        async function openChat(userId, userEmail) {
+            currentChatUserId = userId;
+            
+            // Update modal header
+            document.getElementById('chatUserName').textContent = userEmail?.split('@')[0] || 'ผู้ใช้';
+            document.getElementById('chatUserEmail').textContent = userEmail;
+            document.getElementById('chatUserAvatar').textContent = userEmail?.charAt(0).toUpperCase() || 'U';
+            
+            // Load conversation
+            await loadConversation(userId);
+            
+            // Show modal
+            document.getElementById('chatModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Setup realtime for this user
+            setupChatRealtime(userId);
         }
 
         // ========================================
-        // MARK AS READ
+        // LOAD CONVERSATION
         // ========================================
         
-        async function markAsRead(messageId) {
-            try {
-                const { error } = await supabase
-                    .from('contact_messages')
-                    .update({ status: 'read' })
-                    .eq('id', messageId);
-                
-                if (error) throw error;
-                
-                showNotification('success', 'ทำเครื่องหมายว่าอ่านแล้ว');
-                loadMessages();
-                
-                // Update modal button
-                document.getElementById('markReadBtn').style.display = 'none';
-                
-            } catch (error) {
-                console.error('Mark as read error:', error);
-                showNotification('error', 'ไม่สามารถอัปเดตสถานะได้');
-            }
-        }
-
-        // ========================================
-        // DELETE MESSAGE
-        // ========================================
-        
-        async function deleteMessage(messageId) {
-            if (!confirm('คุณแน่ใจหรือไม่ที่จะลบข้อความนี้?')) return;
+        async function loadConversation(userId) {
+            const chatMessages = document.getElementById('chatMessages');
             
             try {
-                const { error } = await supabase
-                    .from('contact_messages')
-                    .delete()
-                    .eq('id', messageId);
+                const { data: messages, error } = await supabase
+                    .from('support_tickets')
+                    .select('*')
+                    .or(`user_id.eq.${userId},user_email.eq.${currentChatUserId}`)
+                    .order('created_at', { ascending: true });
                 
                 if (error) throw error;
                 
-                showNotification('success', 'ลบข้อความสำเร็จ');
-                loadMessages();
+                chatMessages.innerHTML = '';
                 
-                // Close modal if open
-                if (document.getElementById('messageModal').classList.contains('active')) {
-                    closeModal();
+                if (!messages || messages.length === 0) {
+                    chatMessages.innerHTML = '<div class="empty-state"><p>ยังไม่มีข้อความในแชทนี้</p></div>';
+                    return;
                 }
                 
+                messages.forEach(msg => {
+                    appendChatMessage(msg);
+                });
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
             } catch (error) {
-                console.error('Delete error:', error);
-                showNotification('error', 'ลบข้อความไม่สำเร็จ');
+                console.error('Load conversation error:', error);
+                showNotification('error', 'ไม่สามารถโหลดประวัติแชทได้');
             }
         }
 
         // ========================================
-        // MODAL FUNCTIONS
+        // APPEND CHAT MESSAGE
         // ========================================
         
-        function closeModal() {
-            document.getElementById('messageModal').classList.remove('active');
-            document.body.style.overflow = '';
+        function appendChatMessage(msg) {
+            const chatMessages = document.getElementById('chatMessages');
+            const isUser = !msg.is_admin;
+            const isTH = document.documentElement.lang === 'th';
+            
+            const msgEl = document.createElement('div');
+            msgEl.className = `chat-message ${isUser ? 'user' : 'admin'}`;
+            
+            const avatar = isUser 
+                ? (msg.user_email?.charAt(0).toUpperCase() || 'U')
+                : (msg.admin_email?.charAt(0).toUpperCase() || 'A');
+            
+            const adminInfo = !isUser && msg.admin_email 
+                ? `<span class="admin-name">${msg.admin_email?.split('@')[0]}</span> • ` 
+                : '';
+            
+            msgEl.innerHTML = `
+                <div class="message-avatar">${avatar}</div>
+                <div>
+                    <div class="message-bubble">${escapeHtml(msg.message)}</div>
+                    <div class="message-meta">
+                        ${!isUser ? adminInfo : ''}
+                        <span>${formatTime(msg.created_at)}</span>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(msgEl);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // ========================================
-        // UTILITY FUNCTIONS
-        // ========================================
-        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         function formatDate(dateString) {
             if (!dateString) return '-';
             return new Date(dateString).toLocaleString('th-TH', {
@@ -488,6 +600,139 @@
             });
         }
 
+        function formatTime(dateString) {
+            if (!dateString) return '-';
+            return new Date(dateString).toLocaleTimeString('th-TH', {
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        // ========================================
+        // SEND REPLY
+        // ========================================
+        
+        async function sendReply() {
+            const text = document.getElementById('chatInput').value.trim();
+            if (!text || !currentChatUserId || !currentAdmin) return;
+            
+            const sendBtn = document.getElementById('chatSend');
+            sendBtn.disabled = true;
+            
+            try {
+                // Save to database
+                const { error } = await supabase.from('support_tickets').insert([{
+                    user_id: currentChatUserId,
+                    user_email: document.getElementById('chatUserEmail').textContent,
+                    message: text,
+                    is_admin: true,
+                    admin_email: currentAdmin.email,
+                    admin_id: currentAdmin.id,
+                    status: 'open'
+                }]);
+                
+                if (error) throw error;
+                
+                // Show locally
+                appendChatMessage({
+                    message: text,
+                    is_admin: true,
+                    admin_email: currentAdmin.email,
+                    created_at: new Date().toISOString()
+                });
+                
+                document.getElementById('chatInput').value = '';
+                document.getElementById('chatInput').style.height = 'auto';
+                
+                // Refresh table to show updated "Replied By"
+                loadTickets();
+                
+            } catch (error) {
+                console.error('Send error:', error);
+                showNotification('error', 'ส่งข้อความไม่สำเร็จ');
+            } finally {
+                sendBtn.disabled = false;
+            }
+        }
+
+        // ========================================
+        // CLOSE TICKET
+        // ========================================
+        
+        async function closeTicket(userId) {
+            if (!confirm('คุณแน่ใจหรือไม่ที่จะปิดแชทนี้?')) return;
+            
+            try {
+                const { error } = await supabase
+                    .from('support_tickets')
+                    .update({ status: 'closed' })
+                    .eq('user_id', userId);
+                
+                if (error) throw error;
+                
+                showNotification('success', 'ปิดแชทสำเร็จ');
+                loadTickets();
+                
+            } catch (error) {
+                console.error('Close error:', error);
+                showNotification('error', 'ปิดแชทไม่สำเร็จ');
+            }
+        }
+
+        // ========================================
+        // REALTIME SUBSCRIPTION
+        // ========================================
+        
+        function setupChatRealtime(userId) {
+            if (realtimeSubscription) {
+                supabase.removeChannel(realtimeSubscription);
+            }
+            
+            realtimeSubscription = supabase
+                .channel(`chat_${userId}`)
+                .on('postgres_changes', {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'support_tickets',
+                    filter: `user_id=eq.${userId}`
+                }, (payload) => {
+                    const newMsg = payload.new;
+                    
+                    // Show typing indicator briefly
+                    if (newMsg.is_admin) {
+                        const typing = document.getElementById('typingIndicator');
+                        typing.classList.add('active');
+                        setTimeout(() => typing.classList.remove('active'), 800);
+                    }
+                    
+                    // Append message
+                    appendChatMessage(newMsg);
+                    
+                    // Refresh table if needed
+                    if (newMsg.is_admin) {
+                        loadTickets();
+                    }
+                })
+                .subscribe();
+        }
+
+        // ========================================
+        // MODAL FUNCTIONS
+        // ========================================
+        
+        function closeModal() {
+            document.getElementById('chatModal').classList.remove('active');
+            document.body.style.overflow = '';
+            currentChatUserId = null;
+            if (realtimeSubscription) {
+                supabase.removeChannel(realtimeSubscription);
+                realtimeSubscription = null;
+            }
+        }
+
+        // ========================================
+        // NOTIFICATIONS
+        // ========================================
+        
         function showNotification(type, message) {
             const container = document.getElementById('notificationContainer');
             const notification = document.createElement('div');
@@ -533,6 +778,9 @@
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
             e.preventDefault();
             if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
+                if (realtimeSubscription) {
+                    supabase.removeChannel(realtimeSubscription);
+                }
                 await supabase.auth.signOut();
                 window.location.href = '../index.html';
             }
@@ -567,19 +815,19 @@
         // FILTER & SEARCH
         // ========================================
         
-        document.getElementById('filterStatus')?.addEventListener('change', loadMessages);
+        document.getElementById('filterStatus')?.addEventListener('change', loadTickets);
         
         let searchTimeout;
         document.getElementById('searchInput')?.addEventListener('input', (e) => {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 const keyword = e.target.value.toLowerCase();
-                document.querySelectorAll('#messagesTableBody tr[data-id]').forEach(row => {
+                document.querySelectorAll('#messagesTableBody tr[data-user-id]').forEach(row => {
                     const name = row.cells[0]?.textContent.toLowerCase() || '';
-                    const email = row.cells[1]?.textContent.toLowerCase() || '';
-                    const subject = row.cells[2]?.textContent.toLowerCase() || '';
+                    const email = row.cells[0]?.querySelector('small')?.textContent.toLowerCase() || '';
+                    const message = row.cells[1]?.textContent.toLowerCase() || '';
                     
-                    if (name.includes(keyword) || email.includes(keyword) || subject.includes(keyword)) {
+                    if (name.includes(keyword) || email.includes(keyword) || message.includes(keyword)) {
                         row.style.display = '';
                     } else {
                         row.style.display = 'none';
@@ -601,35 +849,53 @@
             initLanguage();
             initSidebar();
             
-            // Load messages
-            await loadMessages();
+            // Load tickets
+            await loadTickets();
             
             // Hide loader
             document.getElementById('adminLoader').style.display = 'none';
             
             // Event listeners
-            document.getElementById('refreshBtn')?.addEventListener('click', loadMessages);
+            document.getElementById('refreshBtn')?.addEventListener('click', loadTickets);
             document.getElementById('modalClose')?.addEventListener('click', closeModal);
-            document.getElementById('markReadBtn')?.addEventListener('click', () => {
-                const messageId = document.getElementById('messageModal').dataset.messageId;
-                if (messageId) markAsRead(messageId);
+            document.getElementById('chatSend')?.addEventListener('click', sendReply);
+            
+            // Auto-resize textarea
+            document.getElementById('chatInput')?.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
             });
-            document.getElementById('replyBtn')?.addEventListener('click', () => {
-                const email = document.querySelector('#messageDetail a[href^="mailto:"]')?.textContent;
-                if (email) {
-                    window.location.href = `mailto:${email}?subject=Re: ${document.getElementById('modalTitle').textContent}`;
+            
+            // Send on Enter (without Shift)
+            document.getElementById('chatInput')?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendReply();
                 }
             });
             
             // Close modal on outside click
-            document.getElementById('messageModal')?.addEventListener('click', (e) => {
-                if (e.target.id === 'messageModal') closeModal();
+            document.getElementById('chatModal')?.addEventListener('click', (e) => {
+                if (e.target.id === 'chatModal') closeModal();
             });
+            
+            // Global realtime for new tickets
+            supabase
+                .channel('new_tickets')
+                .on('postgres_changes', {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'support_tickets',
+                    filter: 'is_admin=eq.false'
+                }, () => {
+                    loadTickets(); // Refresh table when new user message arrives
+                })
+                .subscribe();
         }
 
         // Make functions global for onclick handlers
-        window.viewMessage = viewMessage;
-        window.deleteMessage = deleteMessage;
+        window.openChat = openChat;
+        window.closeTicket = closeTicket;
 
         // Run init
         if (document.readyState === 'loading') {
