@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Supabase</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Test Supabase Connection</h1>
+    <button onclick="testConnection()">Test</button>
+    <pre id="result"></pre>
+
+    <script type="module">
+        import { config } from './lib/config.js';
+        
+        const supabase = window.supabase.createClient(
+            config.supabaseUrl,
+            config.supabaseAnonKey
+        );
+        
+        window.testConnection = async function() {
+            const result = document.getElementById('result');
+            result.textContent = 'Testing...';
+            
+            try {
+                const { data, error } = await supabase.from('courses').select('*').limit(1);
+                
+                if (error) {
+                    result.textContent = 'Error: ' + error.message;
+                } else {
+                    result.textContent = 'Success! Connected to Supabase.\nData: ' + JSON.stringify(data, null, 2);
+                }
+            } catch (err) {
+                result.textContent = 'Failed: ' + err.message;
+            }
+        };
+    </script>
+</body>
+</html>
