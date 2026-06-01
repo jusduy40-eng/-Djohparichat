@@ -31,304 +31,109 @@
     <style>
         /* Auth Modal Styles */
         .auth-modal {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            padding: 20px;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center;
+            z-index: 10000; opacity: 0; visibility: hidden; transition: all 0.3s ease; padding: 20px;
         }
-        .auth-modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
+        .auth-modal.active { opacity: 1; visibility: visible; }
         .auth-modal-content {
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            width: 100%;
-            max-width: 420px;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-            box-shadow: var(--shadow-xl);
+            background: var(--white); border-radius: var(--radius-lg); width: 100%;
+            max-width: 420px; max-height: 90vh; overflow-y: auto; position: relative;
+            transform: translateY(20px); transition: transform 0.3s ease; box-shadow: var(--shadow-xl);
         }
-        .auth-modal.active .auth-modal-content {
-            transform: translateY(0);
-        }
+        .auth-modal.active .auth-modal-content { transform: translateY(0); }
         .auth-modal-close {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            width: 36px;
-            height: 36px;
-            border: none;
-            background: var(--gray-100);
-            border-radius: var(--radius-full);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--gray-600);
-            transition: var(--transition-fast);
-            z-index: 10;
+            position: absolute; top: 16px; right: 16px; width: 36px; height: 36px;
+            border: none; background: var(--gray-100); border-radius: var(--radius-full);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            color: var(--gray-600); transition: var(--transition-fast); z-index: 10;
         }
-        .auth-modal-close:hover {
-            background: var(--gray-200);
-            color: var(--gray-900);
-        }
-        .auth-modal-header {
-            padding: 24px 24px 0;
-            text-align: center;
-        }
-        .auth-modal-header h3 {
-            font-size: 1.5rem;
-            color: var(--gray-900);
-            margin-bottom: 8px;
-        }
-        .auth-modal-header p {
-            color: var(--gray-600);
-            margin: 0;
-            font-size: 0.95rem;
-        }
-        .auth-modal-body {
-            padding: 24px;
-        }
-        .auth-form {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .auth-form .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .auth-form .form-group label {
-            font-weight: 500;
-            color: var(--gray-700);
-            font-size: 0.9rem;
-        }
+        .auth-modal-close:hover { background: var(--gray-200); color: var(--gray-900); }
+        .auth-modal-header { padding: 24px 24px 0; text-align: center; }
+        .auth-modal-header h3 { font-size: 1.5rem; color: var(--gray-900); margin-bottom: 8px; }
+        .auth-modal-header p { color: var(--gray-600); margin: 0; font-size: 0.95rem; }
+        .auth-modal-body { padding: 24px; }
+        .auth-form { display: flex; flex-direction: column; gap: 16px; }
+        .auth-form .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .auth-form .form-group label { font-weight: 500; color: var(--gray-700); font-size: 0.9rem; }
         .auth-form .form-group input {
-            padding: 12px 16px;
-            border: 2px solid var(--gray-200);
-            border-radius: var(--radius-md);
-            font-size: 1rem;
-            transition: var(--transition-fast);
-            outline: none;
+            padding: 12px 16px; border: 2px solid var(--gray-200); border-radius: var(--radius-md);
+            font-size: 1rem; transition: var(--transition-fast); outline: none;
         }
         .auth-form .form-group input:focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+            border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
         }
-        .auth-form .form-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9rem;
-        }
-        .auth-form .form-options label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--gray-600);
-            cursor: pointer;
-        }
-        .auth-form .form-options a {
-            color: var(--primary-blue);
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .auth-form .form-options a:hover {
-            text-decoration: underline;
-        }
+        .auth-form .form-options { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
+        .auth-form .form-options label { display: flex; align-items: center; gap: 6px; color: var(--gray-600); cursor: pointer; }
+        .auth-form .form-options a { color: var(--primary-blue); text-decoration: none; font-weight: 500; }
+        .auth-form .form-options a:hover { text-decoration: underline; }
         .auth-form .btn-auth {
-            width: 100%;
-            padding: 14px;
-            background: var(--gradient-primary);
-            color: var(--white);
-            border: none;
-            border-radius: var(--radius-md);
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition-normal);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            width: 100%; padding: 14px; background: var(--gradient-primary); color: var(--white);
+            border: none; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: var(--transition-normal); display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .auth-form .btn-auth:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-        .auth-form .btn-auth:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        .auth-divider {
-            text-align: center;
-            margin: 16px 0;
-            position: relative;
-        }
+        .auth-form .btn-auth:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .auth-form .btn-auth:disabled { opacity: 0.7; cursor: not-allowed; }
+        .auth-divider { text-align: center; margin: 16px 0; position: relative; }
         .auth-divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: var(--gray-200);
+            content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--gray-200);
         }
-        .auth-divider span {
-            background: var(--white);
-            padding: 0 12px;
-            color: var(--gray-500);
-            font-size: 0.9rem;
-            position: relative;
-        }
-        .auth-toggle {
-            text-align: center;
-            margin-top: 16px;
-            font-size: 0.95rem;
-            color: var(--gray-600);
-        }
-        .auth-toggle a {
-            color: var(--primary-blue);
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .auth-toggle a:hover {
-            text-decoration: underline;
-        }
-        .auth-message {
-            padding: 12px 16px;
-            border-radius: var(--radius-md);
-            margin-bottom: 16px;
-            font-size: 0.9rem;
-            display: none;
-        }
-        .auth-message.success {
-            background: #d1fae5;
-            color: #065f46;
-            border-left: 4px solid #10b981;
-        }
-        .auth-message.error {
-            background: #fee2e2;
-            color: #991b1b;
-            border-left: 4px solid #ef4444;
-        }
-        .auth-form-view {
-            display: none;
-        }
-        .auth-form-view.active {
-            display: block;
-        }
+        .auth-divider span { background: var(--white); padding: 0 12px; color: var(--gray-500); font-size: 0.9rem; position: relative; }
+        .auth-toggle { text-align: center; margin-top: 16px; font-size: 0.95rem; color: var(--gray-600); }
+        .auth-toggle a { color: var(--primary-blue); text-decoration: none; font-weight: 600; cursor: pointer; }
+        .auth-toggle a:hover { text-decoration: underline; }
+        .auth-message { padding: 12px 16px; border-radius: var(--radius-md); margin-bottom: 16px; font-size: 0.9rem; display: none; }
+        .auth-message.success { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
+        .auth-message.error { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
+        .auth-form-view { display: none; }
+        .auth-form-view.active { display: block; }
         
-        /* User Menu in Navbar */
-        .user-menu {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .user-auth-buttons {
-            display: flex;
-            gap: 8px;
-        }
-        .user-auth-buttons .btn {
-            padding: 8px 16px;
-            font-size: 0.9rem;
-        }
-        .user-auth-buttons .btn-sm {
-            padding: 6px 12px;
-            font-size: 0.85rem;
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-        }
+        /* User Menu */
+        .user-menu { position: relative; display: flex; align-items: center; gap: 12px; }
+        .user-auth-buttons { display: flex; gap: 8px; }
+        .user-auth-buttons .btn { padding: 8px 16px; font-size: 0.9rem; }
+        .user-auth-buttons .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
+        .user-info { display: flex; align-items: center; gap: 10px; cursor: pointer; }
         .user-avatar {
-            width: 36px;
-            height: 36px;
-            background: var(--gradient-primary);
-            border-radius: var(--radius-full);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--white);
-            font-weight: 600;
-            font-size: 0.9rem;
+            width: 36px; height: 36px; background: var(--gradient-primary); border-radius: var(--radius-full);
+            display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: 600; font-size: 0.9rem;
         }
-        .user-name {
-            font-weight: 500;
-            color: var(--gray-800);
-            font-size: 0.95rem;
-            max-width: 120px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+        .user-name { font-weight: 500; color: var(--gray-800); font-size: 0.95rem; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .user-dropdown {
-            position: absolute;
-            top: calc(100% + 8px);
-            right: 0;
-            background: var(--white);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-lg);
-            min-width: 200px;
-            padding: 8px 0;
-            z-index: 1000;
-            display: none;
-            animation: slideDown 0.2s ease;
+            position: absolute; top: calc(100% + 8px); right: 0; background: var(--white);
+            border-radius: var(--radius-md); box-shadow: var(--shadow-lg); min-width: 200px;
+            padding: 8px 0; z-index: 1000; display: none; animation: slideDown 0.2s ease;
         }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .user-dropdown.active {
-            display: block;
-        }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .user-dropdown.active { display: block; }
         .user-dropdown a {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 16px;
-            color: var(--gray-700);
-            text-decoration: none;
-            font-size: 0.95rem;
-            transition: var(--transition-fast);
+            display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--gray-700);
+            text-decoration: none; font-size: 0.95rem; transition: var(--transition-fast);
         }
-        .user-dropdown a:hover {
-            background: var(--gray-50);
-            color: var(--primary-blue);
+        .user-dropdown a:hover { background: var(--gray-50); color: var(--primary-blue); }
+        .user-dropdown a i { width: 20px; text-align: center; color: var(--gray-400); }
+        .user-dropdown .divider { height: 1px; background: var(--gray-200); margin: 4px 0; }
+        .user-dropdown .logout { color: var(--error); }
+        .user-dropdown .logout i { color: var(--error); }
+        
+        /* Footer Social Links */
+        .social-links-footer {
+            display: flex; gap: 12px; margin-top: 16px; justify-content: center;
         }
-        .user-dropdown a i {
-            width: 20px;
-            text-align: center;
-            color: var(--gray-400);
+        .social-link {
+            width: 40px; height: 40px; border-radius: var(--radius-full);
+            background: var(--gray-100); display: flex; align-items: center; justify-content: center;
+            color: var(--gray-700); text-decoration: none; transition: var(--transition-fast);
         }
-        .user-dropdown .divider {
-            height: 1px;
-            background: var(--gray-200);
-            margin: 4px 0;
+        .social-link:hover {
+            background: var(--primary-blue); color: var(--white); transform: translateY(-2px);
         }
-        .user-dropdown .logout {
-            color: var(--error);
-        }
-        .user-dropdown .logout i {
-            color: var(--error);
-        }
+        .social-link.line { background: #00c300; color: white; }
+        .social-link.line:hover { background: #00a300; }
+        .social-link.tiktok { background: #000; color: white; }
+        .social-link.tiktok:hover { background: #333; }
+        .social-link.facebook { background: #1877f2; color: white; }
+        .social-link.facebook:hover { background: #145dbf; }
     </style>
 </head>
 <body>
@@ -343,103 +148,63 @@
     <!-- Auth Modal -->
     <div id="authModal" class="auth-modal">
         <div class="auth-modal-content">
-            <button class="auth-modal-close" id="authModalClose">
-                <i class="fas fa-times"></i>
-            </button>
-            
+            <button class="auth-modal-close" id="authModalClose"><i class="fas fa-times"></i></button>
             <div class="auth-modal-header">
                 <h3 id="authModalTitle">เข้าสู่ระบบ</h3>
                 <p id="authModalDesc">ยินดีต้อนรับกลับ! กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</p>
             </div>
-            
             <div class="auth-modal-body">
                 <!-- Login Form -->
                 <form id="loginForm" class="auth-form auth-form-view active">
                     <div id="loginMessage" class="auth-message"></div>
-                    
                     <div class="form-group">
                         <label for="loginEmail">อีเมล</label>
                         <input type="email" id="loginEmail" required placeholder="example@email.com">
                     </div>
-                    
                     <div class="form-group">
                         <label for="loginPassword">รหัสผ่าน</label>
                         <input type="password" id="loginPassword" required placeholder="••••••••">
                     </div>
-                    
                     <div class="form-options">
-                        <label>
-                            <input type="checkbox" id="loginRemember"> จดจำฉัน
-                        </label>
+                        <label><input type="checkbox" id="loginRemember"> จดจำฉัน</label>
                         <a href="#" id="showForgotPassword">ลืมรหัสผ่าน?</a>
                     </div>
-                    
-                    <button type="submit" class="btn-auth" id="loginBtn">
-                        <span>เข้าสู่ระบบ</span>
-                        <i class="fas fa-sign-in-alt"></i>
-                    </button>
+                    <button type="submit" class="btn-auth" id="loginBtn"><span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i></button>
                 </form>
-                
                 <!-- Sign Up Form -->
                 <form id="signupForm" class="auth-form auth-form-view">
                     <div id="signupMessage" class="auth-message"></div>
-                    
                     <div class="form-group">
                         <label for="signupName">ชื่อ-นามสกุล</label>
                         <input type="text" id="signupName" required placeholder="สมชาย ใจดี">
                     </div>
-                    
                     <div class="form-group">
                         <label for="signupEmail">อีเมล</label>
                         <input type="email" id="signupEmail" required placeholder="example@email.com">
                     </div>
-                    
                     <div class="form-group">
                         <label for="signupPassword">รหัสผ่าน</label>
                         <input type="password" id="signupPassword" required placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6">
                         <small style="color: var(--gray-500); font-size: 0.8rem;">ต้องมีความยาวอย่างน้อย 6 ตัวอักษร</small>
                     </div>
-                    
                     <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="signupTerms" required>
-                            <span>ฉันยอมรับ <a href="#" style="color: var(--primary-blue);">เงื่อนไขการใช้งาน</a> และ <a href="#" style="color: var(--primary-blue);">นโยบายความเป็นส่วนตัว</a></span>
-                        </label>
+                        <label><input type="checkbox" id="signupTerms" required>
+                        <span>ฉันยอมรับ <a href="#" style="color: var(--primary-blue);">เงื่อนไขการใช้งาน</a> และ <a href="#" style="color: var(--primary-blue);">นโยบายความเป็นส่วนตัว</a></span></label>
                     </div>
-                    
-                    <button type="submit" class="btn-auth" id="signupBtn">
-                        <span>สมัครสมาชิก</span>
-                        <i class="fas fa-user-plus"></i>
-                    </button>
+                    <button type="submit" class="btn-auth" id="signupBtn"><span>สมัครสมาชิก</span><i class="fas fa-user-plus"></i></button>
                 </form>
-                
                 <!-- Forgot Password Form -->
                 <form id="forgotPasswordForm" class="auth-form auth-form-view">
                     <div id="forgotMessage" class="auth-message"></div>
-                    
-                    <p style="color: var(--gray-600); font-size: 0.95rem; margin-bottom: 20px;">
-                        กรอกอีเมลของคุณเพื่อรับลิงก์รีเซ็ตรหัสผ่าน
-                    </p>
-                    
+                    <p style="color: var(--gray-600); font-size: 0.95rem; margin-bottom: 20px;">กรอกอีเมลของคุณเพื่อรับลิงก์รีเซ็ตรหัสผ่าน</p>
                     <div class="form-group">
                         <label for="forgotEmail">อีเมล</label>
                         <input type="email" id="forgotEmail" required placeholder="example@email.com">
                     </div>
-                    
-                    <button type="submit" class="btn-auth" id="forgotBtn">
-                        <span>ส่งลิงก์รีเซ็ต</span>
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                    
-                    <div class="auth-toggle">
-                        <a href="#" id="backToLogin">← กลับสู่หน้าเข้าสู่ระบบ</a>
-                    </div>
+                    <button type="submit" class="btn-auth" id="forgotBtn"><span>ส่งลิงก์รีเซ็ต</span><i class="fas fa-paper-plane"></i></button>
+                    <div class="auth-toggle"><a href="#" id="backToLogin">← กลับสู่หน้าเข้าสู่ระบบ</a></div>
                 </form>
-                
-                <div class="auth-divider">
-                    <span>หรือ</span>
-                </div>
-                
+                <div class="auth-divider"><span>หรือ</span></div>
                 <div class="auth-toggle" id="authToggleText">
                     <span id="authTogglePrompt">ยังไม่มีบัญชี?</span>
                     <a href="#" id="authToggleLink">สมัครสมาชิก</a>
@@ -456,34 +221,22 @@
                     <span class="logo-icon"><i class="fas fa-graduation-cap"></i></span>
                     <span class="logo-text">Djohparichat</span>
                 </a>
-                
                 <div class="nav-menu" id="navMenu">
                     <ul class="nav-list">
                         <li><a href="index.html" class="nav-link active" data-th="หน้าหลัก" data-en="Home">หน้าหลัก</a></li>
                         <li><a href="pages/services.html" class="nav-link" data-th="บริการ" data-en="Services">บริการ</a></li>
                         <li><a href="pages/ai-courses.html" class="nav-link" data-th="หลักสูตร AI" data-en="AI Courses">หลักสูตร AI</a></li>
                         <li><a href="pages/about.html" class="nav-link" data-th="เกี่ยวกับเรา" data-en="About">เกี่ยวกับเรา</a></li>
-                        <li><a href="pages/contact.html" class="nav-link" data-th="ติดต่อ" data-en="Contact">ติดต่อ</a></li>
                     </ul>
                 </div>
-
                 <div class="nav-actions">
-                    <!-- Language Switcher -->
                     <div class="language-switcher">
                         <button class="lang-btn active" data-lang="th">TH</button>
                         <span class="lang-divider">|</span>
                         <button class="lang-btn" data-lang="en">EN</button>
                     </div>
-                    
-                    <!-- User Auth Section -->
-                    <div class="user-menu" id="userMenu">
-                        <!-- Will be populated by JavaScript -->
-                    </div>
-                    
-                    <!-- Mobile Toggle -->
-                    <button class="mobile-toggle" id="mobileToggle">
-                        <span class="hamburger"></span>
-                    </button>
+                    <div class="user-menu" id="userMenu"></div>
+                    <button class="mobile-toggle" id="mobileToggle"><span class="hamburger"></span></button>
                 </div>
             </div>
         </div>
@@ -496,68 +249,32 @@
             <div class="floating-shape shape-2"></div>
             <div class="floating-shape shape-3"></div>
         </div>
-        
         <div class="container">
             <div class="hero-content">
                 <div class="hero-text">
-                    <div class="hero-badge">
-                        <i class="fas fa-star"></i>
-                        <span data-th="ผู้เชี่ยวชาญด้าน AI และประกัน" data-en="AI & Insurance Expert">ผู้เชี่ยวชาญด้าน AI และประกัน</span>
-                    </div>
-                    <h1 class="hero-title">
-                        <span data-th="เรียนรู้ AI ใช้งานจริง" data-en="Learn Practical AI">เรียนรู้ AI ใช้งานจริง</span><br>
-                        <span class="highlight" data-th="กับมืออาชีพ" data-en="with Professionals">กับมืออาชีพ</span>
-                    </h1>
+                    <div class="hero-badge"><i class="fas fa-star"></i><span data-th="ผู้เชี่ยวชาญด้าน AI และประกัน" data-en="AI & Insurance Expert">ผู้เชี่ยวชาญด้าน AI และประกัน</span></div>
+                    <h1 class="hero-title"><span data-th="เรียนรู้ AI ใช้งานจริง" data-en="Learn Practical AI">เรียนรู้ AI ใช้งานจริง</span><br><span class="highlight" data-th="กับมืออาชีพ" data-en="with Professionals">กับมืออาชีพ</span></h1>
                     <p class="hero-description" data-th="พัฒนาทักษะของคุณด้วยคอร์สสอนใช้ AI ที่เข้าใจง่าย พร้อมที่ปรึกษาประกันชีวิตมืออาชีพ ดูแลคุณและครอบครัว" data-en="Develop your skills with easy-to-understand AI courses, plus professional life insurance consultation to take care of you and your family">พัฒนาทักษะของคุณด้วยคอร์สสอนใช้ AI ที่เข้าใจง่าย พร้อมที่ปรึกษาประกันชีวิตมืออาชีพ ดูแลคุณและครอบครัว</p>
-                    
                     <div class="hero-buttons">
-                        <a href="pages/services.html" class="btn btn-primary">
-                            <span data-th="เริ่มเรียนรู้" data-en="Start Learning">เริ่มเรียนรู้</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                        <a href="pages/contact.html" class="btn btn-secondary">
-                            <span data-th="ติดต่อสอบถาม" data-en="Contact Us">ติดต่อสอบถาม</span>
-                        </a>
+                        <a href="pages/services.html" class="btn btn-primary"><span data-th="เริ่มเรียนรู้" data-en="Start Learning">เริ่มเรียนรู้</span><i class="fas fa-arrow-right"></i></a>
+                        <a href="#social-footer" class="btn btn-secondary"><span data-th="ติดตามเรา" data-en="Follow Us">ติดตามเรา</span></a>
                     </div>
-
                     <div class="hero-stats">
-                        <div class="stat-item">
-                            <div class="stat-number" data-count="500">0</div>
-                            <div class="stat-label" data-th="นักเรียน" data-en="Students">นักเรียน</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number" data-count="50">0</div>
-                            <div class="stat-label" data-th="คอร์สเรียน" data-en="Courses">คอร์สเรียน</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number" data-count="10">0</div>
-                            <div class="stat-label" data-th="ปีประสบการณ์" data-en="Years Experience">ปีประสบการณ์</div>
-                        </div>
+                        <div class="stat-item"><div class="stat-number" data-count="500">0</div><div class="stat-label" data-th="นักเรียน" data-en="Students">นักเรียน</div></div>
+                        <div class="stat-item"><div class="stat-number" data-count="50">0</div><div class="stat-label" data-th="คอร์สเรียน" data-en="Courses">คอร์สเรียน</div></div>
+                        <div class="stat-item"><div class="stat-number" data-count="10">0</div><div class="stat-label" data-th="ปีประสบการณ์" data-en="Years Experience">ปีประสบการณ์</div></div>
                     </div>
                 </div>
-                
                 <div class="hero-image">
                     <div class="image-wrapper">
-                        <div class="image-placeholder">
-                            <i class="fas fa-user-graduate"></i>
-                        </div>
-                        <div class="floating-card card-1">
-                            <i class="fas fa-robot"></i>
-                            <span>AI Expert</span>
-                        </div>
-                        <div class="floating-card card-2">
-                            <i class="fas fa-shield-alt"></i>
-                            <span data-th="ประกันชีวิต" data-en="Life Insurance">ประกันชีวิต</span>
-                        </div>
+                        <div class="image-placeholder"><i class="fas fa-user-graduate"></i></div>
+                        <div class="floating-card card-1"><i class="fas fa-robot"></i><span>AI Expert</span></div>
+                        <div class="floating-card card-2"><i class="fas fa-shield-alt"></i><span data-th="ประกันชีวิต" data-en="Life Insurance">ประกันชีวิต</span></div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="scroll-indicator">
-            <div class="mouse"><div class="wheel"></div></div>
-            <p data-th="เลื่อนลง" data-en="Scroll Down">เลื่อนลง</p>
-        </div>
+        <div class="scroll-indicator"><div class="mouse"><div class="wheel"></div></div><p data-th="เลื่อนลง" data-en="Scroll Down">เลื่อนลง</p></div>
     </section>
 
     <!-- Services Section -->
@@ -568,7 +285,6 @@
                 <h2 class="section-title" data-th="บริการของเรา" data-en="Our Services">บริการของเรา</h2>
                 <p class="section-description" data-th="เราพร้อมดูแลคุณด้วยบริการคุณภาพในหลากหลายด้าน" data-en="We are ready to take care of you with quality services in various areas">เราพร้อมดูแลคุณด้วยบริการคุณภาพในหลากหลายด้าน</p>
             </div>
-
             <div class="services-grid">
                 <div class="service-card fade-in-up">
                     <div class="service-icon"><i class="fas fa-brain"></i></div>
@@ -579,12 +295,8 @@
                         <li><i class="fas fa-check"></i> <span data-th="เนื้อหาอัปเดตล่าสุด" data-en="Latest content">เนื้อหาอัปเดตล่าสุด</span></li>
                         <li><i class="fas fa-check"></i> <span data-th="ฝึกปฏิบัติจริง" data-en="Hands-on practice">ฝึกปฏิบัติจริง</span></li>
                     </ul>
-                    <a href="pages/ai-courses.html" class="service-link">
-                        <span data-th="ดูรายละเอียด" data-en="Learn More">ดูรายละเอียด</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
+                    <a href="pages/ai-courses.html" class="service-link"><span data-th="ดูรายละเอียด" data-en="Learn More">ดูรายละเอียด</span><i class="fas fa-arrow-right"></i></a>
                 </div>
-
                 <div class="service-card featured fade-in-up">
                     <div class="service-badge" data-th="ยอดนิยม" data-en="Popular">ยอดนิยม</div>
                     <div class="service-icon"><i class="fas fa-shield-heart"></i></div>
@@ -595,12 +307,8 @@
                         <li><i class="fas fa-check"></i> <span data-th="แผนประกันหลากหลาย" data-en="Various plans">แผนประกันหลากหลาย</span></li>
                         <li><i class="fas fa-check"></i> <span data-th="บริการหลังการขาย" data-en="After-sales service">บริการหลังการขาย</span></li>
                     </ul>
-                    <a href="pages/insurance.html" class="service-link">
-                        <span data-th="ดูรายละเอียด" data-en="Learn More">ดูรายละเอียด</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
+                    <a href="pages/insurance.html" class="service-link"><span data-th="ดูรายละเอียด" data-en="Learn More">ดูรายละเอียด</span><i class="fas fa-arrow-right"></i></a>
                 </div>
-
                 <div class="service-card fade-in-up">
                     <div class="service-icon"><i class="fas fa-briefcase"></i></div>
                     <h3 class="service-title" data-th="ผลงานและโครงการ" data-en="Projects & Portfolio">ผลงานและโครงการ</h3>
@@ -610,10 +318,7 @@
                         <li><i class="fas fa-check"></i> <span data-th="อัปเดตสม่ำเสมอ" data-en="Regular updates">อัปเดตสม่ำเสมอ</span></li>
                         <li><i class="fas fa-check"></i> <span data-th="เรียนรู้จากประสบการณ์" data-en="Learn from experience">เรียนรู้จากประสบการณ์</span></li>
                     </ul>
-                    <a href="pages/portfolio.html" class="service-link">
-                        <span data-th="ดูรายละเอียด" data-en="Learn More">ดูรายละเอียด</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
+                    <a href="pages/portfolio.html" class="service-link"><span data-th="ดูรายละเอียด" data-en="Learn More">ดูรายละเอียด</span><i class="fas fa-arrow-right"></i></a>
                 </div>
             </div>
         </div>
@@ -627,14 +332,12 @@
                 <h2 class="section-title" data-th="คอร์สของเรา" data-en="our courses">คอร์สของเรา</h2>
                 <p class="section-description" data-th="พัฒนาทักษะของคุณด้วยคอร์สสอนใช้ AI ที่เข้าใจง่าย" data-en="Develop your skills with easy-to-understand AI training courses.">พัฒนาทักษะของคุณด้วยคอร์สสอนใช้ AI ที่เข้าใจง่าย</p>
             </div>
-
             <div class="portfolio-filter">
                 <button class="filter-btn active" data-filter="all" data-th="ทั้งหมด" data-en="All">ทั้งหมด</button>
                 <button class="filter-btn" data-filter="ai" data-th="AI & เทคโนโลยี" data-en="AI & Tech">AI & เทคโนโลยี</button>
                 <button class="filter-btn" data-filter="insurance" data-th="ประกัน" data-en="Insurance">ประกัน</button>
                 <button class="filter-btn" data-filter="training" data-th="การอบรม" data-en="Training">การอบรม</button>
             </div>
-
             <div class="portfolio-grid">
                 <div class="portfolio-item" data-category="ai">
                     <div class="portfolio-image">
@@ -648,7 +351,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="portfolio-item" data-category="training">
                     <div class="portfolio-image">
                         <div class="image-placeholder"><i class="fas fa-chalkboard-teacher"></i></div>
@@ -661,7 +363,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="portfolio-item" data-category="insurance">
                     <div class="portfolio-image">
                         <div class="image-placeholder"><i class="fas fa-hand-holding-heart"></i></div>
@@ -675,12 +376,8 @@
                     </div>
                 </div>
             </div>
-
             <div class="portfolio-load-more">
-                <a href="pages/portfolio.html" class="btn btn-outline">
-                    <span data-th="ดูผลงานเพิ่มเติม" data-en="View More Portfolio">ดูผลงานเพิ่มเติม</span>
-                    <i class="fas fa-plus"></i>
-                </a>
+                <a href="pages/portfolio.html" class="btn btn-outline"><span data-th="ดูผลงานเพิ่มเติม" data-en="View More Portfolio">ดูผลงานเพิ่มเติม</span><i class="fas fa-plus"></i></a>
             </div>
         </div>
     </section>
@@ -692,143 +389,37 @@
                 <div class="about-image">
                     <div class="image-wrapper">
                         <div class="image-placeholder main"><i class="fas fa-user-tie"></i></div>
-                        <div class="experience-badge">
-                            <span class="years">10+</span>
-                            <span class="text" data-th="ปีประสบการณ์" data-en="Years Experience">ปีประสบการณ์</span>
-                        </div>
+                        <div class="experience-badge"><span class="years">10+</span><span class="text" data-th="ปีประสบการณ์" data-en="Years Experience">ปีประสบการณ์</span></div>
                     </div>
                 </div>
-
                 <div class="about-content">
                     <span class="section-subtitle" data-th="เกี่ยวกับเรา" data-en="About Us">เกี่ยวกับเรา</span>
                     <h2 class="section-title" data-th="ผู้เชี่ยวชาญด้าน AI และประกันชีวิต" data-en="AI & Life Insurance Expert">ผู้เชี่ยวชาญด้าน AI และประกันชีวิต</h2>
                     <p class="about-text" data-th="ด้วยความมุ่งมั่นที่จะพัฒนาทักษะของคนไทยให้ทันกับเทคโนโลยี AI ที่เปลี่ยนแปลงอย่างรวดเร็ว พร้อมเป็นที่ปรึกษาประกันชีวิตจากไทยประกันชีวิต ดูแลคุณและครอบครัวด้วยความจริงใจ" data-en="With a commitment to develop Thai people's skills to keep up with rapidly changing AI technology, plus being a life insurance consultant from Thai Life Insurance, taking care of you and your family with sincerity">ด้วยความมุ่งมั่นที่จะพัฒนาทักษะของคนไทยให้ทันกับเทคโนโลยี AI ที่เปลี่ยนแปลงอย่างรวดเร็ว พร้อมเป็นที่ปรึกษาประกันชีวิตจากไทยประกันชีวิต ดูแลคุณและครอบครัวด้วยความจริงใจ</p>
-                    
                     <div class="about-features">
                         <div class="feature-item">
                             <div class="feature-icon"><i class="fas fa-certificate"></i></div>
-                            <div class="feature-content">
-                                <h4 data-th="ได้รับการรับรอง" data-en="Certified">ได้รับการรับรอง</h4>
-                                <p data-th="ผู้เชี่ยวชาญด้าน AI และประกัน" data-en="AI & Insurance expert">ผู้เชี่ยวชาญด้าน AI และประกัน</p>
-                            </div>
+                            <div class="feature-content"><h4 data-th="ได้รับการรับรอง" data-en="Certified">ได้รับการรับรอง</h4><p data-th="ผู้เชี่ยวชาญด้าน AI และประกัน" data-en="AI & Insurance expert">ผู้เชี่ยวชาญด้าน AI และประกัน</p></div>
                         </div>
                         <div class="feature-item">
                             <div class="feature-icon"><i class="fas fa-heart"></i></div>
-                            <div class="feature-content">
-                                <h4 data-th="ใส่ใจทุกรายละเอียด" data-en="Attention to detail">ใส่ใจทุกรายละเอียด</h4>
-                                <p data-th="ดูแลด้วยความห่วงใย" data-en="Care with concern">ดูแลด้วยความห่วงใย</p>
-                            </div>
+                            <div class="feature-content"><h4 data-th="ใส่ใจทุกรายละเอียด" data-en="Attention to detail">ใส่ใจทุกรายละเอียด</h4><p data-th="ดูแลด้วยความห่วงใย" data-en="Care with concern">ดูแลด้วยความห่วงใย</p></div>
                         </div>
                         <div class="feature-item">
                             <div class="feature-icon"><i class="fas fa-sync-alt"></i></div>
-                            <div class="feature-content">
-                                <h4 data-th="อัปเดตความรู้เสมอ" data-en="Always updated">อัปเดตความรู้เสมอ</h4>
-                                <p data-th="ติดตามเทคโนโลยีล่าสุด" data-en="Follow latest technology">ติดตามเทคโนโลยีล่าสุด</p>
-                            </div>
+                            <div class="feature-content"><h4 data-th="อัปเดตความรู้เสมอ" data-en="Always updated">อัปเดตความรู้เสมอ</h4><p data-th="ติดตามเทคโนโลยีล่าสุด" data-en="Follow latest technology">ติดตามเทคโนโลยีล่าสุด</p></div>
                         </div>
                     </div>
-
                     <div class="about-cta">
-                        <a href="pages/contact.html" class="btn btn-primary">
-                            <span data-th="ติดต่อเราวันนี้" data-en="Contact Us Today">ติดต่อเราวันนี้</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
+                        <a href="#social-footer" class="btn btn-primary"><span data-th="ติดตามเราวันนี้" data-en="Follow Us Today">ติดตามเราวันนี้</span><i class="fas fa-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Contact Section -->
-    <section class="contact" id="contact">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-subtitle" data-th="ติดต่อเรา" data-en="Contact Us">ติดต่อเรา</span>
-                <h2 class="section-title" data-th="พร้อมช่วยเหลือคุณ" data-en="Ready to Help You">พร้อมช่วยเหลือคุณ</h2>
-                <p class="section-description" data-th="มีคำถาม? ติดต่อเราได้เลย เรายินดีช่วยเหลือ" data-en="Have questions? Contact us, we're happy to help">มีคำถาม? ติดต่อเราได้เลย เรายินดีช่วยเหลือ</p>
-            </div>
-
-            <div class="contact-wrapper">
-                <div class="contact-info">
-                    <div class="info-card">
-                        <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
-                        <div class="info-content">
-                            <h3 data-th="โทรศัพท์" data-en="Phone">โทรศัพท์</h3>
-                            <p>+66 XX XXX XXXX</p>
-                        </div>
-                    </div>
-
-                    <div class="info-card">
-                        <div class="info-icon"><i class="fas fa-envelope"></i></div>
-                        <div class="info-content">
-                            <h3 data-th="อีเมล" data-en="Email">อีเมล</h3>
-                            <p>contact@djohparichat.site</p>
-                        </div>
-                    </div>
-
-                    <div class="info-card">
-                        <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
-                        <div class="info-content">
-                            <h3 data-th="ที่อยู่" data-en="Address">ที่อยู่</h3>
-                            <p data-th="กรุงเทพมหานคร, ประเทศไทย" data-en="Bangkok, Thailand">กรุงเทพมหานคร, ประเทศไทย</p>
-                        </div>
-                    </div>
-
-                    <div class="social-links">
-                        <h3 data-th="ติดตามเรา" data-en="Follow Us">ติดตามเรา</h3>
-                        <div class="social-icons">
-                            <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#" class="social-icon"><i class="fab fa-line"></i></a>
-                            <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
-                            <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="contact-form-wrapper">
-                    <form class="contact-form" id="contactForm">
-                        <div class="form-group">
-                            <label for="name" data-th="ชื่อ-นามสกุล" data-en="Full Name">ชื่อ-นามสกุล</label>
-                            <input type="text" id="name" name="name" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="email" data-th="อีเมล" data-en="Email">อีเมล</label>
-                            <input type="email" id="email" name="email" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="phone" data-th="เบอร์โทรศัพท์" data-en="Phone Number">เบอร์โทรศัพท์</label>
-                            <input type="tel" id="phone" name="phone">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="subject" data-th="หัวข้อ" data-en="Subject">หัวข้อ</label>
-                            <select id="subject" name="subject" required>
-                                <option value="" data-th="เลือกหัวข้อ" data-en="Select subject">เลือกหัวข้อ</option>
-                                <option value="ai" data-th="สนใจคอร์ส AI" data-en="Interested in AI course">สนใจคอร์ส AI</option>
-                                <option value="insurance" data-th="สนใจประกันชีวิต" data-en="Interested in life insurance">สนใจประกันชีวิต</option>
-                                <option value="other" data-th="อื่นๆ" data-en="Other">อื่นๆ</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="message" data-th="ข้อความ" data-en="Message">ข้อความ</label>
-                            <textarea id="message" name="message" rows="5" required></textarea>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary btn-full">
-                            <span data-th="ส่งข้อความ" data-en="Send Message">ส่งข้อความ</span>
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
+    <!-- Footer (อัปเดตใหม่ - มีปุ่มโซเชียล) -->
+    <footer class="footer" id="social-footer">
         <div class="container">
             <div class="footer-top">
                 <div class="footer-brand">
@@ -837,6 +428,19 @@
                         <span class="logo-text">Djohparichat</span>
                     </a>
                     <p data-th="เรียนรู้ AI และประกันชีวิตกับมืออาชีพ" data-en="Learn AI and life insurance with professionals">เรียนรู้ AI และประกันชีวิตกับมืออาชีพ</p>
+                    
+                    <!-- Social Links -->
+                    <div class="social-links-footer">
+                        <a href="https://line.me/ti/p/~YOUR_LINE_ID" target="_blank" class="social-link line" title="LINE">
+                            <i class="fab fa-line"></i>
+                        </a>
+                        <a href="https://tiktok.com/@YOUR_TIKTOK" target="_blank" class="social-link tiktok" title="TikTok">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
+                        <a href="https://facebook.com/YOUR_PAGE" target="_blank" class="social-link facebook" title="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                    </div>
                 </div>
 
                 <div class="footer-links">
@@ -849,21 +453,11 @@
                             <li><a href="pages/about.html" data-th="เกี่ยวกับเรา" data-en="About">เกี่ยวกับเรา</a></li>
                         </ul>
                     </div>
-
                     <div class="footer-column">
                         <h4 data-th="บริการ" data-en="Services">บริการ</h4>
                         <ul>
                             <li><a href="pages/ai-courses.html" data-th="สอนใช้ AI" data-en="AI Training">สอนใช้ AI</a></li>
                             <li><a href="pages/insurance.html" data-th="ประกันชีวิต" data-en="Life Insurance">ประกันชีวิต</a></li>
-                            <li><a href="pages/contact.html" data-th="ที่ปรึกษา" data-en="Consultation">ที่ปรึกษา</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="footer-column">
-                        <h4 data-th="ติดต่อ" data-en="Contact">ติดต่อ</h4>
-                        <ul>
-                            <li><a href="tel:+66XXXXXXXXXX">+66 XX XXX XXXX</a></li>
-                            <li><a href="mailto:contact@djohparichat.site">contact@djohparichat.site</a></li>
                         </ul>
                     </div>
                 </div>
@@ -875,7 +469,8 @@
         </div>
     </footer>
 
-    <div class="admin-link">
+    <!-- Admin Link (ซ่อนไว้ก่อน จะแสดงด้วย JS ถ้าเป็น Admin) -->
+    <div class="admin-link" id="adminLink" style="display: none;">
         <a href="admin/index.html" title="Admin Panel"><i class="fas fa-cog"></i></a>
     </div>
 
@@ -887,401 +482,142 @@
     <!-- Auth Script -->
     <script type="module">
         try {
-            // Import config
             const { config } = await import('./lib/config.js');
-            
-            // Initialize Supabase
-            const supabase = window.supabase.createClient(
-                config.supabaseUrl,
-                config.supabaseAnonKey
-            );
+            const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
 
-            // DOM Elements
             const authModal = document.getElementById('authModal');
             const authModalClose = document.getElementById('authModalClose');
             const userMenu = document.getElementById('userMenu');
-            
-            // Forms
+            const adminLink = document.getElementById('adminLink');
             const loginForm = document.getElementById('loginForm');
             const signupForm = document.getElementById('signupForm');
             const forgotPasswordForm = document.getElementById('forgotPasswordForm');
             
-            // Form Views
-            const loginView = document.getElementById('loginForm');
-            const signupView = document.getElementById('signupForm');
-            const forgotView = document.getElementById('forgotPasswordForm');
-            
-            // Messages
-            const loginMessage = document.getElementById('loginMessage');
-            const signupMessage = document.getElementById('signupMessage');
-            const forgotMessage = document.getElementById('forgotMessage');
-            
-            // Toggle Elements
-            const authModalTitle = document.getElementById('authModalTitle');
-            const authModalDesc = document.getElementById('authModalDesc');
-            const authTogglePrompt = document.getElementById('authTogglePrompt');
-            const authToggleLink = document.getElementById('authToggleLink');
-            const showForgotPassword = document.getElementById('showForgotPassword');
-            const backToLogin = document.getElementById('backToLogin');
-            
             let currentView = 'login';
 
-            // ========================================
-            // AUTH MODAL FUNCTIONS
-            // ========================================
-            
             function openAuthModal(view = 'login') {
                 authModal.classList.add('active');
                 document.body.style.overflow = 'hidden';
                 switchAuthView(view);
             }
-            
             function closeAuthModal() {
                 authModal.classList.remove('active');
                 document.body.style.overflow = '';
                 resetForms();
             }
-            
             function switchAuthView(view) {
                 currentView = view;
-                
-                // Hide all forms
-                [loginView, signupView, forgotView].forEach(form => {
-                    form.classList.remove('active');
-                });
-                
-                // Hide all messages
-                [loginMessage, signupMessage, forgotMessage].forEach(msg => {
-                    msg.style.display = 'none';
-                    msg.textContent = '';
-                });
-                
-                // Show selected form
+                document.querySelectorAll('.auth-form-view').forEach(f => f.classList.remove('active'));
+                document.querySelectorAll('.auth-message').forEach(m => { m.style.display = 'none'; m.textContent = ''; });
                 if (view === 'login') {
-                    loginView.classList.add('active');
-                    authModalTitle.textContent = 'เข้าสู่ระบบ';
-                    authModalDesc.textContent = 'ยินดีต้อนรับกลับ! กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ';
-                    authTogglePrompt.textContent = 'ยังไม่มีบัญชี?';
-                    authToggleLink.textContent = 'สมัครสมาชิก';
-                    showForgotPassword.style.display = 'block';
+                    document.getElementById('loginForm').classList.add('active');
+                    document.getElementById('authModalTitle').textContent = 'เข้าสู่ระบบ';
+                    document.getElementById('authTogglePrompt').textContent = 'ยังไม่มีบัญชี?';
+                    document.getElementById('authToggleLink').textContent = 'สมัครสมาชิก';
                 } else if (view === 'signup') {
-                    signupView.classList.add('active');
-                    authModalTitle.textContent = 'สมัครสมาชิก';
-                    authModalDesc.textContent = 'สร้างบัญชีใหม่เพื่อเริ่มเรียนรู้กับเรา';
-                    authTogglePrompt.textContent = 'มีบัญชีแล้ว?';
-                    authToggleLink.textContent = 'เข้าสู่ระบบ';
-                    showForgotPassword.style.display = 'none';
-                } else if (view === 'forgot') {
-                    forgotView.classList.add('active');
-                    authModalTitle.textContent = 'ลืมรหัสผ่าน';
-                    authModalDesc.textContent = 'กรอกอีเมลเพื่อรับลิงก์รีเซ็ตรหัสผ่าน';
-                    authTogglePrompt.style.display = 'none';
-                    authToggleLink.style.display = 'none';
-                    showForgotPassword.style.display = 'none';
+                    document.getElementById('signupForm').classList.add('active');
+                    document.getElementById('authModalTitle').textContent = 'สมัครสมาชิก';
+                    document.getElementById('authTogglePrompt').textContent = 'มีบัญชีแล้ว?';
+                    document.getElementById('authToggleLink').textContent = 'เข้าสู่ระบบ';
                 }
             }
-            
-            function resetForms() {
-                loginForm.reset();
-                signupForm.reset();
-                forgotPasswordForm.reset();
-                switchAuthView('login');
-            }
-            
-            function showMessage(element, type, message) {
-                element.textContent = message;
-                element.className = `auth-message ${type}`;
-                element.style.display = 'block';
-            }
+            function resetForms() { loginForm.reset(); signupForm.reset(); forgotPasswordForm.reset(); switchAuthView('login'); }
 
-            // ========================================
-            // USER MENU FUNCTIONS
-            // ========================================
-            
             function renderUserMenu(user) {
                 if (user) {
                     const initials = user.email?.charAt(0).toUpperCase() || 'U';
-                    const displayName = user.user_metadata?.name || user.email?.split('@')[0] || 'ผู้ใช้';
-                    
                     userMenu.innerHTML = `
                         <div class="user-info" id="userInfo">
                             <div class="user-avatar">${initials}</div>
-                            <span class="user-name">${displayName}</span>
+                            <span class="user-name">${user.email?.split('@')[0]}</span>
                             <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: var(--gray-500);"></i>
                         </div>
                         <div class="user-dropdown" id="userDropdown">
-                            <a href="admin/index.html">
-                                <i class="fas fa-tachometer-alt"></i>
-                                <span>แดชบอร์ด</span>
-                            </a>
-                            <a href="pages/ai-courses.html">
-                                <i class="fas fa-book"></i>
-                                <span>คอร์สของฉัน</span>
-                            </a>
+                            <a href="admin/index.html"><i class="fas fa-tachometer-alt"></i> แดชบอร์ด</a>
                             <div class="divider"></div>
-                            <a href="#" id="logoutBtn" class="logout">
-                                <i class="fas fa-sign-out-alt"></i>
-                                <span>ออกจากระบบ</span>
-                            </a>
-                        </div>
-                    `;
-                    
-                    // Dropdown toggle
-                    const userInfo = document.getElementById('userInfo');
-                    const userDropdown = document.getElementById('userDropdown');
-                    
-                    userInfo.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        userDropdown.classList.toggle('active');
-                    });
-                    
-                    // Close dropdown when clicking outside
-                    document.addEventListener('click', (e) => {
-                        if (!userInfo.contains(e.target) && !userDropdown.contains(e.target)) {
-                            userDropdown.classList.remove('active');
-                        }
-                    });
-                    
-                    // Logout
-                    document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
-                        e.preventDefault();
-                        await handleLogout();
-                    });
-                    
+                            <a href="#" id="logoutBtn" class="logout"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+                        </div>`;
+                    document.getElementById('userInfo').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('active'); });
+                    document.getElementById('logoutBtn')?.addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); renderUserMenu(null); updateAdminLink(null); });
                 } else {
-                    userMenu.innerHTML = `
-                        <div class="user-auth-buttons">
-                            <button class="btn btn-secondary btn-sm" id="openLoginBtn">เข้าสู่ระบบ</button>
-                            <button class="btn btn-primary btn-sm" id="openSignupBtn">สมัครสมาชิก</button>
-                        </div>
-                    `;
-                    
+                    userMenu.innerHTML = `<div class="user-auth-buttons"><button class="btn btn-secondary btn-sm" id="openLoginBtn">เข้าสู่ระบบ</button><button class="btn btn-primary btn-sm" id="openSignupBtn">สมัครสมาชิก</button></div>`;
                     document.getElementById('openLoginBtn')?.addEventListener('click', () => openAuthModal('login'));
                     document.getElementById('openSignupBtn')?.addEventListener('click', () => openAuthModal('signup'));
                 }
             }
 
-            // ========================================
-            // AUTH HANDLERS
-            // ========================================
-            
-            async function handleLogin(email, password, remember) {
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password
-                });
-                
-                if (error) throw error;
-                return data;
-            }
-            
-            async function handleSignup(email, password, name) {
-                const { data, error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: {
-                        data: {
-                            name: name
-                        },
-                        emailRedirectTo: `${window.location.origin}/index.html`
-                    }
-                });
-                
-                if (error) throw error;
-                return data;
-            }
-            
-            async function handleForgotPassword(email) {
-                const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                    redirectTo: `${window.location.origin}/pages/auth.html#update-password`
-                });
-                
-                if (error) throw error;
-            }
-            
-            async function handleLogout() {
-                await supabase.auth.signOut();
-                renderUserMenu(null);
-                closeAuthModal();
-                showNotification('success', 'ออกจากระบบสำเร็จ');
-            }
-            
-            async function checkAuth() {
-                try {
-                    const { data: { session } } = await supabase.auth.getSession();
-                    renderUserMenu(session?.user || null);
-                    return session;
-                } catch (error) {
-                    console.error('Auth check error:', error);
-                    renderUserMenu(null);
-                    return null;
-                }
+            // 🔐 ฟังก์ชันแสดง/ซ่อนลิงก์แอดมิน
+            function updateAdminLink(user) {
+                if (!adminLink) return;
+                const adminEmails = Array.isArray(config.adminEmail) ? config.adminEmail : [config.adminEmail].filter(e => e);
+                const isAdmin = adminEmails.length > 0 && user?.email && adminEmails.includes(user.email);
+                adminLink.style.display = isAdmin ? 'block' : 'none';
             }
 
-            // ========================================
-            // EVENT LISTENERS
-            // ========================================
-            
-            // Modal controls
+            async function handleLogin(email, password) {
+                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+            }
+            async function handleSignup(email, password, name) {
+                const { error } = await supabase.auth.signUp({ email, password, options: { data: { name } } });
+                if (error) throw error;
+            }
+            async function handleForgotPassword(email) {
+                const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/pages/auth.html#update-password` });
+                if (error) throw error;
+            }
+            async function handleLogout() { await supabase.auth.signOut(); renderUserMenu(null); updateAdminLink(null); closeAuthModal(); }
+            async function checkAuth() {
+                try {
+                    const { data } = await supabase.auth.getSession();
+                    const user = data?.session?.user || null;
+                    renderUserMenu(user);
+                    updateAdminLink(user); // ✅ เช็คสิทธิ์แอดมิน
+                    return data?.session;
+                } catch (error) { console.error('Auth check error:', error); renderUserMenu(null); updateAdminLink(null); return null; }
+            }
+
+            // Event Listeners
             authModalClose.addEventListener('click', closeAuthModal);
-            authModal.addEventListener('click', (e) => {
-                if (e.target === authModal) closeAuthModal();
-            });
-            
-            // Toggle between login/signup
-            document.getElementById('authToggleLink')?.addEventListener('click', (e) => {
+            authModal.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
+            document.getElementById('authToggleLink').addEventListener('click', (e) => { e.preventDefault(); switchAuthView(currentView === 'login' ? 'signup' : 'login'); });
+            document.getElementById('showForgotPassword')?.addEventListener('click', (e) => { e.preventDefault(); /* TODO: Implement forgot */ alert('กรุณาติดต่อผู้ดูแลระบบเพื่อรีเซ็ตรหัสผ่าน'); });
+            document.getElementById('backToLogin')?.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('login'); });
+
+            loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const newView = currentView === 'login' ? 'signup' : 'login';
-                switchAuthView(newView);
-            });
-            
-            // Show forgot password
-            showForgotPassword?.addEventListener('click', (e) => {
-                e.preventDefault();
-                switchAuthView('forgot');
-            });
-            
-            // Back to login from forgot
-            backToLogin?.addEventListener('click', (e) => {
-                e.preventDefault();
-                switchAuthView('login');
-            });
-            
-            // Login form submit
-            loginForm?.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
                 const email = document.getElementById('loginEmail').value;
                 const password = document.getElementById('loginPassword').value;
-                const remember = document.getElementById('loginRemember').checked;
                 const btn = document.getElementById('loginBtn');
-                
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังเข้าสู่ระบบ...';
-                
+                btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังเข้าสู่ระบบ...';
                 try {
-                    await handleLogin(email, password, remember);
-                    showMessage(loginMessage, 'success', 'เข้าสู่ระบบสำเร็จ!');
-                    setTimeout(async () => {
-                        closeAuthModal();
-                        await checkAuth();
-                        showNotification('success', 'ยินดีต้อนรับกลับ!');
-                    }, 1000);
-                } catch (error) {
-                    showMessage(loginMessage, 'error', error.message || 'เข้าสู่ระบบไม่สำเร็จ');
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = '<span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i>';
-                }
+                    await handleLogin(email, password);
+                    closeAuthModal(); await checkAuth(); alert('เข้าสู่ระบบสำเร็จ!');
+                } catch (error) { alert('เข้าสู่ระบบไม่สำเร็จ: ' + error.message); }
+                finally { btn.disabled = false; btn.innerHTML = '<span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i>'; }
             });
-            
-            // Signup form submit
-            signupForm?.addEventListener('submit', async (e) => {
+
+            signupForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                
                 const name = document.getElementById('signupName').value;
                 const email = document.getElementById('signupEmail').value;
                 const password = document.getElementById('signupPassword').value;
                 const btn = document.getElementById('signupBtn');
-                
-                if (password.length < 6) {
-                    showMessage(signupMessage, 'error', 'รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
-                    return;
-                }
-                
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังสมัคร...';
-                
+                if (password.length < 6) { alert('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร'); return; }
+                btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังสมัคร...';
                 try {
-                    const { user } = await handleSignup(email, password, name);
-                    
-                    if (user && !user.confirmed_at) {
-                        showMessage(signupMessage, 'success', 'สมัครสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี');
-                    } else {
-                        showMessage(signupMessage, 'success', 'สมัครสมาชิกสำเร็จ!');
-                        setTimeout(async () => {
-                            closeAuthModal();
-                            await checkAuth();
-                        }, 1500);
-                    }
-                } catch (error) {
-                    showMessage(signupMessage, 'error', error.message || 'สมัครสมาชิกไม่สำเร็จ');
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = '<span>สมัครสมาชิก</span><i class="fas fa-user-plus"></i>';
-                }
+                    await handleSignup(email, password, name);
+                    alert('สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี'); closeAuthModal();
+                } catch (error) { alert('สมัครสมาชิกไม่สำเร็จ: ' + error.message); }
+                finally { btn.disabled = false; btn.innerHTML = '<span>สมัครสมาชิก</span><i class="fas fa-user-plus"></i>'; }
             });
-            
-            // Forgot password form submit
-            forgotPasswordForm?.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const email = document.getElementById('forgotEmail').value;
-                const btn = document.getElementById('forgotBtn');
-                
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...';
-                
-                try {
-                    await handleForgotPassword(email);
-                    showMessage(forgotMessage, 'success', 'ส่งลิงก์รีเซ็ตเรียบร้อยแล้ว! กรุณาตรวจสอบอีเมล');
-                    forgotPasswordForm.reset();
-                } catch (error) {
-                    showMessage(forgotMessage, 'error', error.message || 'เกิดข้อผิดพลาด');
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = '<span>ส่งลิงก์รีเซ็ต</span><i class="fas fa-paper-plane"></i>';
-                }
-            });
-            
-            // Notification helper
-            function showNotification(type, message) {
-                const notification = document.createElement('div');
-                notification.className = `notification notification-${type}`;
-                notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i><span>${message}</span>`;
-                notification.style.cssText = `
-                    position: fixed;
-                    top: 100px;
-                    right: 20px;
-                    padding: 14px 20px;
-                    background: ${type === 'success' ? '#4caf50' : '#f44336'};
-                    color: white;
-                    border-radius: 8px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    z-index: 9999;
-                    animation: slideIn 0.3s ease;
-                `;
-                document.body.appendChild(notification);
-                setTimeout(() => {
-                    notification.style.animation = 'slideOut 0.3s ease';
-                    setTimeout(() => notification.remove(), 300);
-                }, 4000);
-            }
 
-            // ========================================
-            // INIT
-            // ========================================
-            
-            // Check auth status on page load
-            checkAuth();
-            
-            // Listen for auth state changes
-            supabase.auth.onAuthStateChange((event, session) => {
-                renderUserMenu(session?.user || null);
-            });
-            
+            // Init
+            (async () => { await checkAuth(); supabase.auth.onAuthStateChange((event, session) => { renderUserMenu(session?.user || null); updateAdminLink(session?.user || null); }); })();
+
         } catch (error) {
             console.error('Auth initialization error:', error);
-            // Show login buttons even if there's an error
-            document.getElementById('userMenu').innerHTML = `
-                <div class="user-auth-buttons">
-                    <button class="btn btn-secondary btn-sm" onclick="alert('ระบบเข้าสู่ระบบกำลังมีปัญหา กรุณาลองใหม่ภายหลัง')">เข้าสู่ระบบ</button>
-                    <button class="btn btn-primary btn-sm" onclick="alert('ระบบสมัครสมาชิกกำลังมีปัญหา กรุณาลองใหม่ภายหลัง')">สมัครสมาชิก</button>
-                </div>
-            `;
+            document.getElementById('userMenu').innerHTML = `<div class="user-auth-buttons"><button class="btn btn-secondary btn-sm" onclick="alert('ระบบเข้าสู่ระบบกำลังมีปัญหา')">เข้าสู่ระบบ</button><button class="btn btn-primary btn-sm" onclick="alert('ระบบสมัครสมาชิกกำลังมีปัญหา')">สมัครสมาชิก</button></div>`;
         }
     </script>
 </body>
