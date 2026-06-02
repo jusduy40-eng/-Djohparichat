@@ -34,6 +34,7 @@
             gap: 16px;
             box-shadow: var(--shadow-sm);
             transition: var(--transition-normal);
+            cursor: pointer;
         }
         .stat-card:hover {
             transform: translateY(-4px);
@@ -144,6 +145,11 @@
         .btn-icon.delete { background: #fee2e2; color: var(--error); }
         .btn-icon.delete:hover { background: var(--error); color: white; }
         
+        /* Loading & Empty States */
+        .text-center { text-align: center; }
+        .text-muted { color: var(--gray-500); font-size: 0.85rem; }
+        .text-error { color: var(--error); }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .stats-grid { grid-template-columns: 1fr 1fr; }
@@ -174,28 +180,28 @@
         <nav class="admin-nav">
             <ul>
                 <li><a href="index" class="active" data-page="dashboard">
-                    <i class="fas fa-dashboard"></i> <span data-th="แดชบอร์ด" data-en="Dashboard">แดชบอร์ด</span>
+                    <i class="fas fa-dashboard"></i> <span>แดชบอร์ด</span>
                 </a></li>
                 <li><a href="admin/contents" data-page="contents">
-                    <i class="fas fa-file-alt"></i> <span data-th="จัดการเนื้อหา" data-en="Contents">จัดการเนื้อหา</span>
+                    <i class="fas fa-file-alt"></i> <span>จัดการเนื้อหา</span>
                 </a></li>
                 <li><a href="courses" data-page="courses">
-                    <i class="fas fa-brain"></i> <span data-th="จัดการคอร์ส" data-en="Courses">จัดการคอร์ส</span>
+                    <i class="fas fa-brain"></i> <span>จัดการคอร์ส</span>
                 </a></li>
                 <li><a href="enrollments" data-page="enrollments">
-                    <i class="fas fa-users"></i> <span data-th="ผู้สมัครเรียน" data-en="Enrollments">ผู้สมัครเรียน</span>
+                    <i class="fas fa-users"></i> <span>ผู้สมัครเรียน</span>
                 </a></li>
                 <li><a href="messages" data-page="messages">
-                    <i class="fas fa-envelope"></i> <span data-th="ข้อความติดต่อ" data-en="Messages">ข้อความติดต่อ</span>
+                    <i class="fas fa-envelope"></i> <span>ข้อความติดต่อ</span>
                 </a></li>
                 <li><a href="settings" data-page="settings">
-                    <i class="fas fa-cog"></i> <span data-th="การตั้งค่า" data-en="Settings">การตั้งค่า</span>
+                    <i class="fas fa-cog"></i> <span>การตั้งค่า</span>
                 </a></li>
                 <li><a href="../index" target="_blank">
-                    <i class="fas fa-external-link-alt"></i> <span data-th="เปิดเว็บไซต์" data-en="View Website">เปิดเว็บไซต์</span>
+                    <i class="fas fa-external-link-alt"></i> <span>เปิดเว็บไซต์</span>
                 </a></li>
                 <li><a href="#" id="logoutBtn" class="logout">
-                    <i class="fas fa-sign-out-alt"></i> <span data-th="ออกจากระบบ" data-en="Logout">ออกจากระบบ</span>
+                    <i class="fas fa-sign-out-alt"></i> <span>ออกจากระบบ</span>
                 </a></li>
             </ul>
         </nav>
@@ -209,10 +215,10 @@
                 <button class="admin-mobile-toggle" id="mobileToggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h1 data-th="แดชบอร์ด" data-en="Dashboard">แดชบอร์ด</h1>
+                <h1>แดชบอร์ด</h1>
             </div>
             <div class="admin-user">
-                <span id="adminEmail">admin@djohparichat.site</span>
+                <span id="adminEmail">กำลังโหลด...</span>
                 <div class="admin-avatar"><i class="fas fa-user"></i></div>
             </div>
         </header>
@@ -222,39 +228,39 @@
             
             <!-- Stats Grid -->
             <div class="stats-grid">
-                <div class="stat-card">
+                <div class="stat-card" onclick="window.location.href='courses'">
                     <div class="stat-icon stat-blue"><i class="fas fa-brain"></i></div>
                     <div class="stat-info">
-                        <h3 data-th="คอร์สทั้งหมด" data-en="Total Courses">คอร์สทั้งหมด</h3>
+                        <h3>คอร์สทั้งหมด</h3>
                         <p class="stat-number" id="totalCourses">-</p>
-                        <span class="stat-change positive"><i class="fas fa-arrow-up"></i> <span data-th="อัปเดตล่าสุด" data-en="Updated">อัปเดตล่าสุด</span></span>
+                        <span class="stat-change positive"><i class="fas fa-arrow-up"></i> อัปเดตล่าสุด</span>
                     </div>
                 </div>
 
-                <div class="stat-card">
+                <div class="stat-card" onclick="window.location.href='enrollments'">
                     <div class="stat-icon stat-gold"><i class="fas fa-users"></i></div>
                     <div class="stat-info">
-                        <h3 data-th="ผู้สมัครเรียน" data-en="Enrollments">ผู้สมัครเรียน</h3>
+                        <h3>ผู้สมัครเรียน</h3>
                         <p class="stat-number" id="totalEnrollments">-</p>
-                        <span class="stat-change positive"><i class="fas fa-arrow-up"></i> <span data-th="เดือนนี้" data-en="This month">เดือนนี้</span></span>
+                        <span class="stat-change positive"><i class="fas fa-arrow-up"></i> เดือนนี้</span>
                     </div>
                 </div>
 
-                <div class="stat-card">
+                <div class="stat-card" onclick="window.location.href='messages'">
                     <div class="stat-icon stat-green"><i class="fas fa-envelope"></i></div>
                     <div class="stat-info">
-                        <h3 data-th="ข้อความใหม่" data-en="New Messages">ข้อความใหม่</h3>
+                        <h3>ข้อความใหม่</h3>
                         <p class="stat-number" id="newMessages">-</p>
-                        <span class="stat-change negative"><i class="fas fa-arrow-down"></i> <span data-th="รอตอบกลับ" data-en="Pending">รอตอบกลับ</span></span>
+                        <span class="stat-change negative"><i class="fas fa-arrow-down"></i> รอตอบกลับ</span>
                     </div>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-icon stat-purple"><i class="fas fa-chart-line"></i></div>
                     <div class="stat-info">
-                        <h3 data-th="ผู้เข้าชม" data-en="Visitors">ผู้เข้าชม</h3>
-                        <p class="stat-number" id="totalVisitors">-</p>
-                        <span class="stat-change positive"><i class="fas fa-arrow-up"></i> <span data-th="วันนี้" data-en="Today">วันนี้</span></span>
+                        <h3>ผู้เข้าชมวันนี้</h3>
+                        <p class="stat-number" id="todayVisitors">-</p>
+                        <span class="stat-change positive"><i class="fas fa-arrow-up"></i> <span id="visitorChange">กำลังโหลด...</span></span>
                     </div>
                 </div>
             </div>
@@ -262,9 +268,9 @@
             <!-- Recent Courses Table -->
             <div class="admin-section">
                 <div class="section-header">
-                    <h2 data-th="คอร์สล่าสุด" data-en="Recent Courses">คอร์สล่าสุด</h2>
+                    <h2>คอร์สล่าสุด</h2>
                     <a href="courses" class="btn btn-sm btn-outline">
-                        <span data-th="ดูทั้งหมด" data-en="View All">ดูทั้งหมด</span>
+                        <span>ดูทั้งหมด</span>
                         <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
@@ -273,17 +279,17 @@
                     <table class="admin-table">
                         <thead>
                             <tr>
-                                <th data-th="ชื่อคอร์ส" data-en="Course Name">ชื่อคอร์ส</th>
-                                <th data-th="ระดับ" data-en="Level">ระดับ</th>
-                                <th data-th="ระยะเวลา" data-en="Duration">ระยะเวลา</th>
-                                <th data-th="สถานะ" data-en="Status">สถานะ</th>
-                                <th data-th="การจัดการ" data-en="Actions">การจัดการ</th>
+                                <th>ชื่อคอร์ส</th>
+                                <th>ระดับ</th>
+                                <th>ระยะเวลา</th>
+                                <th>สถานะ</th>
+                                <th>การจัดการ</th>
                             </tr>
                         </thead>
                         <tbody id="coursesTableBody">
                             <tr>
                                 <td colspan="5" class="text-center">
-                                    <i class="fas fa-spinner fa-spin"></i> <span data-th="กำลังโหลด..." data-en="Loading...">กำลังโหลด...</span>
+                                    <i class="fas fa-spinner fa-spin"></i> กำลังโหลด...
                                 </td>
                             </tr>
                         </tbody>
@@ -294,9 +300,9 @@
             <!-- Recent Enrollments Table -->
             <div class="admin-section">
                 <div class="section-header">
-                    <h2 data-th="ผู้สมัครล่าสุด" data-en="Recent Enrollments">ผู้สมัครล่าสุด</h2>
+                    <h2>ผู้สมัครล่าสุด</h2>
                     <a href="enrollments" class="btn btn-sm btn-outline">
-                        <span data-th="ดูทั้งหมด" data-en="View All">ดูทั้งหมด</span>
+                        <span>ดูทั้งหมด</span>
                         <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
@@ -305,17 +311,17 @@
                     <table class="admin-table">
                         <thead>
                             <tr>
-                                <th data-th="ชื่อ" data-en="Name">ชื่อ</th>
-                                <th data-th="อีเมล" data-en="Email">อีเมล</th>
-                                <th data-th="คอร์ส" data-en="Course">คอร์ส</th>
-                                <th data-th="วันที่สมัคร" data-en="Enrolled Date">วันที่สมัคร</th>
-                                <th data-th="สถานะ" data-en="Status">สถานะ</th>
+                                <th>ชื่อ</th>
+                                <th>อีเมล</th>
+                                <th>คอร์ส</th>
+                                <th>วันที่สมัคร</th>
+                                <th>สถานะ</th>
                             </tr>
                         </thead>
                         <tbody id="enrollmentsTableBody">
                             <tr>
                                 <td colspan="5" class="text-center">
-                                    <i class="fas fa-spinner fa-spin"></i> <span data-th="กำลังโหลด..." data-en="Loading...">กำลังโหลด...</span>
+                                    <i class="fas fa-spinner fa-spin"></i> กำลังโหลด...
                                 </td>
                             </tr>
                         </tbody>
@@ -331,119 +337,164 @@
 
     <!-- Scripts -->
     <script type="module">
-        // Import config
-        import { config } from '../lib/config.js';
+        // ========== CONFIG ==========
+        let config;
+        try {
+            const configModule = await import('../lib/config.js');
+            config = configModule.config;
+        } catch (e) {
+            console.warn('⚠️ Using fallback config');
+            config = {
+                supabaseUrl: 'https://srtsdminbdmxtvjgriev.supabase.co',
+                supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNydHNkbWluYmRteHR2amdyaWV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY4OTU2NzMsImV4cCI6MjA1MjQ3MTY3M30.XYZ123',
+                adminEmail: ['jusduy40@gmail.com']
+            };
+        }
         
-        // Initialize Supabase
-        const supabase = window.supabase.createClient(
-            config.supabaseUrl,
-            config.supabaseAnonKey
-        );
+        const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
 
-        // ========================================
-        // 🔐 ADMIN PERMISSION CHECK
-        // ========================================
+        // ========== AUTH CHECK (ไม่เด้งกลับไปมา) ==========
+        let authChecked = false;
         
         async function checkAdminPermission() {
+            if (authChecked) return true; // ป้องกันเช็คซ้ำ
+            
             try {
                 const { data: { session }, error: sessionError } = await supabase.auth.getSession();
                 
-                if (sessionError) throw sessionError;
-                
-                // 1. เช็คการล็อกอิน
-                if (!session) {
-                    alert('กรุณาเข้าสู่ระบบเพื่อเข้าถึงหน้านี้');
+                if (sessionError) {
+                    console.error('Session error:', sessionError);
                     window.location.href = '../pages/auth';
                     return false;
                 }
                 
-                // 2. เช็คอีเมล Admin (กำหนดใน config)
+                if (!session) {
+                    // ยังไม่ล็อกอิน → ไปหน้าล็อกอิน
+                    window.location.href = '../pages/auth';
+                    return false;
+                }
+                
                 const userEmail = session.user.email;
                 const adminEmails = Array.isArray(config.adminEmail) 
                     ? config.adminEmail 
                     : [config.adminEmail].filter(e => e);
                 
-                const isAdmin = adminEmails.length > 0 
-                    ? adminEmails.includes(userEmail)
-                    : true; // ถ้าไม่กำหนด adminEmail ให้อนุญาตทั้งหมด (สำหรับทดสอบ)
+                // ถ้าไม่มี adminEmail ใน config ให้อนุญาตทั้งหมด (สำหรับทดสอบ)
+                const isAdmin = adminEmails.length === 0 || adminEmails.includes(userEmail);
                 
                 if (!isAdmin) {
-                    alert('⛔ คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (เฉพาะผู้ดูแลระบบเท่านั้น)');
+                    alert('⛔ คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
                     window.location.href = '../index';
                     return false;
                 }
                 
-                // 3. เป็น Admin → แสดงอีเมล
-                document.getElementById('adminEmail').textContent = userEmail;
+                // ✅ ผ่านการตรวจสอบ
+                document.getElementById('adminEmail').textContent = userEmail?.split('@')[0] || 'Admin';
+                authChecked = true;
                 return true;
                 
             } catch (error) {
                 console.error('Permission check error:', error);
-                alert('เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์');
                 window.location.href = '../index';
                 return false;
             }
         }
 
-        // ========================================
-        // LOAD DASHBOARD DATA
-        // ========================================
-        
+        // ========== TRACK PAGE VIEW (นับผู้เข้าชมจริง) ==========
+        async function trackPageView() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                
+                await supabase.from('page_views').insert({
+                    page_path: window.location.pathname,
+                    user_id: session?.user?.id || null,
+                    ip_address: '', // Supabase จะบันทึกให้เองถ้าใช้ Edge Functions
+                    user_agent: navigator.userAgent,
+                    referrer: document.referrer || null,
+                    viewed_at: new Date().toISOString()
+                });
+                
+                console.log('✅ Page view tracked');
+            } catch (error) {
+                console.warn('⚠️ Could not track page view:', error);
+                // ไม่ error ถ้าบันทึกไม่สำเร็จ (เพื่อไม่ให้รบกวนผู้ใช้)
+            }
+        }
+
+        // ========== LOAD DASHBOARD DATA ==========
         async function loadDashboardData() {
             try {
-                // 1. โหลดจำนวนคอร์สที่เผยแพร่แล้ว
-                const { count: coursesCount, error: coursesError } = await supabase
+                // 1. จำนวนคอร์สที่เผยแพร่
+                const { count: coursesCount } = await supabase
                     .from('courses')
                     .select('*', { count: 'exact', head: true })
                     .eq('published', true);
-                
-                if (coursesError) {
-                    console.warn('Courses count error:', coursesError);
-                    document.getElementById('totalCourses').textContent = '0';
-                } else {
-                    document.getElementById('totalCourses').textContent = coursesCount || 0;
-                }
+                document.getElementById('totalCourses').textContent = coursesCount || 0;
 
-                // 2. โหลดจำนวนผู้สมัครเรียน
-                const { count: enrollCount, error: enrollError } = await supabase
+                // 2. จำนวนผู้สมัครเรียน
+                const { count: enrollCount } = await supabase
                     .from('enrollments')
                     .select('*', { count: 'exact', head: true });
-                
-                if (enrollError) {
-                    console.warn('Enrollments count error:', enrollError);
-                    document.getElementById('totalEnrollments').textContent = '0';
-                } else {
-                    document.getElementById('totalEnrollments').textContent = enrollCount || 0;
-                }
+                document.getElementById('totalEnrollments').textContent = enrollCount || 0;
 
-                // 3. โหลดข้อความใหม่ที่ยังไม่ตอบ (จากตาราง support_tickets หรือ contact_messages)
+                // 3. ข้อความใหม่ที่ยังไม่ตอบ
                 let messagesCount = 0;
-                
-                // ลองโหลดจาก support_tickets ก่อน (ระบบแชทใหม่)
-                const { count: chatCount, error: chatError } = await supabase
+                const { count: chatCount } = await supabase
                     .from('support_tickets')
                     .select('*', { count: 'exact', head: true })
                     .eq('is_admin', false)
                     .eq('deleted', false);
-                
-                if (!chatError) {
-                    messagesCount = chatCount || 0;
-                } else {
-                    // ถ้าไม่มีตาราง support_tickets ให้ลองโหลดจาก contact_messages
-                    const { count: contactCount, error: contactError } = await supabase
-                        .from('contact_messages')
-                        .select('*', { count: 'exact', head: true })
-                        .eq('status', 'new');
-                    
-                    if (!contactError) {
-                        messagesCount = contactCount || 0;
-                    }
-                }
+                if (chatCount !== null) messagesCount = chatCount;
                 document.getElementById('newMessages').textContent = messagesCount;
 
-                // 4. ผู้เข้าชม (จำลองข้อมูล - สามารถเชื่อมกับ analytics จริงได้)
-                const visitors = Math.floor(Math.random() * 200) + 50;
-                document.getElementById('totalVisitors').textContent = visitors;
+                // 4. ✅ ผู้เข้าชมวันนี้ (จากตาราง page_views จริง)
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const { data: viewsToday, error: viewsError } = await supabase
+                    .from('page_views')
+                    .select('ip_address', { count: 'exact' })
+                    .gte('viewed_at', today.toISOString())
+                    .maybeSingle();
+                
+                if (viewsError) {
+                    console.warn('Visitor count error:', viewsError);
+                    document.getElementById('todayVisitors').textContent = '0';
+                    document.getElementById('visitorChange').textContent = 'ไม่สามารถโหลดได้';
+                } else {
+                    // นับจำนวน IP ที่ไม่ซ้ำ
+                    const uniqueIps = [...new Set(viewsToday?.map(v => v.ip_address).filter(ip => ip) || [])];
+                    const visitorCount = uniqueIps.length || 0;
+                    
+                    document.getElementById('todayVisitors').textContent = visitorCount;
+                    
+                    // คำนวณการเปลี่ยนแปลง (เทียบกับเมื่อวาน)
+                    const yesterday = new Date(today);
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    
+                    const { data: viewsYesterday } = await supabase
+                        .from('page_views')
+                        .select('ip_address')
+                        .gte('viewed_at', yesterday.toISOString())
+                        .lt('viewed_at', today.toISOString());
+                    
+                    const uniqueIpsYesterday = [...new Set(viewsYesterday?.map(v => v.ip_address).filter(ip => ip) || [])];
+                    const yesterdayCount = uniqueIpsYesterday.length || 0;
+                    
+                    const change = visitorCount - yesterdayCount;
+                    const changeEl = document.getElementById('visitorChange');
+                    
+                    if (change > 0) {
+                        changeEl.innerHTML = `<i class="fas fa-arrow-up"></i> +${change} จากเมื่อวาน`;
+                        changeEl.className = 'stat-change positive';
+                    } else if (change < 0) {
+                        changeEl.innerHTML = `<i class="fas fa-arrow-down"></i> ${change} จากเมื่อวาน`;
+                        changeEl.className = 'stat-change negative';
+                    } else {
+                        changeEl.textContent = 'เท่ากับเมื่อวาน';
+                        changeEl.className = 'stat-change';
+                    }
+                }
 
             } catch (error) {
                 console.error('Error loading dashboard:', error);
@@ -451,10 +502,7 @@
             }
         }
 
-        // ========================================
-        // LOAD RECENT COURSES
-        // ========================================
-        
+        // ========== LOAD RECENT COURSES ==========
         async function loadRecentCourses() {
             const tbody = document.getElementById('coursesTableBody');
             
@@ -469,32 +517,28 @@
                 if (error) throw error;
                 
                 if (!courses || courses.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="text-center" data-th="ไม่มีข้อมูล" data-en="No data">ไม่มีข้อมูล</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center">ไม่มีข้อมูล</td></tr>`;
                     return;
                 }
                 
-                const isTH = document.documentElement.lang === 'th';
-                
                 tbody.innerHTML = courses.map(course => {
                     const levelBadge = {
-                        'beginner': { text: isTH ? 'ผู้เริ่มต้น' : 'Beginner', class: 'badge-blue' },
-                        'intermediate': { text: isTH ? 'ระดับกลาง' : 'Intermediate', class: 'badge-gold' },
-                        'advanced': { text: isTH ? 'ระดับสูง' : 'Advanced', class: 'badge-purple' }
+                        'beginner': { text: 'ผู้เริ่มต้น', class: 'badge-blue' },
+                        'intermediate': { text: 'ระดับกลาง', class: 'badge-gold' },
+                        'advanced': { text: 'ระดับสูง', class: 'badge-purple' }
                     }[course.level] || { text: '-', class: 'badge-gray' };
                     
                     const statusClass = course.published ? 'published' : 'draft';
-                    const statusText = course.published 
-                        ? (isTH ? 'เผยแพร่' : 'Published') 
-                        : (isTH ? 'ร่าง' : 'Draft');
+                    const statusText = course.published ? 'เผยแพร่' : 'ร่าง';
                     
-                    const title = isTH ? course.title_th : (course.title_en || course.title_th);
-                    const duration = isTH ? (course.duration_th || '-') : (course.duration_en || '-');
+                    const title = course.title_th || course.title_en || '-';
+                    const duration = course.duration_th || course.duration_en || '-';
                     
                     return `
                         <tr data-id="${course.id}">
                             <td>
                                 <strong>${title}</strong>
-                                <br><small class="text-muted">${course.icon ? course.icon.replace('fas fa-', '') : '-'}</small>
+                                <br><small class="text-muted">${course.icon?.replace('fas fa-', '') || '-'}</small>
                             </td>
                             <td><span class="badge ${levelBadge.class}">${levelBadge.text}</span></td>
                             <td>${duration}</td>
@@ -514,19 +558,14 @@
             } catch (error) {
                 console.error('Error loading courses:', error);
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center text-error">โหลดข้อมูลไม่สำเร็จ</td></tr>`;
-                showNotification('error', 'ไม่สามารถโหลดคอร์สได้');
             }
         }
 
-        // ========================================
-        // LOAD RECENT ENROLLMENTS
-        // ========================================
-        
+        // ========== LOAD RECENT ENROLLMENTS ==========
         async function loadRecentEnrollments() {
             const tbody = document.getElementById('enrollmentsTableBody');
             
             try {
-                // โหลดข้อมูลการสมัครเรียน พร้อมข้อมูลคอร์สที่สัมพันธ์กัน
                 const { data: enrollments, error } = await supabase
                     .from('enrollments')
                     .select(`
@@ -539,26 +578,24 @@
                 if (error) throw error;
                 
                 if (!enrollments || enrollments.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="text-center" data-th="ไม่มีข้อมูล" data-en="No data">ไม่มีข้อมูล</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center">ไม่มีข้อมูล</td></tr>`;
                     return;
                 }
                 
-                const isTH = document.documentElement.lang === 'th';
-                
                 tbody.innerHTML = enrollments.map(enroll => {
                     const statusBadge = {
-                        'pending': { text: isTH ? 'รอตรวจสอบ' : 'Pending', class: 'badge-gold' },
-                        'confirmed': { text: isTH ? 'ยืนยันแล้ว' : 'Confirmed', class: 'badge-green' },
-                        'completed': { text: isTH ? 'เรียนจบ' : 'Completed', class: 'badge-blue' }
+                        'pending': { text: 'รอตรวจสอบ', class: 'badge-gold' },
+                        'confirmed': { text: 'ยืนยันแล้ว', class: 'badge-green' },
+                        'completed': { text: 'เรียนจบ', class: 'badge-blue' }
                     }[enroll.status] || { text: '-', class: 'badge-gray' };
                     
                     const courseTitle = enroll.courses 
-                        ? (isTH ? enroll.courses.title_th : enroll.courses.title_en)
+                        ? (enroll.courses.title_th || enroll.courses.title_en)
                         : '-';
                     
                     return `
                         <tr>
-                            <td><strong>${enroll.name || '-'}</strong></td>
+                            <td><strong>${enroll.full_name || enroll.nickname || '-'}</strong></td>
                             <td>${enroll.email || '-'}</td>
                             <td>${courseTitle}</td>
                             <td>${formatDate(enroll.created_at)}</td>
@@ -570,22 +607,15 @@
             } catch (error) {
                 console.error('Error loading enrollments:', error);
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center text-error">โหลดข้อมูลไม่สำเร็จ</td></tr>`;
-                showNotification('error', 'ไม่สามารถโหลดข้อมูลผู้สมัครได้');
             }
         }
 
-        // ========================================
-        // UTILITY FUNCTIONS
-        // ========================================
-        
+        // ========== UTILITIES ==========
         function formatDate(dateString) {
             if (!dateString) return '-';
             return new Date(dateString).toLocaleString('th-TH', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
+                year: 'numeric', month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit'
             });
         }
 
@@ -594,19 +624,14 @@
             if (!container) return;
             
             const notification = document.createElement('div');
-            notification.className = `admin-notification notification-${type}`;
             notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
+                position: fixed; top: 20px; right: 20px;
                 padding: 12px 20px;
                 background: ${type === 'success' ? '#d1fae5' : type === 'error' ? '#fee2e2' : '#dbeafe'};
                 color: ${type === 'success' ? '#065f46' : type === 'error' ? '#991b1b' : '#1d4ed8'};
-                border-radius: var(--radius-md);
-                box-shadow: var(--shadow-md);
-                display: flex;
-                align-items: center;
-                gap: 8px;
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                display: flex; align-items: center; gap: 8px;
                 z-index: 10000;
                 animation: slideIn 0.3s ease;
             `;
@@ -623,39 +648,28 @@
             }, 4000);
         }
 
-        // ========================================
-        // GLOBAL FUNCTIONS (for onclick handlers)
-        // ========================================
-        
+        // ========== GLOBAL FUNCTIONS ==========
         window.editCourse = function(courseId) {
-            showNotification('info', `กำลังแก้ไขคอร์ส: ${courseId}`);
             window.location.href = `courses?edit=${courseId}`;
         };
 
         window.deleteCourse = async function(courseId) {
-            if (!confirm('คุณแน่ใจหรือไม่ที่จะลบคอร์สนี้?\nการกระทำนี้จะไม่สามารถกู้คืนได้')) return;
+            if (!confirm('คุณแน่ใจหรือไม่ที่จะลบคอร์สนี้?')) return;
             
             try {
-                const { error } = await supabase
-                    .from('courses')
-                    .delete()
-                    .eq('id', courseId);
-                
+                const { error } = await supabase.from('courses').delete().eq('id', courseId);
                 if (error) throw error;
                 
                 showNotification('success', 'ลบคอร์สสำเร็จ');
                 loadRecentCourses();
-                loadDashboardData(); // อัปเดตจำนวนคอร์สในแดชบอร์ด
+                loadDashboardData();
             } catch (err) {
                 console.error('Delete error:', err);
                 showNotification('error', 'ลบคอร์สไม่สำเร็จ: ' + err.message);
             }
         };
 
-        // ========================================
-        // SIDEBAR & MOBILE TOGGLE
-        // ========================================
-        
+        // ========== SIDEBAR & MOBILE ==========
         function initSidebar() {
             const sidebar = document.getElementById('adminSidebar');
             const mobileToggle = document.getElementById('mobileToggle');
@@ -676,79 +690,42 @@
             });
         }
 
-        // ========================================
-        // LOGOUT
-        // ========================================
-        
+        // ========== LOGOUT ==========
         document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
             e.preventDefault();
-            
             if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
                 await supabase.auth.signOut();
+                authChecked = false;
                 window.location.href = '../index';
             }
         });
 
-        // ========================================
-        // LANGUAGE SWITCHER
-        // ========================================
-        
-        function initLanguage() {
-            const savedLang = localStorage.getItem('admin_language') || 'th';
-            setAdminLanguage(savedLang);
-        }
-        
-        function setAdminLanguage(lang) {
-            document.documentElement.lang = lang;
-            localStorage.setItem('admin_language', lang);
-            
-            document.querySelectorAll('[data-th][data-en]').forEach(el => {
-                const text = el.getAttribute(`data-${lang}`);
-                if (text) {
-                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
-                        el.placeholder = text;
-                    } else {
-                        el.textContent = text;
-                    }
-                }
-            });
-        }
-
-        // ========================================
-        // INIT
-        // ========================================
-        
+        // ========== INIT ==========
         async function init() {
-            try {
-                // 🔐 1. ตรวจสอบสิทธิ์ Admin (สำคัญมาก - ต้องทำก่อน)
-                const isAdmin = await checkAdminPermission();
-                if (!isAdmin) return; // ไม่ใช่ Admin → หยุดทำงานทันที
-                
-                // 2. ตั้งค่าภาษา
-                initLanguage();
-                
-                // 3. ตั้งค่า Sidebar
-                initSidebar();
-                
-                // 4. โหลดข้อมูลแดชบอร์ดพร้อมกันทั้งหมด
-                await Promise.all([
-                    loadDashboardData(),
-                    loadRecentCourses(),
-                    loadRecentEnrollments()
-                ]);
-                
-                // 5. ซ่อน Loader
-                const loader = document.getElementById('adminLoader');
-                if (loader) loader.style.display = 'none';
-                
-            } catch (error) {
-                console.error('Init error:', error);
-                document.getElementById('adminLoader').style.display = 'none';
-                showNotification('error', 'เกิดข้อผิดพลาดในการโหลดหน้าแดชบอร์ด');
-            }
+            // 1. บันทึกการเข้าชมหน้าแดชบอร์ด (นับผู้เข้าชมจริง)
+            await trackPageView();
+            
+            // 2. เช็คสิทธิ์แอดมิน
+            const isAdmin = await checkAdminPermission();
+            if (!isAdmin) return;
+            
+            // 3. ตั้งค่า Sidebar
+            initSidebar();
+            
+            // 4. โหลดข้อมูลทั้งหมด
+            await Promise.all([
+                loadDashboardData(),
+                loadRecentCourses(),
+                loadRecentEnrollments()
+            ]);
+            
+            // 5. ซ่อน Loader
+            const loader = document.getElementById('adminLoader');
+            if (loader) loader.style.display = 'none';
+            
+            console.log('✅ Dashboard initialized');
         }
 
-        // Run init when DOM is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
         } else {
