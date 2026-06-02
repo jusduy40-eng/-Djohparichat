@@ -79,32 +79,32 @@
     <!-- Sidebar -->
     <aside class="admin-sidebar" id="adminSidebar">
         <div class="admin-logo">
-            <a href="../index.html">
+            <a href="../index">
                 <i class="fas fa-graduation-cap"></i>
                 <span>Djohparichat</span>
             </a>
         </div>
         <nav class="admin-nav">
             <ul>
-                <li><a href="index.html" data-page="dashboard">
+                <li><a href="index" data-page="dashboard">
                     <i class="fas fa-dashboard"></i> <span data-th="แดชบอร์ด" data-en="Dashboard">แดชบอร์ด</span>
                 </a></li>
-                <li><a href="contents.html" class="active" data-page="contents">
+                <li><a href="contents" class="active" data-page="contents">
                     <i class="fas fa-file-alt"></i> <span data-th="จัดการเนื้อหา" data-en="Contents">จัดการเนื้อหา</span>
                 </a></li>
-                <li><a href="courses.html" data-page="courses">
+                <li><a href="courses" data-page="courses">
                     <i class="fas fa-brain"></i> <span data-th="จัดการคอร์ส" data-en="Courses">จัดการคอร์ส</span>
                 </a></li>
-                <li><a href="enrollments.html" data-page="enrollments">
+                <li><a href="enrollments" data-page="enrollments">
                     <i class="fas fa-users"></i> <span data-th="ผู้สมัครเรียน" data-en="Enrollments">ผู้สมัครเรียน</span>
                 </a></li>
-                <li><a href="messages.html" data-page="messages">
+                <li><a href="messages" data-page="messages">
                     <i class="fas fa-envelope"></i> <span data-th="ข้อความติดต่อ" data-en="Messages">ข้อความติดต่อ</span>
                 </a></li>
-                <li><a href="settings.html" data-page="settings">
+                <li><a href="settings" data-page="settings">
                     <i class="fas fa-cog"></i> <span data-th="การตั้งค่า" data-en="Settings">การตั้งค่า</span>
                 </a></li>
-                <li><a href="../index.html" target="_blank">
+                <li><a href="../index" target="_blank">
                     <i class="fas fa-external-link-alt"></i> <span data-th="เปิดเว็บไซต์" data-en="View Website">เปิดเว็บไซต์</span>
                 </a></li>
                 <li><a href="#" id="logoutBtn" class="logout">
@@ -284,7 +284,7 @@
             
             if (!session) {
                 alert('กรุณาเข้าสู่ระบบเพื่อเข้าถึงหน้านี้');
-                window.location.href = '../pages/auth.html';
+                window.location.href = '../pages/auth';
                 return false;
             }
             
@@ -299,7 +299,7 @@
             
             if (!isAdmin) {
                 alert('⛔ คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (เฉพาะผู้ดูแลระบบเท่านั้น)');
-                window.location.href = '../index.html';
+                window.location.href = '../index';
                 return false;
             }
             
@@ -562,7 +562,7 @@
             e.preventDefault();
             if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
                 await supabase.auth.signOut();
-                window.location.href = '../index.html';
+                window.location.href = '../index';
             }
         });
 
