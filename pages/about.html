@@ -384,6 +384,7 @@
         .editable {
             position: relative;
             transition: all 0.2s ease;
+            cursor: pointer;
         }
         .editable:hover {
             outline: 2px dashed #cbd5e1;
@@ -663,7 +664,6 @@
         const configModule = await import('../lib/config.js');
         config = configModule.config;
         
-        // Initialize Supabase
         if (config && config.supabaseUrl && config.supabaseAnonKey) {
             supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
             console.log('✅ Supabase initialized');
@@ -672,7 +672,6 @@
         }
     } catch (e) {
         console.error('❌ Failed to load config:', e);
-        // Fallback config
         config = {
             supabaseUrl: 'https://srtsdminbdmxtvjgriev.supabase.co',
             supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNydHNkbWluYmRteHR2amdyaWV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY4OTU2NzMsImV4cCI6MjA1MjQ3MTY3M30.XYZ123',
@@ -686,6 +685,7 @@
     let isAdmin = false;
     let contentData = {};
     let realtimeSubscription = null;
+    let isEditing = false;
 
     // ========== DOM ELEMENTS ==========
     const adminToolbar = document.getElementById('adminToolbar');
@@ -762,13 +762,11 @@
             
             console.log('✅ Content loaded:', data);
             
-            // Map data by key
             contentData = {};
             data.forEach(item => {
                 contentData[item.key] = item.value;
             });
             
-            // Update DOM
             if (contentData['main_image']) {
                 mainImage.src = contentData['main_image'];
                 mainImage.style.display = 'block';
@@ -830,7 +828,7 @@
         }
     }
 
-    // ========== EDIT FUNCTIONS ==========
+    // ========== EDIT FUNCTIONS (COMPLETE) ==========
     function setupEditListeners() {
         if (toggleEditBtn) toggleEditBtn.addEventListener('click', toggleEditMode);
         if (saveAllBtn) saveAllBtn.addEventListener('click', saveAllChanges);
@@ -845,7 +843,7 @@
         
         editableElements.forEach(el => {
             el.addEventListener('click', (e) => {
-                if (isAdmin && !el.classList.contains('editing')) {
+                if (isAdmin && isEditing && !el.classList.contains('editing')) {
                     makeEditable(el);
                 }
             });
@@ -853,11 +851,81 @@
     }
     
     function toggleEditMode() {
-        // ... (code เดิม)
+        isEditing = !isEditing;
+        
+        if (isEditing) {
+            toggleEditBtn.innerHTML = '<i class="fas fa-check"></i> เสร็จสิ้น';
+            toggleEditBtn.classList.replace('btn-edit', 'btn-save');
+            saveAllBtn.style.display = 'flex';
+            cancelEditBtn.style.display = 'flex';
+            
+            editableElements.forEach(el => {
+                el.title = 'คลิกเพื่อแก้ไข';
+                el.style.cursor = 'pointer';
+            });
+            
+            showToast('คลิกที่ข้อความเพื่อแก้ไข', 'success');
+        } else {
+            toggleEditBtn.innerHTML = '<i class="fas fa-edit"></i> แก้ไข';
+            toggleEditBtn.classList.replace('btn-save', 'btn-edit');
+            saveAllBtn.style.display = 'none';
+            cancelEditBtn.style.display = 'none';
+            
+            editableElements.forEach(el => {
+                el.classList.remove('editing');
+                el.title = '';
+                el.style.cursor = '';
+                if (el.querySelector('textarea')) {
+                    el.querySelector('textarea').remove();
+                    el.textContent = el.dataset.original || el.textContent;
+                }
+            });
+        }
     }
     
     function makeEditable(el) {
-        // ... (code เดิม)
+        const key = el.dataset.key;
+        const original = el.textContent;
+        el.dataset.original = original;
+        
+        const textarea = document.createElement('textarea');
+        textarea.value = original;
+        textarea.rows = Math.max(2, Math.ceil(original.length / 50));
+        
+        el.classList.add('editing');
+        const currentHTML = el.innerHTML;
+        el.innerHTML = '';
+        el.appendChild(textarea);
+        
+        const actions = document.createElement('div');
+        actions.className = 'editable-actions';
+        actions.innerHTML = `
+            <button class="btn-save">บันทึก</button>
+            <button class="btn-cancel">ยกเลิก</button>
+        `;
+        el.appendChild(actions);
+        
+        actions.querySelector('.btn-save').addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const newValue = textarea.value.trim();
+            if (newValue && newValue !== original) {
+                await updateContent(key, newValue, 'text');
+            }
+            exitEditMode(el, newValue || original);
+        });
+        
+        actions.querySelector('.btn-cancel').addEventListener('click', (e) => {
+            e.stopPropagation();
+            exitEditMode(el, original);
+        });
+        
+        textarea.focus();
+    }
+    
+    function exitEditMode(el, original) {
+        el.classList.remove('editing');
+        el.textContent = original;
+        el.title = 'คลิกเพื่อแก้ไข';
     }
     
     async function updateContent(key, value, type) {
@@ -883,11 +951,34 @@
     }
     
     async function saveAllChanges() {
-        // ... (code เดิม)
+        editableElements.forEach(el => {
+            if (el.classList.contains('editing')) {
+                const textarea = el.querySelector('textarea');
+                if (textarea) {
+                    const key = el.dataset.key;
+                    const newValue = textarea.value.trim();
+                    const original = el.dataset.original;
+                    
+                    if (newValue && newValue !== original) {
+                        updateContent(key, newValue, 'text');
+                    }
+                    exitEditMode(el, newValue || original);
+                }
+            }
+        });
+        
+        toggleEditMode();
     }
     
     function cancelEdit() {
-        // ... (code เดิม)
+        editableElements.forEach(el => {
+            if (el.classList.contains('editing')) {
+                const original = el.dataset.original;
+                exitEditMode(el, original);
+            }
+        });
+        toggleEditMode();
+        showToast('ยกเลิกการแก้ไข', 'success');
     }
     
     async function handleImageUpload(e) {
