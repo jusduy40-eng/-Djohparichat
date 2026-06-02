@@ -19,134 +19,115 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        /* ========== PAGE HEADER ========== */
+        /* ========== PAGE HEADER (เหมือนหน้าหลัก) ========== */
         .page-header {
             background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
             color: white;
-            padding: 80px 0 60px;
+            padding: 40px 0 30px;
             text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .page-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            opacity: 0.3;
         }
         .page-header h1 {
-            font-size: 2.5rem;
-            margin: 0 0 16px;
-            position: relative;
-            z-index: 1;
+            font-size: 1.8rem;
+            margin: 0 0 8px;
             font-weight: 700;
         }
         .page-header p {
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             opacity: 0.95;
-            position: relative;
-            z-index: 1;
-            max-width: 600px;
-            margin: 0 auto;
+            margin: 0;
         }
         
         /* ========== COURSES GRID ========== */
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 32px;
-            margin-top: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin: 40px 0;
         }
         
         .course-card {
             background: white;
-            border-radius: 20px;
-            padding: 32px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
             transition: all 0.3s ease;
             position: relative;
-            border: 2px solid transparent;
+            border: 1px solid #f1f5f9;
         }
         .course-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 40px rgba(30, 136, 229, 0.15);
-            border-color: #e3f2fd;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(30, 136, 229, 0.12);
         }
         .course-card.featured {
-            border-color: #1e88e5;
-            box-shadow: 0 8px 30px rgba(30, 136, 229, 0.2);
+            border: 2px solid #1e88e5;
         }
         
         .course-badge {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 16px;
+            right: 16px;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 0.75rem;
             font-weight: 600;
         }
         
         .course-icon {
-            width: 70px;
-            height: 70px;
+            width: 56px;
+            height: 56px;
             background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            border-radius: 16px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: 1.75rem;
             color: #1e88e5;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         
         .course-title {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: #1e293b;
-            margin: 0 0 12px;
+            margin: 0 0 10px;
         }
         
         .course-description {
             color: #64748b;
-            font-size: 1rem;
-            line-height: 1.6;
-            margin: 0 0 20px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 0 0 16px;
         }
         
         .course-features {
             list-style: none;
             padding: 0;
-            margin: 0 0 24px;
+            margin: 0 0 20px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         
         .course-features li {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             color: #475569;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
         }
         
         .course-features li i {
             color: #10b981;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
         
         .course-price {
-            font-size: 2rem;
+            font-size: 1.75rem;
             font-weight: 700;
             color: #1e88e5;
-            margin: 0 0 20px;
+            margin: 0 0 16px;
         }
         
         .course-price.free {
@@ -155,10 +136,10 @@
         
         .course-actions .btn {
             width: 100%;
-            padding: 14px 24px;
+            padding: 12px 20px;
             border: none;
-            border-radius: 12px;
-            font-size: 1rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -168,41 +149,35 @@
         .course-actions .btn-primary {
             background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
         }
         
         .course-actions .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(30, 136, 229, 0.4);
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
         }
         
         /* ========== EMPTY & LOADING STATES ========== */
         .courses-empty, .courses-loading {
             text-align: center;
-            padding: 80px 20px;
+            padding: 60px 20px;
             color: #94a3b8;
         }
         
         .courses-empty i, .courses-loading i {
-            font-size: 4rem;
-            margin-bottom: 20px;
+            font-size: 3rem;
+            margin-bottom: 16px;
             opacity: 0.5;
         }
         
-        .courses-empty p, .courses-loading p {
-            font-size: 1.2rem;
-            margin: 0;
-        }
-        
-        /* ========== AUTH MODAL ========== */
+        /* ========== AUTH MODAL (เหมือนหน้าหลัก) ========== */
         .auth-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -220,27 +195,27 @@
         
         .auth-modal-content {
             background: white;
-            border-radius: 24px;
+            border-radius: 20px;
             width: 100%;
-            max-width: 450px;
+            max-width: 420px;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
-            transform: translateY(30px) scale(0.95);
+            transform: translateY(20px);
             transition: transform 0.3s ease;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
         }
         
         .auth-modal.active .auth-modal-content {
-            transform: translateY(0) scale(1);
+            transform: translateY(0);
         }
         
         .auth-modal-close {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 40px;
-            height: 40px;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
             border: none;
             background: rgba(0,0,0,0.05);
             border-radius: 50%;
@@ -250,7 +225,6 @@
             justify-content: center;
             color: #64748b;
             transition: all 0.2s ease;
-            z-index: 10;
         }
         
         .auth-modal-close:hover {
@@ -259,31 +233,31 @@
         }
         
         .auth-modal-header {
-            padding: 40px 32px 24px;
+            padding: 32px 28px 20px;
             text-align: center;
         }
         
         .auth-modal-header h3 {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             color: #1e293b;
-            margin: 0 0 8px;
+            margin: 0 0 6px;
             font-weight: 700;
         }
         
         .auth-modal-header p {
             color: #64748b;
             margin: 0;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
         
         .auth-modal-body {
-            padding: 0 32px 32px;
+            padding: 0 28px 28px;
         }
         
         .auth-form {
             display: none;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
         }
         
         .auth-form.active {
@@ -293,55 +267,55 @@
         .auth-form .form-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
         
         .auth-form .form-group label {
             font-weight: 600;
             color: #475569;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
         
         .auth-form .form-group input {
-            padding: 14px 18px;
+            padding: 12px 16px;
             border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 1rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
             transition: all 0.2s ease;
             outline: none;
         }
         
         .auth-form .form-group input:focus {
             border-color: #1e88e5;
-            box-shadow: 0 0 0 4px rgba(30, 136, 229, 0.1);
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
         }
         
         .auth-form .btn-auth {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
             color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 1.05rem;
+            border-radius: 10px;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             margin-top: 8px;
         }
         
         .auth-form .btn-auth:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(30, 136, 229, 0.4);
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
         }
         
         .auth-divider {
             text-align: center;
-            margin: 24px 0;
+            margin: 20px 0;
             position: relative;
         }
         
@@ -357,16 +331,16 @@
         
         .auth-divider span {
             background: white;
-            padding: 0 16px;
+            padding: 0 12px;
             color: #94a3b8;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             position: relative;
         }
         
         .auth-toggle {
             text-align: center;
-            margin-top: 20px;
-            font-size: 1rem;
+            margin-top: 16px;
+            font-size: 0.95rem;
             color: #64748b;
         }
         
@@ -381,15 +355,15 @@
             text-decoration: underline;
         }
         
-        /* ========== ENROLLMENT MODAL ========== */
+        /* ========== ENROLLMENT MODAL (ปรับขนาดให้เล็กลง) ========== */
         .enrollment-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -407,67 +381,63 @@
         
         .enrollment-modal-content {
             background: white;
-            border-radius: 24px;
+            border-radius: 20px;
             width: 100%;
-            max-width: 700px;
+            max-width: 600px;
             max-height: 90vh;
             overflow: hidden;
             position: relative;
-            transform: translateY(30px) scale(0.95);
+            transform: translateY(20px);
             transition: transform 0.3s ease;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
             display: flex;
             flex-direction: column;
         }
         
         .enrollment-modal.active .enrollment-modal-content {
-            transform: translateY(0) scale(1);
+            transform: translateY(0);
         }
         
         .modal-close {
             position: absolute;
-            top: 24px;
-            right: 24px;
-            width: 40px;
-            height: 40px;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
             border: none;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.9);
             border-radius: 50%;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: #64748b;
             transition: all 0.2s ease;
             z-index: 10;
-            backdrop-filter: blur(10px);
         }
         
         .modal-close:hover {
-            background: rgba(255,255,255,0.3);
+            background: white;
             transform: rotate(90deg);
         }
         
         .modal-header {
-            padding: 32px;
+            padding: 24px 28px;
             background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
             color: white;
-            position: relative;
-            overflow: hidden;
         }
         
         .modal-header h3 {
             margin: 0;
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             display: flex;
             align-items: center;
-            gap: 12px;
-            position: relative;
-            z-index: 1;
+            gap: 10px;
+            font-weight: 700;
         }
         
         .modal-body {
-            padding: 32px;
+            padding: 24px 28px;
             overflow-y: auto;
             flex: 1;
             background: #f8fafc;
@@ -476,41 +446,41 @@
         .enrollment-form {
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 20px;
         }
         
         .form-section {
             background: white;
-            padding: 24px;
-            border-radius: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
         .form-section-title {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
             color: #1e293b;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         
         .form-section-title i {
             color: #1e88e5;
-            font-size: 1.3rem;
+            font-size: 1.1rem;
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         
         .form-group label {
             display: block;
             font-weight: 500;
             color: #475569;
-            font-size: 0.95rem;
-            margin-bottom: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
         }
         
         .form-group label .required {
@@ -522,10 +492,10 @@
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 14px 18px;
+            padding: 10px 14px;
             border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
             transition: all 0.2s ease;
             outline: none;
             font-family: inherit;
@@ -535,14 +505,13 @@
         .form-group input:focus,
         .form-group textarea:focus {
             border-color: #1e88e5;
-            box-shadow: 0 0 0 4px rgba(30, 136, 229, 0.1);
-            transform: translateY(-2px);
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
         }
         
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            gap: 12px;
         }
         
         @media (max-width: 640px) {
@@ -553,31 +522,29 @@
         
         .payment-section {
             background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border: 2px solid #bae6fd;
-            border-radius: 16px;
-            padding: 28px;
-            margin: 8px 0;
+            border: 1px solid #bae6fd;
+            border-radius: 12px;
+            padding: 20px;
         }
         
         .price-card {
             background: white;
-            padding: 24px;
-            border-radius: 16px;
+            padding: 16px;
+            border-radius: 12px;
             text-align: center;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border: 2px solid #e0f2fe;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
         
         .price-label {
             color: #64748b;
-            font-size: 0.95rem;
-            margin-bottom: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
             font-weight: 500;
         }
         
         .price-amount {
-            font-size: 3rem;
+            font-size: 2.25rem;
             font-weight: 700;
             background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
             -webkit-background-clip: text;
@@ -589,8 +556,8 @@
         .payment-methods {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin: 24px 0;
+            gap: 12px;
+            margin: 16px 0;
         }
         
         @media (max-width: 480px) {
@@ -600,167 +567,129 @@
         }
         
         .payment-method {
-            padding: 24px 20px;
+            padding: 16px 12px;
             border: 2px solid #e2e8f0;
-            border-radius: 16px;
+            border-radius: 10px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
             background: white;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .payment-method::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
         }
         
         .payment-method:hover {
             border-color: #1e88e5;
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(30, 136, 229, 0.2);
+            transform: translateY(-2px);
         }
         
         .payment-method.selected {
             border-color: #1e88e5;
-            box-shadow: 0 8px 24px rgba(30, 136, 229, 0.3);
-        }
-        
-        .payment-method.selected::before {
-            opacity: 1;
-        }
-        
-        .payment-method.selected i,
-        .payment-method.selected div {
-            color: white;
-            position: relative;
-            z-index: 1;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
         }
         
         .payment-method i {
-            font-size: 2.5rem;
-            margin-bottom: 12px;
+            font-size: 2rem;
+            margin-bottom: 8px;
             color: #1e88e5;
             display: block;
-            transition: color 0.3s ease;
+        }
+        
+        .payment-method.selected i {
+            color: #1e88e5;
         }
         
         .payment-method div {
             font-weight: 600;
-            font-size: 1.05rem;
+            font-size: 0.9rem;
             color: #475569;
-            transition: color 0.3s ease;
         }
         
         .qr-section {
             background: white;
-            border-radius: 16px;
-            padding: 32px;
+            border-radius: 12px;
+            padding: 20px;
             text-align: center;
-            margin: 24px 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border: 2px dashed #bae6fd;
+            margin: 16px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
         
         .qr-code-wrapper {
             display: inline-block;
-            padding: 20px;
+            padding: 16px;
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-            margin: 16px 0;
+            border-radius: 12px;
+            margin: 12px 0;
             position: relative;
         }
         
         .qr-code-wrapper img {
-            max-width: 280px;
-            border-radius: 12px;
+            max-width: 220px;
+            border-radius: 8px;
             display: block;
         }
         
         .qr-badge {
             position: absolute;
-            top: -10px;
-            right: -10px;
+            top: -8px;
+            right: -8px;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
         
         .promptpay-number {
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            padding: 16px 24px;
-            border-radius: 12px;
-            margin: 16px 0;
-            border: 2px solid #fbbf24;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin: 12px 0;
         }
         
         .promptpay-label {
             color: #92400e;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             margin-bottom: 4px;
         }
         
         .promptpay-value {
             color: #78350f;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
         
         .info-box {
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border-left: 4px solid #f59e0b;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 20px 0;
-            display: flex;
-            gap: 12px;
-        }
-        
-        .info-box i {
-            color: #f59e0b;
-            font-size: 1.5rem;
-            flex-shrink: 0;
-        }
-        
-        .info-box-content {
-            flex: 1;
+            border-left: 3px solid #f59e0b;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
         }
         
         .info-box-title {
             font-weight: 600;
             color: #92400e;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
         }
         
         .info-box ol {
             margin: 0;
-            padding-left: 20px;
+            padding-left: 18px;
             color: #78350f;
-            line-height: 1.8;
+            line-height: 1.6;
+            font-size: 0.85rem;
         }
         
         .file-upload-wrapper {
-            margin-top: 16px;
+            margin-top: 12px;
         }
         
         .file-upload {
             border: 2px dashed #cbd5e1;
-            border-radius: 16px;
-            padding: 32px 24px;
+            border-radius: 10px;
+            padding: 24px 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -770,13 +699,12 @@
         .file-upload:hover {
             border-color: #1e88e5;
             background: #f0f9ff;
-            transform: translateY(-2px);
         }
         
         .file-upload i {
-            font-size: 3rem;
+            font-size: 2.5rem;
             color: #94a3b8;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             display: block;
         }
         
@@ -784,10 +712,11 @@
             font-weight: 600;
             color: #475569;
             margin-bottom: 4px;
+            font-size: 0.9rem;
         }
         
         .file-upload-desc {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #94a3b8;
         }
         
@@ -797,75 +726,65 @@
         
         .preview-image {
             max-width: 100%;
-            max-height: 250px;
-            border-radius: 12px;
-            margin-top: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border: 3px solid white;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-top: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
         .privacy-notice {
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border-left: 4px solid #f59e0b;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 20px 0;
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
-        }
-        
-        .privacy-notice i {
-            color: #f59e0b;
-            font-size: 1.5rem;
-            flex-shrink: 0;
-            margin-top: 2px;
+            border-left: 3px solid #f59e0b;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
         }
         
         .privacy-notice strong {
             color: #92400e;
             display: block;
             margin-bottom: 4px;
+            font-size: 0.9rem;
         }
         
         .privacy-notice p {
             color: #78350f;
             margin: 0;
-            line-height: 1.6;
+            line-height: 1.5;
+            font-size: 0.85rem;
         }
         
         .modal-footer {
-            padding: 24px 32px;
+            padding: 20px 28px;
             background: white;
             border-top: 1px solid #e2e8f0;
             display: flex;
             justify-content: flex-end;
-            gap: 12px;
+            gap: 10px;
         }
         
         .btn {
-            padding: 14px 28px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 12px;
-            font-size: 1rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             font-family: inherit;
         }
         
         .btn-primary {
             background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(30, 136, 229, 0.4);
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
         }
         
         .btn-outline {
@@ -887,22 +806,21 @@
         
         .success-screen {
             text-align: center;
-            padding: 48px 32px;
+            padding: 32px 28px;
         }
         
         .success-icon {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 4rem;
-            margin: 0 auto 32px;
+            font-size: 3rem;
+            margin: 0 auto 24px;
             animation: successPulse 0.6s ease;
-            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.3);
         }
         
         @keyframes successPulse {
@@ -912,80 +830,66 @@
         }
         
         .success-screen h4 {
-            margin: 0 0 16px;
+            margin: 0 0 12px;
             color: #1e293b;
-            font-size: 2rem;
+            font-size: 1.75rem;
         }
         
         .success-screen p {
-            margin: 0 0 32px;
+            margin: 0 0 24px;
             color: #64748b;
-            line-height: 1.8;
-            font-size: 1.1rem;
+            line-height: 1.6;
+            font-size: 1rem;
         }
         
         .status-card {
             background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-            border-left: 4px solid #3b82f6;
-            padding: 24px;
-            border-radius: 12px;
-            margin: 24px 0;
+            border-left: 3px solid #3b82f6;
+            padding: 16px;
+            border-radius: 10px;
+            margin: 20px 0;
             text-align: left;
-        }
-        
-        .status-card i {
-            color: #3b82f6;
-            font-size: 1.5rem;
-            margin-right: 12px;
         }
         
         .status-card strong {
             color: #1e40af;
             display: block;
-            margin-bottom: 8px;
-            font-size: 1.1rem;
+            margin-bottom: 6px;
+            font-size: 1rem;
         }
         
         .status-card small {
             color: #3b82f6;
-            line-height: 1.6;
+            line-height: 1.5;
+            font-size: 0.85rem;
         }
         
         /* Responsive */
         @media (max-width: 768px) {
             .page-header {
-                padding: 60px 0 40px;
+                padding: 32px 0 24px;
             }
             .page-header h1 {
-                font-size: 2rem;
+                font-size: 1.5rem;
             }
             .services-grid {
                 grid-template-columns: 1fr;
-                gap: 24px;
+                gap: 20px;
             }
-            .modal-header {
-                padding: 24px;
+            .enrollment-modal-content {
+                max-width: calc(100vw - 32px);
             }
             .modal-header h3 {
-                font-size: 1.4rem;
+                font-size: 1.2rem;
             }
             .modal-body {
                 padding: 20px;
             }
             .form-section {
-                padding: 20px;
-            }
-            .payment-section {
-                padding: 20px;
+                padding: 16px;
             }
             .price-amount {
-                font-size: 2.5rem;
-            }
-            .qr-section {
-                padding: 24px 16px;
-            }
-            .qr-code-wrapper img {
-                max-width: 100%;
+                font-size: 2rem;
             }
         }
     </style>
@@ -999,7 +903,7 @@
         </div>
     </div>
 
-    <!-- Navigation -->
+    <!-- Navigation (เหมือนหน้าหลัก) -->
     <nav id="navbar" class="navbar">
         <div class="container">
             <div class="nav-wrapper">
@@ -1037,7 +941,6 @@
                 <p id="authModalDesc">ยินดีต้อนรับกลับ! กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</p>
             </div>
             <div class="auth-modal-body">
-                <!-- Login Form -->
                 <form id="loginForm" class="auth-form active">
                     <div class="form-group">
                         <label>อีเมล</label>
@@ -1052,7 +955,6 @@
                     </button>
                 </form>
                 
-                <!-- Sign Up Form -->
                 <form id="signupForm" class="auth-form">
                     <div class="form-group">
                         <label>ชื่อ-นามสกุล</label>
@@ -1065,7 +967,7 @@
                     <div class="form-group">
                         <label>รหัสผ่าน</label>
                         <input type="password" id="signupPassword" required placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6">
-                        <small style="color: #94a3b8; font-size: 0.85rem;">ต้องมีความยาวอย่างน้อย 6 ตัวอักษร</small>
+                        <small style="color: #94a3b8; font-size: 0.8rem;">ต้องมีความยาวอย่างน้อย 6 ตัวอักษร</small>
                     </div>
                     <button type="submit" class="btn-auth" id="signupBtn">
                         <span>สมัครสมาชิก</span><i class="fas fa-user-plus"></i>
@@ -1090,7 +992,7 @@
     </section>
 
     <!-- Courses Section -->
-    <section class="services" style="padding: 60px 0;">
+    <section class="services" style="padding: 0 0 40px;">
         <div class="container">
             <div class="services-grid" id="coursesGrid">
                 <div class="courses-loading">
@@ -1119,7 +1021,6 @@
         <div class="enrollment-modal-content">
             <button class="modal-close" id="enrollmentModalClose" onclick="closeEnrollmentModal()"><i class="fas fa-times"></i></button>
             
-            <!-- Step 1: Form -->
             <div id="enrollmentStep1">
                 <div class="modal-header">
                     <h3><i class="fas fa-user-plus"></i> <span id="enrollCourseName">-</span></h3>
@@ -1130,7 +1031,6 @@
                         <input type="hidden" id="enrollCoursePrice">
                         <input type="hidden" id="enrollIsFree">
                         
-                        <!-- Personal Info Section -->
                         <div class="form-section">
                             <div class="form-section-title">
                                 <i class="fas fa-user-circle"></i>
@@ -1155,15 +1055,14 @@
                             
                             <div class="form-group">
                                 <label>ช่องทางติดต่อ <span class="required">*</span></label>
-                                <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                                    <input type="text" id="enrollFacebook" placeholder="ลิงก์ Facebook" style="flex:1;min-width:200px;">
-                                    <input type="text" id="enrollLine" placeholder="LINE ID" style="flex:1;min-width:150px;">
+                                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                                    <input type="text" id="enrollFacebook" placeholder="ลิงก์ Facebook" style="flex:1;min-width:180px;">
+                                    <input type="text" id="enrollLine" placeholder="LINE ID" style="flex:1;min-width:120px;">
                                 </div>
-                                <small style="color: #94a3b8; margin-top: 6px; display: block;">กรอกอย่างน้อย 1 ช่องทาง</small>
+                                <small style="color: #94a3b8; margin-top: 4px; display: block; font-size: 0.8rem;">กรอกอย่างน้อย 1 ช่องทาง</small>
                             </div>
                         </div>
                         
-                        <!-- Payment Section -->
                         <div id="paymentSection" class="payment-section" style="display:none;">
                             <div class="form-section-title">
                                 <i class="fas fa-credit-card"></i>
@@ -1175,7 +1074,7 @@
                                 <div class="price-amount" id="enrollPriceDisplay">฿0</div>
                             </div>
                             
-                            <label style="font-weight:600;display:block;margin-bottom:16px;color:#475569;">เลือกวิธีการชำระเงิน</label>
+                            <label style="font-weight:600;display:block;margin-bottom:12px;color:#475569;font-size:0.9rem;">เลือกวิธีการชำระเงิน</label>
                             <div class="payment-methods">
                                 <div class="payment-method selected" data-method="promptpay" onclick="selectPaymentMethod(this)">
                                     <i class="fas fa-qrcode"></i>
@@ -1191,9 +1090,9 @@
                                 <div class="qr-code-wrapper">
                                     <span class="qr-badge"><i class="fas fa-check-circle"></i> พร้อมสแกน</span>
                                     <img src="" alt="PromptPay QR" id="paymentQr" style="display:none;">
-                                    <div id="qrPlaceholder" style="padding:60px 40px;">
-                                        <i class="fas fa-qrcode" style="font-size:4rem;color:#cbd5e1;margin-bottom:16px;display:block;"></i>
-                                        <p style="color:#64748b;margin:0;">กำลังสร้าง QR Code...</p>
+                                    <div id="qrPlaceholder" style="padding:40px 30px;">
+                                        <i class="fas fa-qrcode" style="font-size:3rem;color:#cbd5e1;margin-bottom:12px;display:block;"></i>
+                                        <p style="color:#64748b;margin:0;font-size:0.9rem;">กำลังสร้าง QR Code...</p>
                                     </div>
                                 </div>
                                 
@@ -1204,20 +1103,17 @@
                             </div>
                             
                             <div class="info-box">
-                                <i class="fas fa-info-circle"></i>
-                                <div class="info-box-content">
-                                    <div class="info-box-title">ขั้นตอนการชำระเงิน</div>
-                                    <ol>
-                                        <li>สแกน QR Code หรือโอนเงินตามหมายเลข</li>
-                                        <li>บันทึกสลิปการโอนเงิน</li>
-                                        <li>อัปโหลดสลิปด้านล่าง (ถ้ามี)</li>
-                                        <li>กด "ยืนยันการชำระเงิน"</li>
-                                    </ol>
-                                </div>
+                                <div class="info-box-title">ขั้นตอนการชำระเงิน</div>
+                                <ol>
+                                    <li>สแกน QR Code หรือโอนเงินตามหมายเลข</li>
+                                    <li>บันทึกสลิปการโอนเงิน</li>
+                                    <li>อัปโหลดสลิปด้านล่าง (ถ้ามี)</li>
+                                    <li>กด "ยืนยันการชำระเงิน"</li>
+                                </ol>
                             </div>
                             
                             <div class="file-upload-wrapper">
-                                <label style="font-weight:600;color:#475569;display:block;margin-bottom:12px;">อัปโหลดสลิปการชำระเงิน (ไม่บังคับ)</label>
+                                <label style="font-weight:600;color:#475569;display:block;margin-bottom:10px;font-size:0.9rem;">อัปโหลดสลิปการชำระเงิน (ไม่บังคับ)</label>
                                 <div class="file-upload" onclick="document.getElementById('paymentSlip').click()">
                                     <i class="fas fa-cloud-upload-alt"></i>
                                     <div class="file-upload-title">คลิกเพื่ออัปโหลดสลิป</div>
@@ -1227,13 +1123,9 @@
                             </div>
                         </div>
                         
-                        <!-- Privacy Notice -->
                         <div class="privacy-notice">
-                            <i class="fas fa-shield-alt"></i>
-                            <div>
-                                <strong>ความเป็นส่วนตัว</strong>
-                                <p>ข้อมูลของคุณจะถูกเก็บเป็นความลับและใช้เพื่อจัดการการเรียนการสอนเท่านั้น</p>
-                            </div>
+                            <strong>ความเป็นส่วนตัว</strong>
+                            <p>ข้อมูลของคุณจะถูกเก็บเป็นความลับและใช้เพื่อจัดการการเรียนการสอนเท่านั้น</p>
                         </div>
                     </form>
                 </div>
@@ -1248,7 +1140,6 @@
                 </div>
             </div>
             
-            <!-- Step 2: Success -->
             <div id="enrollmentStep2" style="display:none;">
                 <div class="modal-body success-screen">
                     <div class="success-icon"><i class="fas fa-check"></i></div>
@@ -1256,20 +1147,19 @@
                     <p id="successMessage">ขอบคุณที่สมัครเรียน คอร์สนี้พร้อมเริ่มเรียนแล้ว</p>
                     
                     <div id="freeAccess" style="display:none;">
-                        <a href="my-courses" id="startCourseBtn" class="btn btn-primary" style="width:100%;padding:18px;font-size:1.1rem;justify-content:center;">
+                        <a href="my-courses" id="startCourseBtn" class="btn btn-primary" style="width:100%;padding:14px;font-size:1rem;justify-content:center;">
                             <i class="fas fa-play-circle"></i> เริ่มเรียนตอนนี้
                         </a>
                     </div>
                     
                     <div id="paidPending" style="display:none;">
                         <div class="status-card">
-                            <i class="fas fa-clock"></i>
                             <strong>สถานะการชำระเงิน: รอการตรวจสอบ</strong>
                             <small>ทีมงานจะตรวจสอบภายใน 24 ชั่วโมง และจะส่งอีเมลยืนยันให้คุณ</small>
                         </div>
                     </div>
                     
-                    <button class="btn btn-outline" id="backToCourses" onclick="closeEnrollmentModal()" style="margin-top:24px;">
+                    <button class="btn btn-outline" id="backToCourses" onclick="closeEnrollmentModal()" style="margin-top:20px;">
                         <i class="fas fa-arrow-left"></i> กลับไปหน้าคอร์ส
                     </button>
                 </div>
@@ -1282,9 +1172,8 @@
     <script src="../assets/js/animations.js"></script>
     <script src="../assets/js/main.js"></script>
     
-    <!-- Global Functions (ทำให้เรียกจาก HTML ได้) -->
+    <!-- Global Functions -->
     <script>
-        // ========== GLOBAL AUTH FUNCTIONS ==========
         window.openAuthModal = function(view) {
             const authModal = document.getElementById('authModal');
             if (authModal) {
@@ -1359,7 +1248,6 @@
     
     <!-- Auth & Enrollment Script -->
     <script type="module">
-        // Configuration
         let config;
         try {
             const configModule = await import('../lib/config.js');
@@ -1373,26 +1261,21 @@
             };
         }
         
-        // Initialize Supabase
         let supabase;
         try {
             if (config.supabaseUrl && config.supabaseAnonKey) {
                 supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
                 console.log('✅ Supabase client initialized');
-            } else {
-                console.error('❌ Supabase config is missing');
             }
         } catch (error) {
             console.error('❌ Failed to initialize Supabase:', error);
         }
         
-        // Payment Config
         const PAYMENT_CONFIG = {
             testPromptPayPhone: '0999999999',
             isTestMode: true
         };
 
-        // DOM Elements
         const userMenu = document.getElementById('userMenu');
         const coursesGrid = document.getElementById('coursesGrid');
         const coursesEmpty = document.getElementById('coursesEmpty');
@@ -1403,12 +1286,8 @@
         let isAdmin = false;
         let selectedCourse = null;
 
-        // ========== AUTH FUNCTIONS ==========
         async function checkAuth() {
-            if (!supabase) {
-                console.error('Supabase not initialized');
-                return null;
-            }
+            if (!supabase) return null;
             
             try {
                 const { data, error } = await supabase.auth.getSession();
@@ -1453,7 +1332,6 @@
             }
         }
 
-        // Auth Form Submissions
         loginForm?.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!supabase) {
@@ -1475,7 +1353,6 @@
                 closeAuthModal();
                 await checkAuth();
                 loadCourses();
-                alert('เข้าสู่ระบบสำเร็จ!');
             } catch (error) {
                 alert('เข้าสู่ระบบไม่สำเร็จ: ' + error.message);
             } finally {
@@ -1522,7 +1399,6 @@
             }
         });
 
-        // ========== ENROLLMENT FUNCTIONS ==========
         window.openEnrollmentModal = function(course) {
             selectedCourse = course;
             
@@ -1551,7 +1427,6 @@
             document.body.style.overflow = 'hidden';
         };
         
-        // ========== QR CODE GENERATOR ==========
         function generateTestQRCode(amount) {
             const qrImg = document.getElementById('paymentQr');
             const qrPlaceholder = document.getElementById('qrPlaceholder');
@@ -1561,15 +1436,11 @@
             promptpayNumber.textContent = testPhone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
             
             const qrData = `00020101021129370016A0000006770101110113${testPhone}5303764540${Math.round(amount * 100)}5802TH6304`;
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(qrData)}&color=1e88e5&bgcolor=ffffff`;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrData)}&color=1e88e5&bgcolor=ffffff`;
             
             qrImg.src = qrUrl;
             qrImg.style.display = 'block';
             qrPlaceholder.style.display = 'none';
-            
-            qrImg.onload = () => {
-                console.log('✅ QR Code generated successfully');
-            };
         }
         
         function showSuccessScreen(isFree) {
@@ -1645,12 +1516,8 @@
             }
         };
         
-        // ========== LOAD COURSES ==========
         async function loadCourses() {
-            if (!supabase) {
-                console.error('Supabase not initialized');
-                return;
-            }
+            if (!supabase) return;
             
             try {
                 let query = supabase.from('courses').select('*').eq('published', true).order('created_at', { ascending: false });
@@ -1718,7 +1585,6 @@
             }
         }
         
-        // ========== FILE UPLOAD PREVIEW ==========
         const fileInput = document.getElementById('paymentSlip');
         const fileUpload = document.querySelector('.file-upload');
         
@@ -1740,7 +1606,6 @@
             }
         });
         
-        // ========== INIT ==========
         async function init() {
             await checkAuth();
             await loadCourses();
