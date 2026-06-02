@@ -379,3 +379,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+// Remove .html from URLs on click
+document.addEventListener('DOMContentLoaded', function() {
+    // Update all links
+    document.querySelectorAll('a[href]').forEach(link => {
+        const href = link.getAttribute('href');
+        
+        // Skip external links and special protocols
+        if (href.startsWith('http') || href.startsWith('#') || 
+            href.startsWith('mailto:') || href.startsWith('tel:') ||
+            href.includes('://')) {
+            return;
+        }
+        
+        // Remove .html from href
+        if (href.endsWith('.html')) {
+            const cleanHref = href.replace('.html', '');
+            link.setAttribute('href', cleanHref);
+        }
+    });
+    
+    // Handle browser navigation
+    window.addEventListener('popstate', function() {
+        // Optional: Add custom handling
+    });
+});
