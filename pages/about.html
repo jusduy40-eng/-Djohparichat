@@ -594,39 +594,15 @@
         <div class="login-card">
             <h2>🔐 เข้าสู่ระบบเพื่อดูเนื้อหา</h2>
             <p>หน้านี้เป็นเนื้อหาเฉพาะสมาชิก กรุณาล็อกอินเพื่อดำเนินการต่อ</p>
-            <button class="btn btn-primary" id="openLoginBtn">
-                <i class="fas fa-sign-in-alt">index</i> เข้าสู่ระบบ
-            </button>
+            
+            <!-- ✅ ปุ่มนี้เด้งไปหน้าล็อกอินหลัก -->
+            <a href="../admin/login" class="btn btn-primary" style="display:inline-flex; width:100%; justify-content:center; margin-bottom:12px; text-decoration:none;">
+                <i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ
+            </a>
+            
             <button class="btn btn-outline" id="goHomeBtn">
                 <i class="fas fa-home"></i> กลับหน้าหลัก
             </button>
-        </div>
-    </div>
-
-    <!-- Auth Modal -->
-    <div id="authModal" class="auth-modal" style="display:none;">
-        <div class="auth-modal-content">
-            <button class="auth-modal-close" id="authModalClose"><i class="fas fa-times"></i></button>
-            <div class="auth-modal-header">
-                <h3 id="authModalTitle">เข้าสู่ระบบ</h3>
-                <p id="authModalDesc">ยินดีต้อนรับกลับ! กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</p>
-            </div>
-            <div class="auth-modal-body">
-                <!-- Login Form -->
-                <form id="loginForm" class="auth-form active">
-                    <div class="form-group">
-                        <label>อีเมล</label>
-                        <input type="email" id="loginEmail" required placeholder="example@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label>รหัสผ่าน</label>
-                        <input type="password" id="loginPassword" required placeholder="••••••••">
-                    </div>
-                    <button type="submit" class="btn-auth" id="loginBtn">
-                        <span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i>
-                    </button>
-                </form>
-            </div>
         </div>
     </div>
 
@@ -794,10 +770,6 @@
 
     // ========== DOM ELEMENTS ==========
     const loginOverlay = document.getElementById('loginOverlay');
-    const authModal = document.getElementById('authModal');
-    const authModalClose = document.getElementById('authModalClose');
-    const loginForm = document.getElementById('loginForm');
-    const openLoginBtn = document.getElementById('openLoginBtn');
     const goHomeBtn = document.getElementById('goHomeBtn');
     
     const adminToolbar = document.getElementById('adminToolbar');
@@ -885,21 +857,6 @@
         if (aboutSection) aboutSection.style.display = 'block';
     }
     
-    async function handleLogin(email, password) {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        return data;
-    }
-    
-    async function handleLogout() {
-        if (!supabase) return;
-        await supabase.auth.signOut();
-        currentUser = null;
-        isAdmin = false;
-        showLoginOverlay();
-        showToast('ออกจากระบบสำเร็จ', 'success');
-    }
-
     // ========== LOAD CONTENT ==========
     async function loadContent() {
         if (!supabase) {
@@ -1194,48 +1151,8 @@
     }
 
     // ========== EVENT LISTENERS ==========
-    openLoginBtn?.addEventListener('click', () => {
-        authModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    });
-    
     goHomeBtn?.addEventListener('click', () => {
         window.location.href = '../index';
-    });
-    
-    authModalClose?.addEventListener('click', () => {
-        authModal.classList.remove('active');
-        document.body.style.overflow = '';
-    });
-    
-    authModal?.addEventListener('click', (e) => {
-        if (e.target === authModal) {
-            authModal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-    });
-    
-    loginForm?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        const btn = document.getElementById('loginBtn');
-        
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังเข้าสู่ระบบ...';
-        
-        try {
-            await handleLogin(email, password);
-            authModal.classList.remove('active');
-            document.body.style.overflow = '';
-            await checkAuth();
-            showToast('เข้าสู่ระบบสำเร็จ!', 'success');
-        } catch (error) {
-            alert('เข้าสู่ระบบไม่สำเร็จ: ' + error.message);
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i>';
-        }
     });
 
     // ========== INIT ==========
