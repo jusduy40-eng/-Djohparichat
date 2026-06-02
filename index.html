@@ -488,6 +488,18 @@
             object-fit: cover;
         }
         
+        /* Loading States */
+        .loading-placeholder {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: var(--radius-md);
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
         /* Mobile Responsive */
         @media (max-width: 480px) {
             .chat-widget {
@@ -633,26 +645,24 @@
         <div class="container">
             <div class="hero-content">
                 <div class="hero-text">
-                    <div class="hero-badge"><i class="fas fa-star"></i><span data-th="ผู้เชี่ยวชาญด้าน AI และประกัน" data-en="AI & Insurance Expert">ผู้เชี่ยวชาญด้าน AI และประกัน</span></div>
-                    <h1 class="hero-title"><span data-th="เรียนรู้ AI ใช้งานจริง" data-en="Learn Practical AI">เรียนรู้ AI ใช้งานจริง</span><br><span class="highlight" data-th="กับมืออาชีพ" data-en="with Professionals">กับมืออาชีพ</span></h1>
-                    <p class="hero-description" data-th="พัฒนาทักษะของคุณด้วยคอร์สสอนใช้ AI ที่เข้าใจง่าย พร้อมที่ปรึกษาประกันชีวิตมืออาชีพ ดูแลคุณและครอบครัว" data-en="Develop your skills with easy-to-understand AI courses, plus professional life insurance consultation to take care of you and your family">พัฒนาทักษะของคุณด้วยคอร์สสอนใช้ AI ที่เข้าใจง่าย พร้อมที่ปรึกษาประกันชีวิตมืออาชีพ ดูแลคุณและครอบครัว</p>
+                    <div class="hero-badge"><i class="fas fa-star"></i><span id="heroBadge" data-th="ผู้เชี่ยวชาญด้าน AI และประกัน" data-en="AI & Insurance Expert">กำลังโหลด...</span></div>
+                    <h1 class="hero-title"><span id="heroTitle1" data-th="เรียนรู้ AI ใช้งานจริง" data-en="Learn Practical AI">กำลังโหลด...</span><br><span class="highlight" id="heroTitle2" data-th="กับมืออาชีพ" data-en="with Professionals">กำลังโหลด...</span></h1>
+                    <p class="hero-description" id="heroDescription" data-th="พัฒนาทักษะของคุณด้วยคอร์สสอนใช้ AI ที่เข้าใจง่าย พร้อมที่ปรึกษาประกันชีวิตมืออาชีพ ดูแลคุณและครอบครัว" data-en="Develop your skills with easy-to-understand AI courses, plus professional life insurance consultation to take care of you and your family">กำลังโหลดเนื้อหา...</p>
                     <div class="hero-buttons">
                         <a href="pages/services" class="btn btn-primary"><span data-th="เริ่มเรียนรู้" data-en="Start Learning">เริ่มเรียนรู้</span><i class="fas fa-arrow-right"></i></a>
                         <a href="#social-footer" class="btn btn-secondary"><span data-th="ติดตามเรา" data-en="Follow Us">ติดตามเรา</span></a>
                     </div>
                     <div class="hero-stats">
-                        <div class="stat-item"><div class="stat-number" data-count="500">0</div><div class="stat-label" data-th="นักเรียน" data-en="Students">นักเรียน</div></div>
-                        <div class="stat-item"><div class="stat-number" data-count="50">0</div><div class="stat-label" data-th="คอร์สเรียน" data-en="Courses">คอร์สเรียน</div></div>
-                        <div class="stat-item"><div class="stat-number" data-count="10">0</div><div class="stat-label" data-th="ปีประสบการณ์" data-en="Years Experience">ปีประสบการณ์</div></div>
+                        <div class="stat-item"><div class="stat-number" id="statStudents" data-count="500">0</div><div class="stat-label" data-th="นักเรียน" data-en="Students">นักเรียน</div></div>
+                        <div class="stat-item"><div class="stat-number" id="statCourses" data-count="50">0</div><div class="stat-label" data-th="คอร์สเรียน" data-en="Courses">คอร์สเรียน</div></div>
+                        <div class="stat-item"><div class="stat-number" id="statExperience" data-count="10">0</div><div class="stat-label" data-th="ปีประสบการณ์" data-en="Years Experience">ปีประสบการณ์</div></div>
                     </div>
                 </div>
                 <div class="hero-image">
                     <div class="image-wrapper">
-                        <!-- ✅ รูปภาพหน้าแรก -->
-                        <img src="https://i.postimg.cc/cL0wD68y/1.webp" 
-                             alt="AI Expert - Djohparichat" 
-                             class="hero-main-image"
-                             style="width:100%;height:auto;max-width:500px;border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);object-fit:cover;">
+                        <!-- ✅ รูปภาพหน้าแรกจากฐานข้อมูล -->
+                        <img src="" alt="AI Expert - Djohparichat" id="heroImage" class="hero-main-image" style="display:none; width:100%;height:auto;max-width:500px;border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);object-fit:cover;">
+                        <div class="image-placeholder" id="heroImagePlaceholder" style="width:100%;max-width:500px;height:400px;background:linear-gradient(135deg,#e3f2fd 0%,#bbdefb 100%);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;color:var(--primary-blue);font-size:4rem;"><i class="fas fa-robot"></i></div>
                         
                         <div class="floating-card card-1"><i class="fas fa-robot"></i><span>AI Expert</span></div>
                         <div class="floating-card card-2"><i class="fas fa-shield-alt"></i><span data-th="ประกันชีวิต" data-en="Life Insurance">ประกันชีวิต</span></div>
@@ -667,45 +677,15 @@
     <section class="services" id="services">
         <div class="container">
             <div class="section-header">
-                <span class="section-subtitle" data-th="สิ่งที่เราให้บริการ" data-en="What We Offer">สิ่งที่เราให้บริการ</span>
-                <h2 class="section-title" data-th="บริการของเรา" data-en="Our Services">บริการของเรา</h2>
-                <p class="section-description" data-th="เราพร้อมดูแลคุณด้วยบริการคุณภาพในหลากหลายด้าน" data-en="We are ready to take care of you with quality services in various areas">เราพร้อมดูแลคุณด้วยบริการคุณภาพในหลากหลายด้าน</p>
+                <span class="section-subtitle" id="servicesSubtitle" data-th="สิ่งที่เราให้บริการ" data-en="What We Offer">กำลังโหลด...</span>
+                <h2 class="section-title" id="servicesTitle" data-th="บริการของเรา" data-en="Our Services">กำลังโหลด...</h2>
+                <p class="section-description" id="servicesDescription" data-th="เราพร้อมดูแลคุณด้วยบริการคุณภาพในหลากหลายด้าน" data-en="We are ready to take care of you with quality services in various areas">กำลังโหลด...</p>
             </div>
-            <div class="services-grid">
-                <div class="service-card fade-in-up">
-                    <div class="service-icon"><i class="fas fa-brain"></i></div>
-                    <h3 class="service-title" data-th="สอนใช้ AI" data-en="AI Training">สอนใช้ AI</h3>
-                    <p class="service-description" data-th="เรียนรู้การใช้งาน AI เครื่องมือต่างๆ อย่าง ChatGPT, Midjourney, และอื่นๆ เพื่อเพิ่มประสิทธิภาพในการทำงาน" data-en="Learn to use various AI tools like ChatGPT, Midjourney, and others to increase work efficiency">เรียนรู้การใช้งาน AI เครื่องมือต่างๆ อย่าง ChatGPT, Midjourney, และอื่นๆ เพื่อเพิ่มประสิทธิภาพในการทำงาน</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> <span data-th="สอนแบบตัวต่อตัว" data-en="One-on-one teaching">สอนแบบตัวต่อตัว</span></li>
-                        <li><i class="fas fa-check"></i> <span data-th="เนื้อหาอัปเดตล่าสุด" data-en="Latest content">เนื้อหาอัปเดตล่าสุด</span></li>
-                        <li><i class="fas fa-check"></i> <span data-th="ฝึกปฏิบัติจริง" data-en="Hands-on practice">ฝึกปฏิบัติจริง</span></li>
-                    </ul>
-                    <a href="pages/ai-courses" class="service-link"><span data-th="ดูรายละเอียด" data-en="Learn More">ดูรายละเอียด</span><i class="fas fa-arrow-right"></i></a>
-                </div>
-                <div class="service-card featured fade-in-up">
-                    <div class="service-badge" data-th="ยอดนิยม" data-en="Popular">ยอดนิยม</div>
-                    <div class="service-icon"><i class="fas fa-shield-heart"></i></div>
-                    <h3 class="service-title" data-th="ประกันชีวิต" data-en="Life Insurance">ประกันชีวิต</h3>
-                    <p class="service-description" data-th="ที่ปรึกษาประกันชีวิตจากไทยประกันชีวิต ดูแลคุณและครอบครัวด้วยความห่วงใย พร้อมแผนประกันที่หลากหลาย" data-en="Life insurance consultant from Thai Life Insurance, taking care of you and your family with various insurance plans">ที่ปรึกษาประกันชีวิตจากไทยประกันชีวิต ดูแลคุณและครอบครัวด้วยความห่วงใย พร้อมแผนประกันที่หลากหลาย</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> <span data-th="ปรึกษาฟรี" data-en="Free consultation">ปรึกษาฟรี</span></li>
-                        <li><i class="fas fa-check"></i> <span data-th="แผนประกันหลากหลาย" data-en="Various plans">แผนประกันหลากหลาย</span></li>
-                        <li><i class="fas fa-check"></i> <span data-th="บริการหลังการขาย" data-en="After-sales service">บริการหลังการขาย</span></li>
-                    </ul>
-                    <a href="pages/insurance" class="service-link"><span data-th="ดูรายละเอียด" data-en="Learn More">ดูรายละเอียด</span><i class="fas fa-arrow-right"></i></a>
-                </div>
-                <div class="service-card fade-in-up">
-                    <div class="service-icon"><i class="fas fa-briefcase"></i></div>
-                    <h3 class="service-title" data-th="ผลงานและโครงการ" data-en="Projects & Portfolio">ผลงานและโครงการ</h3>
-                    <p class="service-description" data-th="ติดตามผลงานและโครงการต่างๆ ที่เราได้ทำ พร้อมกรณีศึกษาที่น่าสนใจ" data-en="Follow our works and various projects with interesting case studies">ติดตามผลงานและโครงการต่างๆ ที่เราได้ทำ พร้อมกรณีศึกษาที่น่าสนใจ</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> <span data-th="กรณีจริง" data-en="Real cases">กรณีจริง</span></li>
-                        <li><i class="fas fa-check"></i> <span data-th="อัปเดตสม่ำเสมอ" data-en="Regular updates">อัปเดตสม่ำเสมอ</span></li>
-                        <li><i class="fas fa-check"></i> <span data-th="เรียนรู้จากประสบการณ์" data-en="Learn from experience">เรียนรู้จากประสบการณ์</span></li>
-                    </ul>
-                    <a href="pages/portfolio" class="service-link"><span data-th="ดูรายละเอียด" data-en="Learn More">ดูรายละเอียด</span><i class="fas fa-arrow-right"></i></a>
-                </div>
+            <div class="services-grid" id="servicesGrid">
+                <!-- Services will be loaded from database -->
+                <div class="service-card loading-placeholder" style="height:300px;"></div>
+                <div class="service-card loading-placeholder" style="height:300px;"></div>
+                <div class="service-card loading-placeholder" style="height:300px;"></div>
             </div>
         </div>
     </section>
@@ -714,9 +694,9 @@
     <section class="portfolio" id="portfolio">
         <div class="container">
             <div class="section-header">
-                <span class="section-subtitle" data-th="หลักสูตร AI" data-en="AI courses">AI courses</span>
-                <h2 class="section-title" data-th="คอร์สของเรา" data-en="our courses">คอร์สของเรา</h2>
-                <p class="section-description" data-th="พัฒนาทักษะของคุณด้วยคอร์สสอนใช้ AI ที่เข้าใจง่าย" data-en="Develop your skills with easy-to-understand AI training courses.">พัฒนาทักษะของคุณด้วยคอร์สสอนใช้ AI ที่เข้าใจง่าย</p>
+                <span class="section-subtitle" id="portfolioSubtitle" data-th="หลักสูตร AI" data-en="AI courses">กำลังโหลด...</span>
+                <h2 class="section-title" id="portfolioTitle" data-th="คอร์สของเรา" data-en="our courses">กำลังโหลด...</h2>
+                <p class="section-description" id="portfolioDescription" data-th="พัฒนาทักษะของคุณด้วยคอร์สสอนใช้ AI ที่เข้าใจง่าย" data-en="Develop your skills with easy-to-understand AI training courses.">กำลังโหลด...</p>
             </div>
             <div class="portfolio-filter">
                 <button class="filter-btn active" data-filter="all" data-th="ทั้งหมด" data-en="All">ทั้งหมด</button>
@@ -724,43 +704,11 @@
                 <button class="filter-btn" data-filter="insurance" data-th="ประกัน" data-en="Insurance">ประกัน</button>
                 <button class="filter-btn" data-filter="training" data-th="การอบรม" data-en="Training">การอบรม</button>
             </div>
-            <div class="portfolio-grid">
-                <div class="portfolio-item" data-category="ai">
-                    <div class="portfolio-image">
-                        <div class="image-placeholder"><i class="fas fa-robot"></i></div>
-                        <div class="portfolio-overlay">
-                            <div class="portfolio-info">
-                                <h3 data-th="คอร์ส AI สำหรับผู้เริ่มต้น" data-en="AI Course for Beginners">คอร์ส AI สำหรับผู้เริ่มต้น</h3>
-                                <p data-th="เรียนรู้พื้นฐานการใช้งาน AI" data-en="Learn AI basics">เรียนรู้พื้นฐานการใช้งาน AI</p>
-                            </div>
-                            <a href="pages/ai-courses" class="portfolio-link"><i class="fas fa-arrow-right"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="portfolio-item" data-category="training">
-                    <div class="portfolio-image">
-                        <div class="image-placeholder"><i class="fas fa-chalkboard-teacher"></i></div>
-                        <div class="portfolio-overlay">
-                            <div class="portfolio-info">
-                                <h3 data-th="อบรมการใช้ ChatGPT" data-en="ChatGPT Training">อบรมการใช้ ChatGPT</h3>
-                                <p data-th="เทคนิคการใช้ ChatGPT อย่างมืออาชีพ" data-en="Professional ChatGPT techniques">เทคนิคการใช้ ChatGPT อย่างมืออาชีพ</p>
-                            </div>
-                            <a href="#" class="portfolio-link"><i class="fas fa-arrow-right"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="portfolio-item" data-category="insurance">
-                    <div class="portfolio-image">
-                        <div class="image-placeholder"><i class="fas fa-hand-holding-heart"></i></div>
-                        <div class="portfolio-overlay">
-                            <div class="portfolio-info">
-                                <h3 data-th="ประกันชีวิตสำหรับครอบครัว" data-en="Family Life Insurance">ประกันชีวิตสำหรับครอบครัว</h3>
-                                <p data-th="คุ้มครองคนที่รักด้วยแผนประกันที่เหมาะสม" data-en="Protect loved ones with suitable plans">คุ้มครองคนที่รักด้วยแผนประกันที่เหมาะสม</p>
-                            </div>
-                            <a href="#" class="portfolio-link"><i class="fas fa-arrow-right"></i></a>
-                        </div>
-                    </div>
-                </div>
+            <div class="portfolio-grid" id="portfolioGrid">
+                <!-- Portfolio items will be loaded from database -->
+                <div class="portfolio-item loading-placeholder" style="height:250px;"></div>
+                <div class="portfolio-item loading-placeholder" style="height:250px;"></div>
+                <div class="portfolio-item loading-placeholder" style="height:250px;"></div>
             </div>
             <div class="portfolio-load-more">
                 <a href="pages/portfolio" class="btn btn-outline"><span data-th="ดูผลงานเพิ่มเติม" data-en="View More Portfolio">ดูผลงานเพิ่มเติม</span><i class="fas fa-plus"></i></a>
@@ -774,30 +722,21 @@
             <div class="about-wrapper">
                 <div class="about-image">
                     <div class="image-wrapper">
-                        <!-- ✅ รูปภาพเกี่ยวกับเรา -->
-                        <img src="https://i.postimg.cc/MGrs21yM/2.webp" 
-                             alt="About Us - Djohparichat" 
-                             class="about-main-image">
-                        <div class="experience-badge"><span class="years">10+</span><span class="text" data-th="ปีประสบการณ์" data-en="Years Experience">ปีประสบการณ์</span></div>
+                        <!-- ✅ รูปภาพเกี่ยวกับเราจากฐานข้อมูล -->
+                        <img src="" alt="About Us - Djohparichat" id="aboutImage" class="about-main-image" style="display:none;">
+                        <div class="image-placeholder" id="aboutImagePlaceholder" style="width:100%;height:100%;background:linear-gradient(135deg,#e3f2fd 0%,#bbdefb 100%);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;color:var(--primary-blue);font-size:4rem;"><i class="fas fa-user-tie"></i></div>
+                        <div class="experience-badge"><span class="years" id="aboutExperience">10+</span><span class="text" data-th="ปีประสบการณ์" data-en="Years Experience">ปีประสบการณ์</span></div>
                     </div>
                 </div>
                 <div class="about-content">
-                    <span class="section-subtitle" data-th="เกี่ยวกับเรา" data-en="About Us">เกี่ยวกับเรา</span>
-                    <h2 class="section-title" data-th="ผู้เชี่ยวชาญด้าน AI และประกันชีวิต" data-en="AI & Life Insurance Expert">ผู้เชี่ยวชาญด้าน AI และประกันชีวิต</h2>
-                    <p class="about-text" data-th="ด้วยความมุ่งมั่นที่จะพัฒนาทักษะของคนไทยให้ทันกับเทคโนโลยี AI ที่เปลี่ยนแปลงอย่างรวดเร็ว พร้อมเป็นที่ปรึกษาประกันชีวิตจากไทยประกันชีวิต ดูแลคุณและครอบครัวด้วยความจริงใจ" data-en="With a commitment to develop Thai people's skills to keep up with rapidly changing AI technology, plus being a life insurance consultant from Thai Life Insurance, taking care of you and your family with sincerity">ด้วยความมุ่งมั่นที่จะพัฒนาทักษะของคนไทยให้ทันกับเทคโนโลยี AI ที่เปลี่ยนแปลงอย่างรวดเร็ว พร้อมเป็นที่ปรึกษาประกันชีวิตจากไทยประกันชีวิต ดูแลคุณและครอบครัวด้วยความจริงใจ</p>
-                    <div class="about-features">
-                        <div class="feature-item">
-                            <div class="feature-icon"><i class="fas fa-certificate"></i></div>
-                            <div class="feature-content"><h4 data-th="ได้รับการรับรอง" data-en="Certified">ได้รับการรับรอง</h4><p data-th="ผู้เชี่ยวชาญด้าน AI และประกัน" data-en="AI & Insurance expert">ผู้เชี่ยวชาญด้าน AI และประกัน</p></div>
-                        </div>
-                        <div class="feature-item">
-                            <div class="feature-icon"><i class="fas fa-heart"></i></div>
-                            <div class="feature-content"><h4 data-th="ใส่ใจทุกรายละเอียด" data-en="Attention to detail">ใส่ใจทุกรายละเอียด</h4><p data-th="ดูแลด้วยความห่วงใย" data-en="Care with concern">ดูแลด้วยความห่วงใย</p></div>
-                        </div>
-                        <div class="feature-item">
-                            <div class="feature-icon"><i class="fas fa-sync-alt"></i></div>
-                            <div class="feature-content"><h4 data-th="อัปเดตความรู้เสมอ" data-en="Always updated">อัปเดตความรู้เสมอ</h4><p data-th="ติดตามเทคโนโลยีล่าสุด" data-en="Follow latest technology">ติดตามเทคโนโลยีล่าสุด</p></div>
-                        </div>
+                    <span class="section-subtitle" id="aboutSubtitle" data-th="เกี่ยวกับเรา" data-en="About Us">กำลังโหลด...</span>
+                    <h2 class="section-title" id="aboutTitle" data-th="ผู้เชี่ยวชาญด้าน AI และประกันชีวิต" data-en="AI & Life Insurance Expert">กำลังโหลด...</h2>
+                    <p class="about-text" id="aboutDescription" data-th="ด้วยความมุ่งมั่นที่จะพัฒนาทักษะของคนไทยให้ทันกับเทคโนโลยี AI ที่เปลี่ยนแปลงอย่างรวดเร็ว พร้อมเป็นที่ปรึกษาประกันชีวิตจากไทยประกันชีวิต ดูแลคุณและครอบครัวด้วยความจริงใจ" data-en="With a commitment to develop Thai people's skills to keep up with rapidly changing AI technology, plus being a life insurance consultant from Thai Life Insurance, taking care of you and your family with sincerity">กำลังโหลดเนื้อหา...</p>
+                    <div class="about-features" id="aboutFeatures">
+                        <!-- Features will be loaded from database -->
+                        <div class="feature-item loading-placeholder" style="height:80px;"></div>
+                        <div class="feature-item loading-placeholder" style="height:80px;"></div>
+                        <div class="feature-item loading-placeholder" style="height:80px;"></div>
                     </div>
                     <div class="about-cta">
                         <a href="#social-footer" class="btn btn-primary"><span data-th="ติดตามเราวันนี้" data-en="Follow Us Today">ติดตามเราวันนี้</span><i class="fas fa-arrow-right"></i></a>
@@ -816,7 +755,7 @@
                         <span class="logo-icon"><i class="fas fa-graduation-cap"></i></span>
                         <span class="logo-text">Djohparichat</span>
                     </a>
-                    <p data-th="เรียนรู้ AI และประกันชีวิตกับมืออาชีพ" data-en="Learn AI and life insurance with professionals">เรียนรู้ AI และประกันชีวิตกับมืออาชีพ</p>
+                    <p id="footerDescription" data-th="เรียนรู้ AI และประกันชีวิตกับมืออาชีพ" data-en="Learn AI and life insurance with professionals">กำลังโหลด...</p>
                     
                     <!-- Social Links -->
                     <div class="social-links-footer">
@@ -925,448 +864,780 @@
     <script src="assets/js/animations.js"></script>
     <script src="assets/js/main.js"></script>
     
-    <!-- Auth & Chat Script -->
+    <!-- Database Content Script -->
     <script type="module">
+        // ========== CONFIG & SETUP ==========
+        let config, supabase;
+        
         try {
-            const { config } = await import('./lib/config.js');
-            const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+            const configModule = await import('./lib/config.js');
+            config = configModule.config;
+        } catch (e) {
+            console.warn('⚠️ Using fallback config');
+            config = {
+                supabaseUrl: 'https://srtsdminbdmxtvjgriev.supabase.co',
+                supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNydHNkbWluYmRteHR2amdyaWV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY4OTU2NzMsImV4cCI6MjA1MjQ3MTY3M30.XYZ123',
+                adminEmail: ['jusduy40@gmail.com']
+            };
+        }
+        
+        if (config?.supabaseUrl && config?.supabaseAnonKey) {
+            supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+            console.log('✅ Supabase initialized');
+        }
 
-            // DOM Elements
-            const authModal = document.getElementById('authModal');
-            const authModalClose = document.getElementById('authModalClose');
-            const userMenu = document.getElementById('userMenu');
-            const adminLink = document.getElementById('adminLink');
-            const loginForm = document.getElementById('loginForm');
-            const signupForm = document.getElementById('signupForm');
-            const forgotPasswordForm = document.getElementById('forgotPasswordForm');
-            
-            // Chat Elements
-            const chatToggle = document.getElementById('chatToggle');
-            const chatWindow = document.getElementById('chatWindow');
-            const chatClose = document.getElementById('chatClose');
-            const chatMinimize = document.getElementById('chatMinimize');
-            const chatMessages = document.getElementById('chatMessages');
-            const chatEmpty = document.getElementById('chatEmpty');
-            const chatInput = document.getElementById('chatInput');
-            const chatSend = document.getElementById('chatSend');
-            const chatBadge = document.getElementById('chatBadge');
-            const typingIndicator = document.getElementById('typingIndicator');
-            const newChatBtn = document.getElementById('newChatBtn');
-            
-            let currentUser = null;
-            let isAdmin = false;
-            let unreadCount = 0;
-            let realtimeSubscription = null;
+        // ========== DOM ELEMENTS ==========
+        const loader = document.getElementById('loader');
+        
+        // Hero Section
+        const heroBadge = document.getElementById('heroBadge');
+        const heroTitle1 = document.getElementById('heroTitle1');
+        const heroTitle2 = document.getElementById('heroTitle2');
+        const heroDescription = document.getElementById('heroDescription');
+        const heroImage = document.getElementById('heroImage');
+        const heroImagePlaceholder = document.getElementById('heroImagePlaceholder');
+        const statStudents = document.getElementById('statStudents');
+        const statCourses = document.getElementById('statCourses');
+        const statExperience = document.getElementById('statExperience');
+        
+        // Services Section
+        const servicesSubtitle = document.getElementById('servicesSubtitle');
+        const servicesTitle = document.getElementById('servicesTitle');
+        const servicesDescription = document.getElementById('servicesDescription');
+        const servicesGrid = document.getElementById('servicesGrid');
+        
+        // Portfolio Section
+        const portfolioSubtitle = document.getElementById('portfolioSubtitle');
+        const portfolioTitle = document.getElementById('portfolioTitle');
+        const portfolioDescription = document.getElementById('portfolioDescription');
+        const portfolioGrid = document.getElementById('portfolioGrid');
+        
+        // About Section
+        const aboutSubtitle = document.getElementById('aboutSubtitle');
+        const aboutTitle = document.getElementById('aboutTitle');
+        const aboutDescription = document.getElementById('aboutDescription');
+        const aboutImage = document.getElementById('aboutImage');
+        const aboutImagePlaceholder = document.getElementById('aboutImagePlaceholder');
+        const aboutExperience = document.getElementById('aboutExperience');
+        const aboutFeatures = document.getElementById('aboutFeatures');
+        
+        // Footer
+        const footerDescription = document.getElementById('footerDescription');
+        
+        // Auth & Chat
+        const authModal = document.getElementById('authModal');
+        const userMenu = document.getElementById('userMenu');
+        const adminLink = document.getElementById('adminLink');
+        const chatToggle = document.getElementById('chatToggle');
+        const chatWindow = document.getElementById('chatWindow');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const chatSend = document.getElementById('chatSend');
+        const chatBadge = document.getElementById('chatBadge');
+        const newChatBtn = document.getElementById('newChatBtn');
+        
+        let currentUser = null;
+        let isAdmin = false;
+        let unreadCount = 0;
+        let realtimeSubscription = null;
 
-            // ========================================
-            // AUTH FUNCTIONS
-            // ========================================
+        // ========== LOAD CONTENT FROM DATABASE ==========
+        
+        // Load About Content (from about_content table)
+        async function loadAboutContent() {
+            if (!supabase) return loadAboutFallback();
             
-            let currentView = 'login';
-            function openAuthModal(view = 'login') {
-                authModal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-                switchAuthView(view);
-            }
-            function closeAuthModal() {
-                authModal.classList.remove('active');
-                document.body.style.overflow = '';
-                resetForms();
-            }
-            function switchAuthView(view) {
-                currentView = view;
-                document.querySelectorAll('.auth-form-view').forEach(f => f.classList.remove('active'));
-                document.querySelectorAll('.auth-message').forEach(m => { m.style.display = 'none'; m.textContent = ''; });
-                if (view === 'login') {
-                    document.getElementById('loginForm').classList.add('active');
-                    document.getElementById('authModalTitle').textContent = 'เข้าสู่ระบบ';
-                    document.getElementById('authTogglePrompt').textContent = 'ยังไม่มีบัญชี?';
-                    document.getElementById('authToggleLink').textContent = 'สมัครสมาชิก';
-                } else if (view === 'signup') {
-                    document.getElementById('signupForm').classList.add('active');
-                    document.getElementById('authModalTitle').textContent = 'สมัครสมาชิก';
-                    document.getElementById('authTogglePrompt').textContent = 'มีบัญชีแล้ว?';
-                    document.getElementById('authToggleLink').textContent = 'เข้าสู่ระบบ';
+            try {
+                const { data, error } = await supabase.from('about_content').select('*');
+                
+                if (error || !data || data.length === 0) {
+                    console.warn('⚠️ About content load error:', error);
+                    return loadAboutFallback();
                 }
-            }
-            function resetForms() { loginForm.reset(); signupForm.reset(); forgotPasswordForm.reset(); switchAuthView('login'); }
-
-            function renderUserMenu(user) {
-                if (user) {
-                    const initials = user.email?.charAt(0).toUpperCase() || 'U';
-                    userMenu.innerHTML = `
-                        <div class="user-info" id="userInfo">
-                            <div class="user-avatar">${initials}</div>
-                            <span class="user-name">${user.email?.split('@')[0]}</span>
-                            <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: var(--gray-500);"></i>
+                
+                const content = {};
+                data.forEach(item => { content[item.key] = item.value; });
+                
+                // Update Hero Section
+                if (content['hero_badge']) heroBadge.textContent = content['hero_badge'];
+                if (content['hero_title_1']) heroTitle1.textContent = content['hero_title_1'];
+                if (content['hero_title_2']) heroTitle2.textContent = content['hero_title_2'];
+                if (content['hero_description']) heroDescription.textContent = content['hero_description'];
+                if (content['main_image']) {
+                    heroImage.src = content['main_image'];
+                    heroImage.style.display = 'block';
+                    heroImagePlaceholder.style.display = 'none';
+                }
+                
+                // Update Stats
+                if (content['stat_students']) animateCount(statStudents, parseInt(content['stat_students']) || 500);
+                if (content['stat_courses']) animateCount(statCourses, parseInt(content['stat_courses']) || 50);
+                if (content['experience_years']) {
+                    aboutExperience.textContent = content['experience_years'];
+                    animateCount(statExperience, parseInt(content['experience_years']) || 10);
+                }
+                
+                // Update Services Section
+                if (content['services_subtitle']) servicesSubtitle.textContent = content['services_subtitle'];
+                if (content['services_title']) servicesTitle.textContent = content['services_title'];
+                if (content['services_description']) servicesDescription.textContent = content['services_description'];
+                
+                // Update Portfolio Section
+                if (content['portfolio_subtitle']) portfolioSubtitle.textContent = content['portfolio_subtitle'];
+                if (content['portfolio_title']) portfolioTitle.textContent = content['portfolio_title'];
+                if (content['portfolio_description']) portfolioDescription.textContent = content['portfolio_description'];
+                
+                // Update About Section
+                if (content['about_subtitle']) aboutSubtitle.textContent = content['about_subtitle'];
+                if (content['title_th']) aboutTitle.textContent = content['title_th'];
+                if (content['description_th']) aboutDescription.textContent = content['description_th'];
+                if (content['main_image']) {
+                    aboutImage.src = content['main_image'];
+                    aboutImage.style.display = 'block';
+                    aboutImagePlaceholder.style.display = 'none';
+                }
+                
+                // Update Features
+                const features = [
+                    { title: content['feature_1_title_th'], desc: content['feature_1_desc_th'], icon: 'fa-certificate' },
+                    { title: content['feature_2_title_th'], desc: content['feature_2_desc_th'], icon: 'fa-heart' },
+                    { title: content['feature_3_title_th'], desc: content['feature_3_desc_th'], icon: 'fa-sync-alt' }
+                ].filter(f => f.title);
+                
+                if (features.length > 0) {
+                    aboutFeatures.innerHTML = features.map(f => `
+                        <div class="feature-item fade-in-up">
+                            <div class="feature-icon"><i class="fas ${f.icon}"></i></div>
+                            <div class="feature-content">
+                                <h4>${escapeHtml(f.title)}</h4>
+                                <p>${escapeHtml(f.desc || '')}</p>
+                            </div>
                         </div>
-                        <div class="user-dropdown" id="userDropdown">
-                            <a href="pages/profile"><i class="fas fa-user-edit"></i> แก้ไขโปรไฟล์</a>
-                            <a href="pages/my-courses"><i class="fas fa-graduation-cap"></i> ประวัติการเรียน</a>
-                            <div class="divider"></div>
-                            <a href="#" id="logoutBtn" class="logout"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
-                        </div>`;
-                    document.getElementById('userInfo').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('active'); });
-                    document.getElementById('logoutBtn')?.addEventListener('click', async (e) => { 
-                        e.preventDefault(); 
-                        await supabase.auth.signOut(); 
-                        renderUserMenu(null); 
-                        updateAdminLink(null); 
-                        initChat(null); 
-                    });
-                } else {
-                    userMenu.innerHTML = `<div class="user-auth-buttons"><button class="btn btn-secondary btn-sm" id="openLoginBtn">เข้าสู่ระบบ</button><button class="btn btn-primary btn-sm" id="openSignupBtn">สมัครสมาชิก</button></div>`;
-                    document.getElementById('openLoginBtn')?.addEventListener('click', () => openAuthModal('login'));
-                    document.getElementById('openSignupBtn')?.addEventListener('click', () => openAuthModal('signup'));
+                    `).join('');
                 }
+                
+                // Update Footer
+                if (content['footer_description']) footerDescription.textContent = content['footer_description'];
+                
+            } catch (error) {
+                console.error('About content error:', error);
+                loadAboutFallback();
             }
+        }
+        
+        // Fallback content if database fails
+        function loadAboutFallback() {
+            heroBadge.textContent = 'ผู้เชี่ยวชาญด้าน AI และประกัน';
+            heroTitle1.textContent = 'เรียนรู้ AI ใช้งานจริง';
+            heroTitle2.textContent = 'กับมืออาชีพ';
+            heroDescription.textContent = 'พัฒนาทักษะของคุณด้วยคอร์สสอนใช้ AI ที่เข้าใจง่าย พร้อมที่ปรึกษาประกันชีวิตมืออาชีพ ดูแลคุณและครอบครัว';
+            heroImage.src = 'https://i.postimg.cc/cL0wD68y/1.webp';
+            heroImage.style.display = 'block';
+            heroImagePlaceholder.style.display = 'none';
+            
+            animateCount(statStudents, 500);
+            animateCount(statCourses, 50);
+            animateCount(statExperience, 10);
+            
+            servicesSubtitle.textContent = 'สิ่งที่เราให้บริการ';
+            servicesTitle.textContent = 'บริการของเรา';
+            servicesDescription.textContent = 'เราพร้อมดูแลคุณด้วยบริการคุณภาพในหลากหลายด้าน';
+            
+            portfolioSubtitle.textContent = 'หลักสูตร AI';
+            portfolioTitle.textContent = 'คอร์สของเรา';
+            portfolioDescription.textContent = 'พัฒนาทักษะของคุณด้วยคอร์สสอนใช้ AI ที่เข้าใจง่าย';
+            
+            aboutSubtitle.textContent = 'เกี่ยวกับเรา';
+            aboutTitle.textContent = 'ผู้เชี่ยวชาญด้าน AI และประกันชีวิต';
+            aboutDescription.textContent = 'ด้วยความมุ่งมั่นที่จะพัฒนาทักษะของคนไทยให้ทันกับเทคโนโลยี AI ที่เปลี่ยนแปลงอย่างรวดเร็ว พร้อมเป็นที่ปรึกษาประกันชีวิตจากไทยประกันชีวิต ดูแลคุณและครอบครัวด้วยความจริงใจ';
+            aboutImage.src = 'https://i.postimg.cc/MGrs21yM/2.webp';
+            aboutImage.style.display = 'block';
+            aboutImagePlaceholder.style.display = 'none';
+            
+            aboutFeatures.innerHTML = `
+                <div class="feature-item fade-in-up">
+                    <div class="feature-icon"><i class="fas fa-certificate"></i></div>
+                    <div class="feature-content"><h4>ได้รับการรับรอง</h4><p>ผู้เชี่ยวชาญด้าน AI และประกัน</p></div>
+                </div>
+                <div class="feature-item fade-in-up">
+                    <div class="feature-icon"><i class="fas fa-heart"></i></div>
+                    <div class="feature-content"><h4>ใส่ใจทุกรายละเอียด</h4><p>ดูแลด้วยความห่วงใย</p></div>
+                </div>
+                <div class="feature-item fade-in-up">
+                    <div class="feature-icon"><i class="fas fa-sync-alt"></i></div>
+                    <div class="feature-content"><h4>อัปเดตความรู้เสมอ</h4><p>ติดตามเทคโนโลยีล่าสุด</p></div>
+                </div>
+            `;
+            
+            footerDescription.textContent = 'เรียนรู้ AI และประกันชีวิตกับมืออาชีพ';
+        }
+        
+        // Load Services from courses table
+        async function loadServices() {
+            if (!supabase) return loadServicesFallback();
+            
+            try {
+                const { data: courses, error } = await supabase
+                    .from('courses')
+                    .select('*')
+                    .eq('published', true)
+                    .limit(3);
+                
+                if (error || !courses || courses.length === 0) {
+                    return loadServicesFallback();
+                }
+                
+                servicesGrid.innerHTML = courses.map(course => {
+                    const icons = {
+                        'ai': 'fa-brain',
+                        'insurance': 'fa-shield-heart',
+                        'training': 'fa-chalkboard-teacher',
+                        'portfolio': 'fa-briefcase'
+                    };
+                    const icon = icons[course.category?.toLowerCase()] || 'fa-star';
+                    const title = course.title_th || course.title_en || 'บริการ';
+                    const description = course.description_th || course.description_en || '';
+                    
+                    return `
+                        <div class="service-card fade-in-up">
+                            <div class="service-icon"><i class="fas ${icon}"></i></div>
+                            <h3 class="service-title">${escapeHtml(title)}</h3>
+                            <p class="service-description">${escapeHtml(description.substring(0, 150))}${description.length > 150 ? '...' : ''}</p>
+                            <ul class="service-features">
+                                <li><i class="fas fa-check"></i> สอนแบบตัวต่อตัว</li>
+                                <li><i class="fas fa-check"></i> เนื้อหาอัปเดตล่าสุด</li>
+                                <li><i class="fas fa-check"></i> ฝึกปฏิบัติจริง</li>
+                            </ul>
+                            <a href="pages/ai-courses" class="service-link"><span>ดูรายละเอียด</span><i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Services load error:', error);
+                loadServicesFallback();
+            }
+        }
+        
+        function loadServicesFallback() {
+            servicesGrid.innerHTML = `
+                <div class="service-card fade-in-up">
+                    <div class="service-icon"><i class="fas fa-brain"></i></div>
+                    <h3 class="service-title">สอนใช้ AI</h3>
+                    <p class="service-description">เรียนรู้การใช้งาน AI เครื่องมือต่างๆ อย่าง ChatGPT, Midjourney, และอื่นๆ เพื่อเพิ่มประสิทธิภาพในการทำงาน</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> สอนแบบตัวต่อตัว</li>
+                        <li><i class="fas fa-check"></i> เนื้อหาอัปเดตล่าสุด</li>
+                        <li><i class="fas fa-check"></i> ฝึกปฏิบัติจริง</li>
+                    </ul>
+                    <a href="pages/ai-courses" class="service-link"><span>ดูรายละเอียด</span><i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="service-card featured fade-in-up">
+                    <div class="service-badge">ยอดนิยม</div>
+                    <div class="service-icon"><i class="fas fa-shield-heart"></i></div>
+                    <h3 class="service-title">ประกันชีวิต</h3>
+                    <p class="service-description">ที่ปรึกษาประกันชีวิตจากไทยประกันชีวิต ดูแลคุณและครอบครัวด้วยความห่วงใย พร้อมแผนประกันที่หลากหลาย</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> ปรึกษาฟรี</li>
+                        <li><i class="fas fa-check"></i> แผนประกันหลากหลาย</li>
+                        <li><i class="fas fa-check"></i> บริการหลังการขาย</li>
+                    </ul>
+                    <a href="pages/insurance" class="service-link"><span>ดูรายละเอียด</span><i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="service-card fade-in-up">
+                    <div class="service-icon"><i class="fas fa-briefcase"></i></div>
+                    <h3 class="service-title">ผลงานและโครงการ</h3>
+                    <p class="service-description">ติดตามผลงานและโครงการต่างๆ ที่เราได้ทำ พร้อมกรณีศึกษาที่น่าสนใจ</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> กรณีจริง</li>
+                        <li><i class="fas fa-check"></i> อัปเดตสม่ำเสมอ</li>
+                        <li><i class="fas fa-check"></i> เรียนรู้จากประสบการณ์</li>
+                    </ul>
+                    <a href="pages/portfolio" class="service-link"><span>ดูรายละเอียด</span><i class="fas fa-arrow-right"></i></a>
+                </div>
+            `;
+        }
+        
+        // Load Portfolio/Courses from courses table
+        async function loadPortfolio() {
+            if (!supabase) return loadPortfolioFallback();
+            
+            try {
+                const { data: courses, error } = await supabase
+                    .from('courses')
+                    .select('*')
+                    .eq('published', true)
+                    .limit(3);
+                
+                if (error || !courses || courses.length === 0) {
+                    return loadPortfolioFallback();
+                }
+                
+                const icons = {
+                    'ai': 'fa-robot',
+                    'insurance': 'fa-hand-holding-heart',
+                    'training': 'fa-chalkboard-teacher',
+                    'portfolio': 'fa-briefcase'
+                };
+                
+                portfolioGrid.innerHTML = courses.map(course => {
+                    const icon = icons[course.category?.toLowerCase()] || 'fa-star';
+                    const title = course.title_th || course.title_en || 'คอร์ส';
+                    const description = course.description_th || course.description_en || '';
+                    const category = course.category || 'ai';
+                    
+                    return `
+                        <div class="portfolio-item fade-in-up" data-category="${category}">
+                            <div class="portfolio-image">
+                                <div class="image-placeholder"><i class="fas ${icon}"></i></div>
+                                <div class="portfolio-overlay">
+                                    <div class="portfolio-info">
+                                        <h3>${escapeHtml(title)}</h3>
+                                        <p>${escapeHtml(description.substring(0, 60))}${description.length > 60 ? '...' : ''}</p>
+                                    </div>
+                                    <a href="pages/ai-courses" class="portfolio-link"><i class="fas fa-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Portfolio load error:', error);
+                loadPortfolioFallback();
+            }
+        }
+        
+        function loadPortfolioFallback() {
+            portfolioGrid.innerHTML = `
+                <div class="portfolio-item fade-in-up" data-category="ai">
+                    <div class="portfolio-image">
+                        <div class="image-placeholder"><i class="fas fa-robot"></i></div>
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-info">
+                                <h3>คอร์ส AI สำหรับผู้เริ่มต้น</h3>
+                                <p>เรียนรู้พื้นฐานการใช้งาน AI</p>
+                            </div>
+                            <a href="pages/ai-courses" class="portfolio-link"><i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="portfolio-item fade-in-up" data-category="training">
+                    <div class="portfolio-image">
+                        <div class="image-placeholder"><i class="fas fa-chalkboard-teacher"></i></div>
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-info">
+                                <h3>อบรมการใช้ ChatGPT</h3>
+                                <p>เทคนิคการใช้ ChatGPT อย่างมืออาชีพ</p>
+                            </div>
+                            <a href="#" class="portfolio-link"><i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="portfolio-item fade-in-up" data-category="insurance">
+                    <div class="portfolio-image">
+                        <div class="image-placeholder"><i class="fas fa-hand-holding-heart"></i></div>
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-info">
+                                <h3>ประกันชีวิตสำหรับครอบครัว</h3>
+                                <p>คุ้มครองคนที่รักด้วยแผนประกันที่เหมาะสม</p>
+                            </div>
+                            <a href="#" class="portfolio-link"><i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Animate counter
+        function animateCount(element, target) {
+            if (!element) return;
+            let current = 0;
+            const increment = target / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = target + '+';
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current) + '+';
+                }
+            }, 30);
+        }
+        
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
 
-            function updateAdminLink(user) {
-                if (!adminLink) return;
-                const adminEmails = Array.isArray(config.adminEmail) ? config.adminEmail : [config.adminEmail].filter(e => e);
-                isAdmin = adminEmails.length > 0 && user?.email && adminEmails.includes(user.email);
-                adminLink.style.display = isAdmin ? 'block' : 'none';
-            }
-
-            async function handleLogin(email, password) {
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) throw error;
-            }
-            async function handleSignup(email, password, name) {
-                const { error } = await supabase.auth.signUp({ email, password, options: { data: { name } } });
-                if (error) throw error;
-            }
-            async function handleForgotPassword(email) {
-                const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/pages/auth#update-password` });
-                if (error) throw error;
-            }
-            async function handleLogout() { 
-                await supabase.auth.signOut(); 
-                renderUserMenu(null); 
-                updateAdminLink(null); 
-                initChat(null); 
-                closeAuthModal(); 
-            }
-            async function checkAuth() {
-                try {
-                    const { data } = await supabase.auth.getSession();
-                    currentUser = data?.session?.user || null;
-                    renderUserMenu(currentUser);
-                    updateAdminLink(currentUser);
-                    initChat(currentUser);
-                    return data?.session;
-                } catch (error) { 
-                    console.error('Auth check error:', error); 
+        // ========== AUTH FUNCTIONS ==========
+        
+        function renderUserMenu(user) {
+            if (user) {
+                const initials = user.email?.charAt(0).toUpperCase() || 'U';
+                userMenu.innerHTML = `
+                    <div class="user-info" id="userInfo">
+                        <div class="user-avatar">${initials}</div>
+                        <span class="user-name">${user.email?.split('@')[0]}</span>
+                        <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: var(--gray-500);"></i>
+                    </div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="pages/profile"><i class="fas fa-user-edit"></i> แก้ไขโปรไฟล์</a>
+                        <a href="pages/my-courses"><i class="fas fa-graduation-cap"></i> ประวัติการเรียน</a>
+                        <div class="divider"></div>
+                        <a href="#" id="logoutBtn" class="logout"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+                    </div>`;
+                document.getElementById('userInfo')?.addEventListener('click', (e) => { 
+                    e.stopPropagation(); 
+                    document.getElementById('userDropdown')?.classList.toggle('active'); 
+                });
+                document.getElementById('logoutBtn')?.addEventListener('click', async (e) => { 
+                    e.preventDefault(); 
+                    await supabase?.auth.signOut(); 
                     renderUserMenu(null); 
                     updateAdminLink(null); 
-                    return null; 
-                }
+                    initChat(null); 
+                });
+            } else {
+                userMenu.innerHTML = `<div class="user-auth-buttons"><button class="btn btn-secondary btn-sm" id="openLoginBtn">เข้าสู่ระบบ</button><button class="btn btn-primary btn-sm" id="openSignupBtn">สมัครสมาชิก</button></div>`;
+                document.getElementById('openLoginBtn')?.addEventListener('click', () => openAuthModal('login'));
+                document.getElementById('openSignupBtn')?.addEventListener('click', () => openAuthModal('signup'));
             }
+        }
+        
+        function updateAdminLink(user) {
+            if (!adminLink) return;
+            const adminEmails = Array.isArray(config.adminEmail) ? config.adminEmail : [config.adminEmail].filter(e => e);
+            isAdmin = adminEmails.length > 0 && user?.email && adminEmails.includes(user.email);
+            adminLink.style.display = isAdmin ? 'block' : 'none';
+        }
+        
+        function openAuthModal(view = 'login') {
+            authModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeAuthModal() {
+            authModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        async function checkAuth() {
+            if (!supabase) {
+                renderUserMenu(null);
+                updateAdminLink(null);
+                return null;
+            }
+            try {
+                const { data } = await supabase.auth.getSession();
+                currentUser = data?.session?.user || null;
+                renderUserMenu(currentUser);
+                updateAdminLink(currentUser);
+                initChat(currentUser);
+                return data?.session;
+            } catch (error) {
+                console.error('Auth check error:', error);
+                renderUserMenu(null);
+                updateAdminLink(null);
+                return null;
+            }
+        }
 
-            // Auth Event Listeners
-            authModalClose.addEventListener('click', closeAuthModal);
-            authModal.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
-            document.getElementById('authToggleLink').addEventListener('click', (e) => { e.preventDefault(); switchAuthView(currentView === 'login' ? 'signup' : 'login'); });
-            document.getElementById('showForgotPassword')?.addEventListener('click', (e) => { e.preventDefault(); alert('กรุณาติดต่อผู้ดูแลระบบเพื่อรีเซ็ตรหัสผ่าน'); });
-            document.getElementById('backToLogin')?.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('login'); });
-
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                const btn = document.getElementById('loginBtn');
-                btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังเข้าสู่ระบบ...';
-                try {
-                    await handleLogin(email, password);
-                    closeAuthModal(); await checkAuth(); alert('เข้าสู่ระบบสำเร็จ!');
-                } catch (error) { alert('เข้าสู่ระบบไม่สำเร็จ: ' + error.message); }
-                finally { btn.disabled = false; btn.innerHTML = '<span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i>'; }
-            });
-
-            signupForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const name = document.getElementById('signupName').value;
-                const email = document.getElementById('signupEmail').value;
-                const password = document.getElementById('signupPassword').value;
-                const btn = document.getElementById('signupBtn');
-                if (password.length < 6) { alert('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร'); return; }
-                btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังสมัคร...';
-                try {
-                    await handleSignup(email, password, name);
-                    alert('สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี'); closeAuthModal();
-                } catch (error) { alert('สมัครสมาชิกไม่สำเร็จ: ' + error.message); }
-                finally { btn.disabled = false; btn.innerHTML = '<span>สมัครสมาชิก</span><i class="fas fa-user-plus"></i>'; }
-            });
-
-            // ========================================
-            // CHAT FUNCTIONS
-            // ========================================
-            
-            function toggleChat() {
-                chatWindow.classList.toggle('active');
-                if (chatWindow.classList.contains('active')) {
-                    chatBadge.style.display = 'none';
-                    unreadCount = 0;
-                    chatInput.focus();
-                }
+        // ========== CHAT FUNCTIONS ==========
+        
+        function toggleChat() {
+            chatWindow.classList.toggle('active');
+            if (chatWindow.classList.contains('active')) {
+                chatBadge.style.display = 'none';
+                unreadCount = 0;
+                chatInput.focus();
             }
+        }
+        
+        function formatTime(date) {
+            return new Date(date).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        function appendMessage(message, isUser) {
+            if (chatEmpty) chatEmpty.style.display = 'none';
             
-            function formatTime(date) {
-                return new Date(date).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-            }
+            const msgEl = document.createElement('div');
+            msgEl.className = `chat-message ${isUser ? 'user' : ''}`;
+            msgEl.innerHTML = `
+                <div class="avatar">${isUser ? (currentUser?.email?.charAt(0).toUpperCase() || 'U') : '<i class="fas fa-headset"></i>'}</div>
+                <div>
+                    <div class="chat-bubble">${escapeHtml(message.message)}</div>
+                    <span class="chat-time">${formatTime(message.created_at)}</span>
+                </div>
+            `;
+            chatMessages.appendChild(msgEl);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        async function sendMessage() {
+            const text = chatInput?.value.trim();
+            if (!text || !currentUser || !supabase) return;
             
-            function appendMessage(message, isUser) {
-                chatEmpty.style.display = 'none';
-                
-                const msgEl = document.createElement('div');
-                msgEl.className = `chat-message ${isUser ? 'user' : ''}`;
-                msgEl.innerHTML = `
-                    <div class="avatar">${isUser ? (currentUser?.email?.charAt(0).toUpperCase() || 'U') : '<i class="fas fa-headset"></i>'}</div>
-                    <div>
-                        <div class="chat-bubble">${escapeHtml(message.message)}</div>
-                        <span class="chat-time">${formatTime(message.created_at)}</span>
-                    </div>
-                `;
-                chatMessages.appendChild(msgEl);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
+            if (chatSend) chatSend.disabled = true;
             
-            function showResetNotice() {
-                // Clear existing messages first
-                chatMessages.innerHTML = '';
+            try {
+                const { error } = await supabase.from('support_tickets').insert([{
+                    user_id: currentUser.id,
+                    user_email: currentUser.email,
+                    message: text,
+                    is_admin: false,
+                    status: 'open',
+                    deleted: false
+                }]);
                 
-                const notice = document.createElement('div');
-                notice.className = 'chat-reset-notice';
-                notice.innerHTML = `<i class="fas fa-rotate"></i> แอดมินได้รีเซ็ตแชทนี้แล้ว - เริ่มสนทนาใหม่ได้เลย`;
-                chatMessages.appendChild(notice);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                if (error) throw error;
                 
-                // Show new chat button and disable input
-                newChatBtn.classList.add('active');
-                chatInput.disabled = true;
-                chatSend.disabled = true;
-            }
-            
-            function escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
-            
-            async function sendMessage() {
-                const text = chatInput.value.trim();
-                if (!text || !currentUser) return;
-                
-                chatSend.disabled = true;
-                
-                try {
-                    // Save to database
-                    const { error } = await supabase.from('support_tickets').insert([{
-                        user_id: currentUser.id,
-                        user_email: currentUser.email,
-                        message: text,
-                        is_admin: false,
-                        status: 'open',
-                        deleted: false
-                    }]);
-                    
-                    if (error) throw error;
-                    
-                    // Show locally
-                    appendMessage({ message: text, created_at: new Date().toISOString(), deleted: false }, true);
+                appendMessage({ message: text, created_at: new Date().toISOString(), deleted: false }, true);
+                if (chatInput) {
                     chatInput.value = '';
                     chatInput.style.height = 'auto';
-                    
-                    // Hide reset notice and enable input if shown
-                    newChatBtn.classList.remove('active');
-                    chatInput.disabled = false;
-                    chatSend.disabled = false;
-                    
-                } catch (error) {
-                    console.error('Send error:', error);
-                    alert('ส่งข้อความไม่สำเร็จ กรุณาลองใหม่');
-                } finally {
-                    chatSend.disabled = false;
                 }
-            }
-            
-            async function loadMessages() {
-                if (!currentUser) return;
+                if (newChatBtn) newChatBtn.classList.remove('active');
+                if (chatInput) chatInput.disabled = false;
+                if (chatSend) chatSend.disabled = false;
                 
-                try {
-                    const { data, error } = await supabase
-                        .from('support_tickets')
-                        .select('*')
-                        .eq('user_id', currentUser.id)
-                        .eq('deleted', false)
-                        .order('created_at', { ascending: true })
-                        .limit(50);
+            } catch (error) {
+                console.error('Send error:', error);
+                alert('ส่งข้อความไม่สำเร็จ กรุณาลองใหม่');
+            } finally {
+                if (chatSend) chatSend.disabled = false;
+            }
+        }
+        
+        async function loadMessages() {
+            if (!currentUser || !supabase) return;
+            
+            try {
+                const { data, error } = await supabase
+                    .from('support_tickets')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .eq('deleted', false)
+                    .order('created_at', { ascending: true })
+                    .limit(50);
+                
+                if (error) throw error;
+                
+                if (chatMessages) chatMessages.innerHTML = '';
+                
+                if (!data || data.length === 0) {
+                    if (chatEmpty) chatEmpty.style.display = 'block';
+                    if (newChatBtn) newChatBtn.classList.remove('active');
+                    if (chatInput) chatInput.disabled = false;
+                    if (chatSend) chatSend.disabled = false;
+                    return;
+                }
+                
+                if (chatEmpty) chatEmpty.style.display = 'none';
+                
+                data.forEach(msg => {
+                    if (msg.deleted !== true && chatMessages) {
+                        appendMessage(msg, !msg.is_admin);
+                    }
+                });
+                
+                if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+            } catch (error) {
+                console.error('Load messages error:', error);
+            }
+        }
+        
+        function setupRealtime() {
+            if (!currentUser || !supabase) return;
+            if (realtimeSubscription) supabase.removeChannel(realtimeSubscription);
+            
+            realtimeSubscription = supabase
+                .channel(`chat_${currentUser?.id}`)
+                .on('postgres_changes', {
+                    event: '*',
+                    schema: 'public',
+                    table: 'support_tickets',
+                    filter: `user_id=eq.${currentUser?.id}`
+                }, (payload) => {
+                    const change = payload.new || payload.old;
+                    if (!change || change.user_id !== currentUser?.id) return;
                     
-                    if (error) throw error;
-                    
-                    chatMessages.innerHTML = '';
-                    
-                    if (!data || data.length === 0) {
-                        chatEmpty.style.display = 'block';
-                        newChatBtn.classList.remove('active');
-                        chatInput.disabled = false;
-                        chatSend.disabled = false;
+                    if (payload.eventType === 'DELETE' || (payload.eventType === 'UPDATE' && change.deleted === true)) {
+                        if (chatMessages) {
+                            chatMessages.innerHTML = '';
+                            const notice = document.createElement('div');
+                            notice.className = 'chat-reset-notice';
+                            notice.innerHTML = `<i class="fas fa-rotate"></i> แอดมินได้รีเซ็ตแชทนี้แล้ว - เริ่มสนทนาใหม่ได้เลย`;
+                            chatMessages.appendChild(notice);
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                        }
+                        if (newChatBtn) newChatBtn.classList.add('active');
+                        if (chatInput) chatInput.disabled = true;
+                        if (chatSend) chatSend.disabled = true;
                         return;
                     }
                     
-                    chatEmpty.style.display = 'none';
-                    
-                    // Display messages that are not deleted
-                    data.forEach(msg => {
-                        if (msg.deleted !== true) {
-                            appendMessage(msg, !msg.is_admin);
+                    if (payload.eventType === 'INSERT' && change.deleted !== true && chatMessages) {
+                        appendMessage(change, !change.is_admin);
+                        if (!chatWindow?.classList.contains('active') && !change.is_admin && chatBadge) {
+                            unreadCount++;
+                            chatBadge.textContent = unreadCount;
+                            chatBadge.style.display = 'flex';
                         }
-                    });
-                    
-                    // Scroll to bottom
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                    
-                } catch (error) {
-                    console.error('Load error:', error);
-                }
-            }
-            
-            function setupRealtime() {
-                if (realtimeSubscription) {
-                    supabase.removeChannel(realtimeSubscription);
-                }
-                
-                realtimeSubscription = supabase
-                    .channel(`chat_${currentUser?.id}`)
-                    .on('postgres_changes', {
-                        event: '*',  // รับทุก event: INSERT, UPDATE, DELETE
-                        schema: 'public',
-                        table: 'support_tickets',
-                        filter: `user_id=eq.${currentUser?.id}`
-                    }, (payload) => {
-                        const change = payload.new || payload.old;
-                        
-                        if (!change || change.user_id !== currentUser?.id) return;
-                        
-                        // 🔥 Handle DELETE event (admin deleted chat)
-                        if (payload.eventType === 'DELETE') {
-                            showResetNotice();
-                            return;
-                        }
-                        
-                        // 🔥 Handle UPDATE event (admin marked as deleted)
-                        if (payload.eventType === 'UPDATE' && change.deleted === true) {
-                            showResetNotice();
-                            return;
-                        }
-                        
-                        // Handle INSERT event (new message)
-                        if (payload.eventType === 'INSERT' && change.deleted !== true) {
-                            // Show typing indicator briefly for admin messages
-                            if (change.is_admin) {
-                                typingIndicator.classList.add('active');
-                                setTimeout(() => typingIndicator.classList.remove('active'), 1000);
-                            }
-                            
-                            // Append message
-                            appendMessage(change, !change.is_admin);
-                            
-                            // Update badge if chat is closed
-                            if (!chatWindow.classList.contains('active') && !change.is_admin) {
-                                unreadCount++;
-                                chatBadge.textContent = unreadCount;
-                                chatBadge.style.display = 'flex';
-                            }
-                        }
-                    })
-                    .subscribe();
-            }
-            
-            function initChat(user) {
-                currentUser = user;
-                
-                if (user) {
-                    // Load and setup realtime
-                    loadMessages();
-                    setupRealtime();
-                    
-                    // Show chat toggle
-                    chatToggle.style.display = 'flex';
-                } else {
-                    // Hide chat for non-logged users
-                    chatToggle.style.display = 'none';
-                    if (realtimeSubscription) {
-                        supabase.removeChannel(realtimeSubscription);
-                        realtimeSubscription = null;
                     }
+                })
+                .subscribe();
+        }
+        
+        function initChat(user) {
+            currentUser = user;
+            if (user && supabase) {
+                loadMessages();
+                setupRealtime();
+                if (chatToggle) chatToggle.style.display = 'flex';
+            } else {
+                if (chatToggle) chatToggle.style.display = 'none';
+                if (realtimeSubscription && supabase) {
+                    supabase.removeChannel(realtimeSubscription);
+                    realtimeSubscription = null;
                 }
             }
-            
-            // ========================================
-            // NEW CHAT BUTTON
-            // ========================================
-            
-            newChatBtn.addEventListener('click', () => {
-                // Clear chat display
-                chatMessages.innerHTML = '';
-                chatEmpty.style.display = 'block';
-                
-                // Hide reset notice and enable input
-                newChatBtn.classList.remove('active');
-                chatInput.disabled = false;
-                chatSend.disabled = false;
-                chatInput.focus();
-            });
-            
-            // ========================================
-            // CHAT EVENT LISTENERS
-            // ========================================
-            
-            chatToggle.addEventListener('click', toggleChat);
-            chatClose.addEventListener('click', () => chatWindow.classList.remove('active'));
-            chatMinimize.addEventListener('click', () => chatWindow.classList.remove('active'));
-            
-            chatSend.addEventListener('click', sendMessage);
-            chatInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
-            });
-            
-            // Auto-resize textarea
-            chatInput.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-            });
-            
-            // Close chat when clicking outside on mobile
-            document.addEventListener('click', (e) => {
-                if (window.innerWidth <= 480 && 
-                    chatWindow.classList.contains('active') && 
-                    !chatWindow.contains(e.target) && 
-                    !chatToggle.contains(e.target)) {
-                    chatWindow.classList.remove('active');
-                }
-            });
+        }
 
-            // ========================================
-            // INIT
-            // ========================================
-            
-            (async () => {
+        // ========== EVENT LISTENERS ==========
+        
+        // Auth Modal
+        document.getElementById('authModalClose')?.addEventListener('click', closeAuthModal);
+        authModal?.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
+        document.getElementById('authToggleLink')?.addEventListener('click', (e) => { 
+            e.preventDefault(); 
+            // Toggle between login/signup views would go here
+        });
+        
+        // Login Form
+        document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail')?.value;
+            const password = document.getElementById('loginPassword')?.value;
+            const btn = document.getElementById('loginBtn');
+            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังเข้าสู่ระบบ...'; }
+            try {
+                if (supabase) {
+                    const { error } = await supabase.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                }
+                closeAuthModal();
                 await checkAuth();
-                supabase.auth.onAuthStateChange((event, session) => {
-                    currentUser = session?.user || null;
-                    renderUserMenu(currentUser);
-                    updateAdminLink(currentUser);
-                    initChat(currentUser);
+                alert('เข้าสู่ระบบสำเร็จ!');
+            } catch (error) {
+                alert('เข้าสู่ระบบไม่สำเร็จ: ' + error.message);
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerHTML = '<span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i>'; }
+            }
+        });
+        
+        // Signup Form
+        document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signupName')?.value;
+            const email = document.getElementById('signupEmail')?.value;
+            const password = document.getElementById('signupPassword')?.value;
+            const btn = document.getElementById('signupBtn');
+            if (password?.length < 6) { alert('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร'); return; }
+            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังสมัคร...'; }
+            try {
+                if (supabase) {
+                    const { error } = await supabase.auth.signUp({ email, password, options: { data: { name } } });
+                    if (error) throw error;
+                }
+                alert('สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี');
+                closeAuthModal();
+            } catch (error) {
+                alert('สมัครสมาชิกไม่สำเร็จ: ' + error.message);
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerHTML = '<span>สมัครสมาชิก</span><i class="fas fa-user-plus"></i>'; }
+            }
+        });
+        
+        // Chat Events
+        chatToggle?.addEventListener('click', toggleChat);
+        document.getElementById('chatClose')?.addEventListener('click', () => chatWindow?.classList.remove('active'));
+        document.getElementById('chatMinimize')?.addEventListener('click', () => chatWindow?.classList.remove('active'));
+        chatSend?.addEventListener('click', sendMessage);
+        chatInput?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+        });
+        chatInput?.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+        newChatBtn?.addEventListener('click', () => {
+            if (chatMessages) chatMessages.innerHTML = '';
+            if (chatEmpty) chatEmpty.style.display = 'block';
+            if (newChatBtn) newChatBtn.classList.remove('active');
+            if (chatInput) { chatInput.disabled = false; chatInput.focus(); }
+            if (chatSend) chatSend.disabled = false;
+        });
+        
+        // Portfolio Filter
+        document.querySelectorAll('.filter-btn')?.forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const filter = this.dataset.filter;
+                document.querySelectorAll('.portfolio-item')?.forEach(item => {
+                    if (filter === 'all' || item.dataset.category === filter) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
                 });
-            })();
+            });
+        });
 
-        } catch (error) {
-            console.error('Initialization error:', error);
-            document.getElementById('userMenu').innerHTML = `<div class="user-auth-buttons"><button class="btn btn-secondary btn-sm" onclick="alert('ระบบกำลังมีปัญหา')">เข้าสู่ระบบ</button><button class="btn btn-primary btn-sm" onclick="alert('ระบบกำลังมีปัญหา')">สมัครสมาชิก</button></div>`;
+        // ========== INIT ==========
+        
+        async function init() {
+            console.log('🚀 Initializing main page...');
+            
+            // 1. Check auth first
+            await checkAuth();
+            
+            // 2. Load content from database
+            await Promise.all([
+                loadAboutContent(),
+                loadServices(),
+                loadPortfolio()
+            ]);
+            
+            // 3. Hide loader
+            if (loader) loader.style.display = 'none';
+            
+            // 4. Initialize animations
+            if (typeof initAnimations === 'function') initAnimations();
+            
+            console.log('✅ Main page initialized');
+        }
+        
+        // Run init
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+        
+        // Auth state change listener
+        if (supabase) {
+            supabase.auth.onAuthStateChange((event, session) => {
+                currentUser = session?.user || null;
+                renderUserMenu(currentUser);
+                updateAdminLink(currentUser);
+                initChat(currentUser);
+            });
         }
     </script>
 </body>
