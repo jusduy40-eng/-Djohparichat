@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการคอร์ส | Admin - Djohparichat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+        .form-group label { font-weight: 500; color: var(--gray-700); }
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 12px; border: 2px solid var(--gray-200); border-radius: var(--radius-md);
+            font-size: 1rem; outline: none; transition: var(--transition-fast);
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(30,136,229,0.1);
+        }
+        .features-list { display: flex; flex-direction: column; gap: 8px; }
+        .feature-item { display: flex; gap: 8px; }
+        .feature-item input { flex: 1; }
+        .btn-remove { background: var(--error); color: white; border: none; padding: 8px 12px; border-radius: var(--radius-sm); cursor: pointer; }
+        .course-list { display: flex; flex-direction: column; gap: 12px; }
+        .course-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--gray-50); border-radius: var(--radius-md); }
+        .course-item .actions { display: flex; gap: 8px; }
+        .course-item .actions button { padding: 6px 12px; border: none; border-radius: var(--radius-sm); cursor: pointer; }
+        .course-item .actions .edit { background: var(--sky-blue); color: var(--primary-blue); }
+        .course-item .actions .delete { background: var(--error); color: white; }
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .status-badge.published { background: #d1fae5; color: #065f46; }
+        .status-badge.draft { background: #fee2e2; color: #991b1b; }
+        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body class="admin-body">
+    <aside class="admin-sidebar">
+        <div class="admin-logo"><a href="../index.html"><i class="fas fa-graduation-cap"></i> Djohparichat</a></div>
+        <nav class="admin-nav">
+            <ul>
+                <li><a href="index.html"><i class="fas fa-dashboard"></i> แดชบอร์ด</a></li>
+                <li><a href="contents.html"><i class="fas fa-file-alt"></i> จัดการเนื้อหา</a></li>
+                <li><a href="courses.html" class="active"><i class="fas fa-brain"></i> จัดการคอร์ส</a></li>
+                <li><a href="messages.html"><i class="fas fa-envelope"></i> ข้อความติดต่อ</a></li>
+                <li><a href="settings.html"><i class="fas fa-cog"></i> การตั้งค่า</a></li>
+                <li><a href="../index.html" target="_blank"><i class="fas fa-external-link-alt"></i> เปิดเว็บไซต์</a></li>
+                <li><a href="#" id="logoutBtn" class="logout"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a></li>
+            </ul>
+        </nav>
+    </aside>
+    <main class="admin-main">
+        <header class="admin-header">
+            <h1>จัดการคอร์สเรียน</h1>
+            <div class="admin-user"><span id="adminEmail">admin@djohparichat.site</span><div class="admin-avatar"><i class="fas fa-user"></i></div></div>
+        </header>
+        <div class="admin-content">
+            <div class="admin-section">
+                <div class="section-header">
+                    <h2 id="formTitle">เพิ่มคอร์สใหม่</h2>
+                    <button class="btn btn-outline" id="cancelEdit" style="display:none;">ยกเลิก</button>
+                </div>
+                <form id="courseForm" class="admin-form">
+                    <input type="hidden" id="courseId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>ชื่อคอร์ส (ไทย) *</label>
+                            <input type="text" id="titleTh" required>
+                        </div>
+                        <div class="form-group">
+                            <label>ชื่อคอร์ส (อังกฤษ)</label>
+                            <input type="text" id="titleEn">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>คำอธิบาย (ไทย) *</label>
+                            <textarea id="descTh" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>คำอธิบาย (อังกฤษ)</label>
+                            <textarea id="descEn" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>ไอคอน (Font Awesome class)</label>
+                            <input type="text" id="icon" placeholder="fa-robot" value="fa-robot">
+                        </div>
+                        <div class="form-group">
+                            <label>ราคา (บาท)</label>
+                            <input type="number" id="price" min="0" value="0">
+                            <label style="margin-top:8px;"><input type="checkbox" id="isFree"> คอร์สฟรี</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>คุณสมบัติ/สิ่งที่ได้เรียน</label>
+                        <div class="features-list" id="featuresList">
+                            <div class="feature-item"><input type="text" class="feature-th" placeholder="ภาษาไทย"><input type="text" class="feature-en" placeholder="English"><button type="button" class="btn-remove" onclick="removeFeature(this)">×</button></div>
+                        </div>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="addFeature()" style="margin-top:8px;">+ เพิ่มคุณสมบัติ</button>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><input type="checkbox" id="isFeatured"> แสดงเป็นคอร์สแนะนำ</label>
+                        </div>
+                        <div class="form-group">
+                            <label><input type="checkbox" id="isPublished" checked> เผยแพร่ทันที</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> บันทึกคอร์ส</button>
+                </form>
+            </div>
+            <div class="admin-section">
+                <h2>คอร์สทั้งหมด</h2>
+                <div id="coursesList" class="course-list">
+                    <p style="color:var(--gray-500)">กำลังโหลด...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script type="module">
+        import { config } from '../lib/config.js';
+        const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+        
+        // Check admin
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session || !(config.adminEmail?.includes?.(session.user.email) || Array.isArray(config.adminEmail) && config.adminEmail.includes(session.user.email))) {
+            alert('ไม่มีสิทธิ์เข้าถึง'); window.location.href = '../index.html';
+        }
+        document.getElementById('adminEmail').textContent = session.user.email;
+        
+        // Form elements
+        const form = document.getElementById('courseForm');
+        const coursesList = document.getElementById('coursesList');
+        const featuresList = document.getElementById('featuresList');
+        
+        // Add/remove features
+        window.addFeature = () => {
+            const div = document.createElement('div');
+            div.className = 'feature-item';
+            div.innerHTML = `<input type="text" class="feature-th" placeholder="ภาษาไทย"><input type="text" class="feature-en" placeholder="English"><button type="button" class="btn-remove" onclick="removeFeature(this)">×</button>`;
+            featuresList.appendChild(div);
+        };
+        window.removeFeature = (btn) => btn.parentElement.remove();
+        
+        // Load courses
+        async function loadCourses() {
+            const { data } = await supabase.from('courses').select('*').order('created_at', { ascending: false });
+            coursesList.innerHTML = data?.map(c => `
+                <div class="course-item">
+                    <div>
+                        <strong>${c.title_th}</strong>
+                        <span class="status-badge ${c.published ? 'published' : 'draft'}">${c.published ? 'เผยแพร่' : 'ร่าง'}</span>
+                    </div>
+                    <div class="actions">
+                        <button class="edit" onclick="editCourse('${c.id}')">แก้ไข</button>
+                        <button class="delete" onclick="deleteCourse('${c.id}')">ลบ</button>
+                    </div>
+                </div>
+            `).join('') || '<p style="color:var(--gray-500)">ยังไม่มีคอร์ส</p>';
+        }
+        
+        // Edit course
+        window.editCourse = async (id) => {
+            const { data } = await supabase.from('courses').select('*').eq('id', id).single();
+            if (!data) return;
+            document.getElementById('formTitle').textContent = 'แก้ไขคอร์ส';
+            document.getElementById('courseId').value = data.id;
+            document.getElementById('titleTh').value = data.title_th;
+            document.getElementById('titleEn').value = data.title_en || '';
+            document.getElementById('descTh').value = data.description_th;
+            document.getElementById('descEn').value = data.description_en || '';
+            document.getElementById('icon').value = data.icon || 'fa-robot';
+            document.getElementById('price').value = data.price || 0;
+            document.getElementById('isFree').checked = data.is_free;
+            document.getElementById('isFeatured').checked = data.is_featured;
+            document.getElementById('isPublished').checked = data.published;
+            featuresList.innerHTML = '';
+            (data.features || []).forEach(f => {
+                const div = document.createElement('div');
+                div.className = 'feature-item';
+                div.innerHTML = `<input type="text" class="feature-th" value="${f.th}" placeholder="ภาษาไทย"><input type="text" class="feature-en" value="${f.en||''}" placeholder="English"><button type="button" class="btn-remove" onclick="removeFeature(this)">×</button>`;
+                featuresList.appendChild(div);
+            });
+            document.getElementById('cancelEdit').style.display = 'inline-block';
+            form.scrollIntoView({ behavior: 'smooth' });
+        };
+        
+        // Delete course
+        window.deleteCourse = async (id) => {
+            if (!confirm('ยืนยันการลบคอร์สนี้?')) return;
+            await supabase.from('courses').delete().eq('id', id);
+            loadCourses();
+        };
+        
+        // Submit form
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const features = [];
+            document.querySelectorAll('.feature-item').forEach(item => {
+                const th = item.querySelector('.feature-th').value.trim();
+                const en = item.querySelector('.feature-en').value.trim();
+                if (th) features.push({ th, en });
+            });
+            const course = {
+                title_th: document.getElementById('titleTh').value,
+                title_en: document.getElementById('titleEn').value || null,
+                description_th: document.getElementById('descTh').value,
+                description_en: document.getElementById('descEn').value || null,
+                icon: document.getElementById('icon').value || 'fa-robot',
+                price: parseInt(document.getElementById('price').value) || 0,
+                is_free: document.getElementById('isFree').checked,
+                is_featured: document.getElementById('isFeatured').checked,
+                published: document.getElementById('isPublished').checked,
+                features: features,
+                updated_at: new Date().toISOString()
+            };
+            const id = document.getElementById('courseId').value;
+            const { error } = id 
+                ? await supabase.from('courses').update(course).eq('id', id)
+                : await supabase.from('courses').insert([{ ...course, created_at: new Date().toISOString() }]);
+            if (error) { alert('บันทึกไม่สำเร็จ: ' + error.message); return; }
+            alert('บันทึกสำเร็จ!');
+            form.reset();
+            document.getElementById('courseId').value = '';
+            document.getElementById('formTitle').textContent = 'เพิ่มคอร์สใหม่';
+            document.getElementById('cancelEdit').style.display = 'none';
+            featuresList.innerHTML = '<div class="feature-item"><input type="text" class="feature-th" placeholder="ภาษาไทย"><input type="text" class="feature-en" placeholder="English"><button type="button" class="btn-remove" onclick="removeFeature(this)">×</button></div>';
+            loadCourses();
+        });
+        
+        // Cancel edit
+        document.getElementById('cancelEdit').addEventListener('click', () => {
+            form.reset();
+            document.getElementById('courseId').value = '';
+            document.getElementById('formTitle').textContent = 'เพิ่มคอร์สใหม่';
+            document.getElementById('cancelEdit').style.display = 'none';
+            featuresList.innerHTML = '<div class="feature-item"><input type="text" class="feature-th" placeholder="ภาษาไทย"><input type="text" class="feature-en" placeholder="English"><button type="button" class="btn-remove" onclick="removeFeature(this)">×</button></div>';
+        });
+        
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = '../index.html';
+        });
+        
+        // Init
+        loadCourses();
+    </script>
+</body>
+</html>
