@@ -4,35 +4,170 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>คอร์สของฉัน | Djohparichat</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        .course-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-normal);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .course-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        .course-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--sky-blue);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+        }
+        .course-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin: 0;
+        }
+        .course-description {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+        .enrollment-info {
+            background: var(--gray-50);
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status-badge.approved { background: #d1fae5; color: #065f46; }
+        .status-badge.pending { background: #fef3c7; color: #92400e; }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray-500);
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        @media (max-width: 768px) {
+            .services-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar">
-        <!-- Navigation -->
+    <!-- Loading -->
+    <div id="loader" class="loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p>กำลังโหลด...</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="navbar">
+        <div class="container">
+            <div class="nav-wrapper">
+                <a href="../index" class="logo">
+                    <span class="logo-icon"><i class="fas fa-graduation-cap"></i></span>
+                    <span class="logo-text">Djohparichat</span>
+                </a>
+                <div class="nav-menu">
+                    <ul class="nav-list">
+                        <li><a href="../index" class="nav-link">หน้าหลัก</a></li>
+                        <li><a href="services" class="nav-link">บริการ</a></li>
+                        <li><a href="ai-courses" class="nav-link">หลักสูตร AI</a></li>
+                        <li><a href="about" class="nav-link">เกี่ยวกับเรา</a></li>
+                    </ul>
+                </div>
+                <div class="nav-actions">
+                    <div class="user-menu" id="userMenu"></div>
+                </div>
+            </div>
+        </div>
     </nav>
-    
+
+    <!-- Page Header -->
     <section class="page-header">
-        <h1>คอร์สของฉัน</h1>
-    </section>
-    
-    <section class="container" style="padding: 40px 0;">
-        <div id="myCoursesList">
-            <p style="text-align:center;color:var(--gray-500);">กำลังโหลด...</p>
+        <div class="container">
+            <h1>คอร์สของฉัน</h1>
+            <p>ดูคอร์สที่คุณสมัครเรียนและติดตามความคืบหน้า</p>
         </div>
     </section>
-    
+
+    <!-- My Courses Section -->
+    <section class="container" style="padding: 40px 0; min-height: 400px;">
+        <div id="myCoursesList">
+            <div class="empty-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>กำลังโหลดคอร์ส...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 Djohparichat. สงวนลิขสิทธิ์ทุกประการ</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script -->
     <script type="module">
         import { config } from '../lib/config.js';
         const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
         
         async function loadMyCourses() {
             const { data: { session } } = await supabase.auth.getSession();
+            
             if (!session) {
-                window.location.href = '../pages/auth';
+                window.location.href = 'auth';
                 return;
             }
             
-            const { data: enrollments } = await supabase
+            // แสดงเมนูผู้ใช้
+            const initials = session.user.email?.charAt(0).toUpperCase() || 'U';
+            document.getElementById('userMenu').innerHTML = `
+                <div class="user-info">
+                    <div class="user-avatar">${initials}</div>
+                    <span class="user-name">${session.user.email?.split('@')[0]}</span>
+                </div>`;
+            
+            // โหลดคอร์สที่สมัคร
+            const { data: enrollments, error } = await supabase
                 .from('enrollments')
                 .select(`
                     *,
@@ -41,6 +176,7 @@
                         title_th,
                         title_en,
                         description_th,
+                        description_en,
                         icon,
                         is_free
                     )
@@ -51,41 +187,85 @@
             
             const container = document.getElementById('myCoursesList');
             
+            if (error) {
+                console.error('Error loading courses:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle" style="color: var(--error);"></i>
+                        <p style="color: var(--error);">เกิดข้อผิดพลาดในการโหลดคอร์ส</p>
+                        <a href="ai-courses" class="btn btn-primary" style="margin-top:16px;">กลับไปหน้าคอร์ส</a>
+                    </div>`;
+                return;
+            }
+            
             if (!enrollments || enrollments.length === 0) {
                 container.innerHTML = `
-                    <div style="text-align:center;padding:60px 20px;">
-                        <i class="fas fa-graduation-cap" style="font-size:3rem;color:var(--gray-300);margin-bottom:16px;"></i>
-                        <p style="color:var(--gray-500);">คุณยังไม่มีคอร์สเรียน</p>
+                    <div class="empty-state">
+                        <i class="fas fa-graduation-cap"></i>
+                        <p>คุณยังไม่มีคอร์สเรียน</p>
                         <a href="ai-courses" class="btn btn-primary" style="margin-top:16px;">ดูคอร์สทั้งหมด</a>
-                    </div>
-                `;
+                    </div>`;
                 return;
             }
             
             container.innerHTML = `
                 <div class="services-grid">
-                    ${enrollments.map(enroll => `
-                        <div class="course-card">
-                            <div class="course-icon">
-                                <i class="fas ${enroll.courses.icon || 'fa-robot'}"></i>
+                    ${enrollments.map(enroll => {
+                        const title = enroll.courses?.title_th || 'คอร์ส';
+                        const description = enroll.courses?.description_th || '';
+                        const icon = enroll.courses?.icon || 'fa-robot';
+                        const isFree = enroll.courses?.is_free;
+                        const enrolledDate = new Date(enroll.created_at).toLocaleDateString('th-TH');
+                        
+                        return `
+                            <div class="course-card">
+                                <div class="course-icon">
+                                    <i class="fas ${icon}"></i>
+                                </div>
+                                <h3 class="course-title">${title}</h3>
+                                <p class="course-description">${description}</p>
+                                
+                                <div class="enrollment-info">
+                                    <div style="margin-bottom:8px;">
+                                        <i class="fas fa-calendar"></i> 
+                                        สมัครเมื่อ: ${enrolledDate}
+                                    </div>
+                                    <div>
+                                        <i class="fas fa-tag"></i> 
+                                        ${isFree ? 'คอร์สฟรี' : 'คอร์สเสียเงิน'}
+                                    </div>
+                                    <div style="margin-top:8px;">
+                                        <span class="status-badge approved">
+                                            <i class="fas fa-check-circle"></i> เข้าเรียนได้
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-primary" onclick="startCourse('${enroll.course_id}', '${title.replace(/'/g, "\\'")}')">
+                                    <i class="fas fa-play"></i> เริ่มเรียน
+                                </button>
                             </div>
-                            <h3>${enroll.courses.title_th}</h3>
-                            <p>${enroll.courses.description_th}</p>
-                            <button class="btn btn-primary" onclick="startCourse('${enroll.course_id}')">
-                                <i class="fas fa-play"></i> เริ่มเรียน
-                            </button>
-                        </div>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>
             `;
+            
+            // ซ่อน loader
+            document.getElementById('loader').style.display = 'none';
         }
         
-        function startCourse(courseId) {
-            alert('กำลังเข้าสู่คอร์ส: ' + courseId);
-            // TODO: Redirect to course content
+        function startCourse(courseId, courseTitle) {
+            // TODO: Redirect to actual course content page
+            alert('🎉 ยินดีด้วย! คุณได้เริ่มเรียนคอร์ส "' + courseTitle + '"\n\n(กำลังพัฒนาระบบเรียนออนไลน์)');
+            // window.location.href = 'course-content?id=' + courseId;
         }
         
-        loadMyCourses();
+        // โหลดคอร์สเมื่อหน้าเว็บพร้อม
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadMyCourses);
+        } else {
+            loadMyCourses();
+        }
     </script>
 </body>
 </html>
