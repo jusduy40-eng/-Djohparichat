@@ -496,6 +496,70 @@
         .toast.success { background: #10b981; }
         .toast.error { background: #ef4444; }
         
+        /* ========== LOGIN OVERLAY (บังคับล็อกอิน) ========== */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+        
+        .login-overlay.hidden {
+            display: none !important;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            text-align: center;
+            animation: slideUp 0.4s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .login-card h2 {
+            font-size: 1.5rem;
+            color: #1e293b;
+            margin: 0 0 8px;
+            font-weight: 700;
+        }
+        
+        .login-card p {
+            color: #64748b;
+            margin: 0 0 24px;
+            font-size: 0.95rem;
+        }
+        
+        .login-card .btn {
+            width: 100%;
+            margin-bottom: 12px;
+        }
+        
+        .login-card .btn-outline {
+            background: white;
+            color: #64748b;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .login-card .btn-outline:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        
         /* Footer */
         .footer {
             background: #f8fafc;
@@ -522,6 +586,47 @@
         <div class="loader-content">
             <div class="loader-spinner"></div>
             <p class="loader-text">กำลังโหลด...</p>
+        </div>
+    </div>
+
+    <!-- Login Overlay (บังคับล็อกอิน) -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-card">
+            <h2>🔐 เข้าสู่ระบบเพื่อดูเนื้อหา</h2>
+            <p>หน้านี้เป็นเนื้อหาเฉพาะสมาชิก กรุณาล็อกอินเพื่อดำเนินการต่อ</p>
+            <button class="btn btn-primary" id="openLoginBtn">
+                <i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ
+            </button>
+            <button class="btn btn-outline" id="goHomeBtn">
+                <i class="fas fa-home"></i> กลับหน้าหลัก
+            </button>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="auth-modal" style="display:none;">
+        <div class="auth-modal-content">
+            <button class="auth-modal-close" id="authModalClose"><i class="fas fa-times"></i></button>
+            <div class="auth-modal-header">
+                <h3 id="authModalTitle">เข้าสู่ระบบ</h3>
+                <p id="authModalDesc">ยินดีต้อนรับกลับ! กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</p>
+            </div>
+            <div class="auth-modal-body">
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form active">
+                    <div class="form-group">
+                        <label>อีเมล</label>
+                        <input type="email" id="loginEmail" required placeholder="example@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>รหัสผ่าน</label>
+                        <input type="password" id="loginPassword" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn-auth" id="loginBtn">
+                        <span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -561,8 +666,8 @@
         </div>
     </section>
 
-    <!-- About Section -->
-    <section class="about">
+    <!-- About Section (ซ่อนไว้จนกว่าจะล็อกอิน) -->
+    <section class="about" id="aboutSection" style="display:none;">
         <div class="container">
             <div class="about-wrapper">
                 <!-- Image Section (Admin Editable) -->
@@ -688,6 +793,13 @@
     let isEditing = false;
 
     // ========== DOM ELEMENTS ==========
+    const loginOverlay = document.getElementById('loginOverlay');
+    const authModal = document.getElementById('authModal');
+    const authModalClose = document.getElementById('authModalClose');
+    const loginForm = document.getElementById('loginForm');
+    const openLoginBtn = document.getElementById('openLoginBtn');
+    const goHomeBtn = document.getElementById('goHomeBtn');
+    
     const adminToolbar = document.getElementById('adminToolbar');
     const toggleEditBtn = document.getElementById('toggleEditBtn');
     const saveAllBtn = document.getElementById('saveAllBtn');
@@ -695,6 +807,7 @@
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toastMessage');
     
+    const aboutSection = document.getElementById('aboutSection');
     const editableElements = document.querySelectorAll('.editable');
     const mainImage = document.getElementById('mainImage');
     const imagePlaceholder = document.getElementById('imagePlaceholder');
@@ -702,19 +815,20 @@
     const imageUpload = document.getElementById('imageUpload');
     const experienceYears = document.getElementById('experienceYears');
 
-    // ========== AUTH ==========
+    // ========== AUTH FUNCTIONS ==========
     async function checkAuth() {
         if (!supabase) {
             console.error('❌ Supabase not initialized');
+            showLoginOverlay();
             return null;
         }
         
         try {
-            console.log('🔍 Checking auth...');
             const { data, error } = await supabase.auth.getSession();
             
             if (error) {
                 console.error('Auth error:', error);
+                showLoginOverlay();
                 return null;
             }
             
@@ -723,53 +837,84 @@
             if (currentUser) {
                 console.log('✅ User logged in:', currentUser.email);
                 
+                // เช็คสิทธิ์แอดมิน
                 const adminEmails = Array.isArray(config.adminEmail) ? config.adminEmail : [config.adminEmail].filter(e => e);
                 isAdmin = adminEmails.length > 0 && adminEmails.includes(currentUser.email);
                 
                 if (isAdmin) {
-                    console.log('✅ User is admin - showing admin tools');
+                    console.log('✅ User is admin');
                     if (adminToolbar) adminToolbar.classList.add('active');
                     if (editImageBtn) editImageBtn.style.display = 'flex';
                     setupEditListeners();
-                } else {
-                    console.log('ℹ️ User is not admin');
                 }
+                
+                // ✅ ล็อกอินสำเร็จ - แสดงเนื้อหา
+                hideLoginOverlay();
+                showAboutSection();
+                await loadContent();
+                
+                if (isAdmin) {
+                    setupRealtime();
+                }
+                
             } else {
-                console.log('ℹ️ No user logged in');
+                console.log('ℹ️ No user logged in - showing login overlay');
+                showLoginOverlay();
             }
             
             return currentUser;
         } catch (error) {
             console.error('checkAuth error:', error);
+            showLoginOverlay();
             return null;
         }
+    }
+    
+    function showLoginOverlay() {
+        if (loginOverlay) loginOverlay.classList.remove('hidden');
+        if (aboutSection) aboutSection.style.display = 'none';
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function hideLoginOverlay() {
+        if (loginOverlay) loginOverlay.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+    
+    function showAboutSection() {
+        if (aboutSection) aboutSection.style.display = 'block';
+    }
+    
+    async function handleLogin(email, password) {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        return data;
+    }
+    
+    async function handleLogout() {
+        if (!supabase) return;
+        await supabase.auth.signOut();
+        currentUser = null;
+        isAdmin = false;
+        showLoginOverlay();
+        showToast('ออกจากระบบสำเร็จ', 'success');
     }
 
     // ========== LOAD CONTENT ==========
     async function loadContent() {
         if (!supabase) {
-            console.error('❌ Cannot load content: Supabase not initialized');
             showToast('ไม่สามารถโหลดข้อมูลได้', 'error');
             return;
         }
         
         try {
-            console.log('📥 Loading content from database...');
             const { data, error } = await supabase
                 .from('about_content')
                 .select('*');
             
             if (error) {
-                console.error('❌ Load error:', error);
+                console.error('Load error:', error);
                 showToast('โหลดเนื้อหาไม่สำเร็จ: ' + error.message, 'error');
-                return;
-            }
-            
-            console.log('✅ Content loaded:', data);
-            
-            if (!data || data.length === 0) {
-                console.warn('⚠️ No data found in about_content table');
-                showToast('ไม่พบข้อมูลในฐานข้อมูล', 'warning');
                 return;
             }
             
@@ -778,41 +923,18 @@
                 contentData[item.key] = item.value;
             });
             
-            // Update Image
             if (contentData['main_image']) {
-                console.log('🖼️ Loading image:', contentData['main_image']);
                 mainImage.src = contentData['main_image'];
                 mainImage.style.display = 'block';
                 imagePlaceholder.style.display = 'none';
             }
-            
-            // Update Text Content
-            if (contentData['title_th']) {
-                document.getElementById('titleContent').textContent = contentData['title_th'];
-                console.log('📝 Title loaded:', contentData['title_th']);
-            }
-            if (contentData['description_th']) {
-                document.getElementById('descriptionContent').textContent = contentData['description_th'];
-                console.log('📝 Description loaded');
-            }
-            if (contentData['experience_years']) {
-                experienceYears.textContent = contentData['experience_years'];
-                console.log('📝 Experience loaded:', contentData['experience_years']);
-            }
-            if (contentData['feature_1_title_th']) {
-                document.getElementById('feature1Title').textContent = contentData['feature_1_title_th'];
-            }
-            if (contentData['feature_1_desc_th']) {
-                document.getElementById('feature1Desc').textContent = contentData['feature_1_desc_th'];
-            }
-            if (contentData['feature_2_title_th']) {
-                document.getElementById('feature2Title').textContent = contentData['feature_2_title_th'];
-            }
-            if (contentData['feature_2_desc_th']) {
-                document.getElementById('feature2Desc').textContent = contentData['feature_2_desc_th'];
-            }
-            
-            console.log('✅ All content updated successfully');
+            if (contentData['title_th']) document.getElementById('titleContent').textContent = contentData['title_th'];
+            if (contentData['description_th']) document.getElementById('descriptionContent').textContent = contentData['description_th'];
+            if (contentData['experience_years']) experienceYears.textContent = contentData['experience_years'];
+            if (contentData['feature_1_title_th']) document.getElementById('feature1Title').textContent = contentData['feature_1_title_th'];
+            if (contentData['feature_1_desc_th']) document.getElementById('feature1Desc').textContent = contentData['feature_1_desc_th'];
+            if (contentData['feature_2_title_th']) document.getElementById('feature2Title').textContent = contentData['feature_2_title_th'];
+            if (contentData['feature_2_desc_th']) document.getElementById('feature2Desc').textContent = contentData['feature_2_desc_th'];
             
         } catch (error) {
             console.error('loadContent error:', error);
@@ -824,7 +946,6 @@
     function setupRealtime() {
         if (!supabase) return;
         
-        console.log('🔄 Setting up realtime updates...');
         realtimeSubscription = supabase
             .channel('about_content_changes')
             .on('postgres_changes', {
@@ -832,7 +953,6 @@
                 schema: 'public',
                 table: 'about_content'
             }, (payload) => {
-                console.log('🔄 Realtime update:', payload);
                 if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
                     const { key, value, type } = payload.new;
                     updateElement(key, value, type);
@@ -842,7 +962,6 @@
     }
     
     function updateElement(key, value, type) {
-        console.log('🔄 Updating element:', key, value);
         if (type === 'image' && key === 'main_image') {
             mainImage.src = value;
             mainImage.style.display = 'block';
@@ -929,7 +1048,6 @@
         textarea.rows = Math.max(2, Math.ceil(original.length / 50));
         
         el.classList.add('editing');
-        const currentHTML = el.innerHTML;
         el.innerHTML = '';
         el.appendChild(textarea);
         
@@ -973,7 +1091,9 @@
         try {
             const { error } = await supabase
                 .from('about_content')
-                .upsert({ key, value, type, updated_at: new Date().toISOString() });
+                .upsert({ key, value, type, updated_at: new Date().toISOString() }, {
+                    onConflict: 'key'
+                });
             
             if (error) throw error;
             
@@ -1035,7 +1155,7 @@
             const fileExt = file.name.split('.').pop();
             const fileName = `about-main-${Date.now()}.${fileExt}`;
             
-            const { data: uploadData, error: uploadError } = await supabase.storage
+            const { error: uploadError } = await supabase.storage
                 .from('about-images')
                 .upload(fileName, file);
             
@@ -1073,22 +1193,59 @@
         }, 3000);
     }
 
+    // ========== EVENT LISTENERS ==========
+    openLoginBtn?.addEventListener('click', () => {
+        authModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+    
+    goHomeBtn?.addEventListener('click', () => {
+        window.location.href = '../index';
+    });
+    
+    authModalClose?.addEventListener('click', () => {
+        authModal.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+    
+    authModal?.addEventListener('click', (e) => {
+        if (e.target === authModal) {
+            authModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+    
+    loginForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const btn = document.getElementById('loginBtn');
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังเข้าสู่ระบบ...';
+        
+        try {
+            await handleLogin(email, password);
+            authModal.classList.remove('active');
+            document.body.style.overflow = '';
+            await checkAuth();
+            showToast('เข้าสู่ระบบสำเร็จ!', 'success');
+        } catch (error) {
+            alert('เข้าสู่ระบบไม่สำเร็จ: ' + error.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i>';
+        }
+    });
+
     // ========== INIT ==========
     async function init() {
         console.log('🚀 Initializing about page...');
         
-        // 1. เช็ค Auth ก่อน
+        // 1. เช็คสิทธิ์ก่อน (บังคับล็อกอิน)
         await checkAuth();
         
-        // 2. โหลดข้อมูล (ทำทีหลัง Auth เสร็จ)
-        await loadContent();
-        
-        // 3. Setup Realtime (ถ้าเป็นแอดมิน)
-        if (isAdmin) {
-            setupRealtime();
-        }
-        
-        // 4. ซ่อน Loader
+        // 2. ซ่อน Loader
         const loader = document.getElementById('loader');
         if (loader) {
             loader.style.display = 'none';
