@@ -353,152 +353,119 @@
         
         const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
 
-        // ========== AUTH CHECK (ไม่เด้งกลับไปมา) ==========
-        let authChecked = false;
-        
-        async function checkAdminPermission() {
-            if (authChecked) return true; // ป้องกันเช็คซ้ำ
-            
+        // ========== GLOBAL STATE ==========
+        let currentUser = null;
+        let isAdmin = false;
+
+        // ========== AUTH CHECK (เช็ค session ที่มีอยู่) ==========
+        async function checkAuth() {
             try {
                 const { data: { session }, error: sessionError } = await supabase.auth.getSession();
                 
                 if (sessionError) {
                     console.error('Session error:', sessionError);
-                    window.location.href = '../pages/auth';
                     return false;
                 }
                 
                 if (!session) {
-                    // ยังไม่ล็อกอิน → ไปหน้าล็อกอิน
-                    window.location.href = '../pages/auth';
+                    console.log('ℹ️ No active session');
                     return false;
                 }
                 
-                const userEmail = session.user.email;
+                currentUser = session.user;
+                const userEmail = currentUser.email;
+                
+                // เช็คสิทธิ์แอดมิน
                 const adminEmails = Array.isArray(config.adminEmail) 
                     ? config.adminEmail 
                     : [config.adminEmail].filter(e => e);
                 
-                // ถ้าไม่มี adminEmail ใน config ให้อนุญาตทั้งหมด (สำหรับทดสอบ)
-                const isAdmin = adminEmails.length === 0 || adminEmails.includes(userEmail);
+                // อนุญาตถ้าเป็นแอดมิน หรือ ไม่มี config (สำหรับทดสอบ)
+                isAdmin = adminEmails.length === 0 || adminEmails.includes(userEmail);
                 
-                if (!isAdmin) {
-                    alert('⛔ คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
-                    window.location.href = '../index';
+                if (isAdmin) {
+                    console.log('✅ Admin authenticated:', userEmail);
+                    document.getElementById('adminEmail').textContent = userEmail?.split('@')[0] || 'Admin';
+                    return true;
+                } else {
+                    console.warn('⚠️ User is not admin:', userEmail);
                     return false;
                 }
                 
-                // ✅ ผ่านการตรวจสอบ
-                document.getElementById('adminEmail').textContent = userEmail?.split('@')[0] || 'Admin';
-                authChecked = true;
-                return true;
-                
             } catch (error) {
-                console.error('Permission check error:', error);
-                window.location.href = '../index';
+                console.error('Auth check error:', error);
                 return false;
             }
         }
 
-        // ========== TRACK PAGE VIEW (นับผู้เข้าชมจริง) ==========
+        // ========== TRACK PAGE VIEW ==========
         async function trackPageView() {
             try {
-                const { data: { session } } = await supabase.auth.getSession();
-                
                 await supabase.from('page_views').insert({
                     page_path: window.location.pathname,
-                    user_id: session?.user?.id || null,
-                    ip_address: '', // Supabase จะบันทึกให้เองถ้าใช้ Edge Functions
+                    user_id: currentUser?.id || null,
                     user_agent: navigator.userAgent,
                     referrer: document.referrer || null,
                     viewed_at: new Date().toISOString()
                 });
-                
-                console.log('✅ Page view tracked');
             } catch (error) {
-                console.warn('⚠️ Could not track page view:', error);
-                // ไม่ error ถ้าบันทึกไม่สำเร็จ (เพื่อไม่ให้รบกวนผู้ใช้)
+                // ไม่ต้องแสดง error ถ้าบันทึกไม่สำเร็จ
             }
         }
 
         // ========== LOAD DASHBOARD DATA ==========
         async function loadDashboardData() {
             try {
-                // 1. จำนวนคอร์สที่เผยแพร่
+                // 1. จำนวนคอร์ส
                 const { count: coursesCount } = await supabase
                     .from('courses')
                     .select('*', { count: 'exact', head: true })
                     .eq('published', true);
                 document.getElementById('totalCourses').textContent = coursesCount || 0;
 
-                // 2. จำนวนผู้สมัครเรียน
+                // 2. จำนวนผู้สมัคร
                 const { count: enrollCount } = await supabase
                     .from('enrollments')
                     .select('*', { count: 'exact', head: true });
                 document.getElementById('totalEnrollments').textContent = enrollCount || 0;
 
-                // 3. ข้อความใหม่ที่ยังไม่ตอบ
+                // 3. ข้อความใหม่
                 let messagesCount = 0;
-                const { count: chatCount } = await supabase
-                    .from('support_tickets')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('is_admin', false)
-                    .eq('deleted', false);
-                if (chatCount !== null) messagesCount = chatCount;
+                try {
+                    const { count: chatCount } = await supabase
+                        .from('support_tickets')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('is_admin', false)
+                        .eq('deleted', false);
+                    if (chatCount !== null) messagesCount = chatCount;
+                } catch (e) {
+                    // ตารางอาจยังไม่มี
+                }
                 document.getElementById('newMessages').textContent = messagesCount;
 
-                // 4. ✅ ผู้เข้าชมวันนี้ (จากตาราง page_views จริง)
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                
-                const { data: viewsToday, error: viewsError } = await supabase
-                    .from('page_views')
-                    .select('ip_address', { count: 'exact' })
-                    .gte('viewed_at', today.toISOString())
-                    .maybeSingle();
-                
-                if (viewsError) {
-                    console.warn('Visitor count error:', viewsError);
-                    document.getElementById('todayVisitors').textContent = '0';
-                    document.getElementById('visitorChange').textContent = 'ไม่สามารถโหลดได้';
-                } else {
-                    // นับจำนวน IP ที่ไม่ซ้ำ
+                // 4. ผู้เข้าชมวันนี้
+                try {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    const { data: viewsToday } = await supabase
+                        .from('page_views')
+                        .select('ip_address')
+                        .gte('viewed_at', today.toISOString());
+                    
                     const uniqueIps = [...new Set(viewsToday?.map(v => v.ip_address).filter(ip => ip) || [])];
                     const visitorCount = uniqueIps.length || 0;
                     
                     document.getElementById('todayVisitors').textContent = visitorCount;
+                    document.getElementById('visitorChange').textContent = 'ผู้เข้าชมจริง';
                     
-                    // คำนวณการเปลี่ยนแปลง (เทียบกับเมื่อวาน)
-                    const yesterday = new Date(today);
-                    yesterday.setDate(yesterday.getDate() - 1);
-                    
-                    const { data: viewsYesterday } = await supabase
-                        .from('page_views')
-                        .select('ip_address')
-                        .gte('viewed_at', yesterday.toISOString())
-                        .lt('viewed_at', today.toISOString());
-                    
-                    const uniqueIpsYesterday = [...new Set(viewsYesterday?.map(v => v.ip_address).filter(ip => ip) || [])];
-                    const yesterdayCount = uniqueIpsYesterday.length || 0;
-                    
-                    const change = visitorCount - yesterdayCount;
-                    const changeEl = document.getElementById('visitorChange');
-                    
-                    if (change > 0) {
-                        changeEl.innerHTML = `<i class="fas fa-arrow-up"></i> +${change} จากเมื่อวาน`;
-                        changeEl.className = 'stat-change positive';
-                    } else if (change < 0) {
-                        changeEl.innerHTML = `<i class="fas fa-arrow-down"></i> ${change} จากเมื่อวาน`;
-                        changeEl.className = 'stat-change negative';
-                    } else {
-                        changeEl.textContent = 'เท่ากับเมื่อวาน';
-                        changeEl.className = 'stat-change';
-                    }
+                } catch (e) {
+                    document.getElementById('todayVisitors').textContent = '0';
+                    document.getElementById('visitorChange').textContent = 'กำลังติดตาม';
                 }
 
             } catch (error) {
-                console.error('Error loading dashboard:', error);
-                showNotification('error', 'ไม่สามารถโหลดข้อมูลแดชบอร์ดได้');
+                console.error('Dashboard load error:', error);
             }
         }
 
@@ -556,48 +523,71 @@
                 }).join('');
                 
             } catch (error) {
-                console.error('Error loading courses:', error);
+                console.error('Courses load error:', error);
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center text-error">โหลดข้อมูลไม่สำเร็จ</td></tr>`;
             }
         }
 
-        // ========== LOAD RECENT ENROLLMENTS ==========
+        // ========== LOAD RECENT ENROLLMENTS (แก้แล้ว - ไม่ join courses) ==========
         async function loadRecentEnrollments() {
             const tbody = document.getElementById('enrollmentsTableBody');
             
             try {
+                // ✅ แก้ไข: เลือกเฉพาะข้อมูลจาก enrollments table
                 const { data: enrollments, error } = await supabase
                     .from('enrollments')
-                    .select(`
-                        *,
-                        courses ( title_th, title_en )
-                    `)
+                    .select('*')  // ไม่ join กับ courses
                     .order('created_at', { ascending: false })
                     .limit(5);
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('Enrollments error:', error);
+                    throw error;
+                }
                 
                 if (!enrollments || enrollments.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="5" class="text-center">ไม่มีข้อมูล</td></tr>`;
                     return;
                 }
                 
-                tbody.innerHTML = enrollments.map(enroll => {
+                // ✅ ดึงชื่อคอร์สแยกต่างหาก (ถ้ามี course_id)
+                const enrollmentsWithCourses = await Promise.all(
+                    enrollments.map(async (enroll) => {
+                        let courseTitle = '-';
+                        
+                        if (enroll.course_id) {
+                            try {
+                                const { data: course } = await supabase
+                                    .from('courses')
+                                    .select('title_th, title_en')
+                                    .eq('id', enroll.course_id)
+                                    .single();
+                                
+                                if (course) {
+                                    courseTitle = course.title_th || course.title_en || '-';
+                                }
+                            } catch (e) {
+                                // ไม่เป็นไรถ้าไม่มีคอร์ส
+                            }
+                        }
+                        
+                        return { ...enroll, courseTitle };
+                    })
+                );
+                
+                tbody.innerHTML = enrollmentsWithCourses.map(enroll => {
                     const statusBadge = {
                         'pending': { text: 'รอตรวจสอบ', class: 'badge-gold' },
                         'confirmed': { text: 'ยืนยันแล้ว', class: 'badge-green' },
-                        'completed': { text: 'เรียนจบ', class: 'badge-blue' }
+                        'completed': { text: 'เรียนจบ', class: 'badge-blue' },
+                        'approved': { text: 'อนุมัติแล้ว', class: 'badge-green' }
                     }[enroll.status] || { text: '-', class: 'badge-gray' };
-                    
-                    const courseTitle = enroll.courses 
-                        ? (enroll.courses.title_th || enroll.courses.title_en)
-                        : '-';
                     
                     return `
                         <tr>
                             <td><strong>${enroll.full_name || enroll.nickname || '-'}</strong></td>
                             <td>${enroll.email || '-'}</td>
-                            <td>${courseTitle}</td>
+                            <td>${enroll.courseTitle || '-'}</td>
                             <td>${formatDate(enroll.created_at)}</td>
                             <td><span class="badge ${statusBadge.class}">${statusBadge.text}</span></td>
                         </tr>
@@ -605,7 +595,7 @@
                 }).join('');
                 
             } catch (error) {
-                console.error('Error loading enrollments:', error);
+                console.error('Enrollments load error:', error);
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center text-error">โหลดข้อมูลไม่สำเร็จ</td></tr>`;
             }
         }
@@ -695,19 +685,25 @@
             e.preventDefault();
             if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
                 await supabase.auth.signOut();
-                authChecked = false;
+                currentUser = null;
+                isAdmin = false;
                 window.location.href = '../index';
             }
         });
 
         // ========== INIT ==========
         async function init() {
-            // 1. บันทึกการเข้าชมหน้าแดชบอร์ด (นับผู้เข้าชมจริง)
-            await trackPageView();
+            // 1. เช็ค authentication (ใช้ session ที่มีอยู่)
+            const isAuthenticated = await checkAuth();
             
-            // 2. เช็คสิทธิ์แอดมิน
-            const isAdmin = await checkAdminPermission();
-            if (!isAdmin) return;
+            if (!isAuthenticated || !isAdmin) {
+                // ยังไม่ล็อกอิน หรือ ไม่ใช่แอดมิน → ไปหน้าหลัก
+                window.location.href = '../index';
+                return;
+            }
+            
+            // 2. บันทึกการเข้าชม
+            await trackPageView();
             
             // 3. ตั้งค่า Sidebar
             initSidebar();
