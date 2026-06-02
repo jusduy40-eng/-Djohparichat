@@ -11,7 +11,7 @@
     <style>
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
-        .form-group label { font-weight: 500; color: var(--gray-700); }
+        .form-group label { font-weight: 500; color: var(--gray-700); font-size: 0.9rem; }
         .form-group input, .form-group select, .form-group textarea {
             padding: 12px; border: 2px solid var(--gray-200); border-radius: var(--radius-md);
             font-size: 1rem; outline: none; transition: var(--transition-fast);
@@ -19,23 +19,115 @@
         .form-group input:focus, .form-group textarea:focus {
             border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(30,136,229,0.1);
         }
+        .form-group small { color: var(--gray-500); font-size: 0.8rem; }
+        
+        /* Image Upload */
+        .image-upload {
+            border: 2px dashed var(--gray-300);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        .image-upload:hover {
+            border-color: var(--primary-blue);
+            background: var(--gray-50);
+        }
+        .image-upload.has-image {
+            border-style: solid;
+            border-color: var(--primary-blue);
+        }
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: var(--radius-md);
+            margin: 10px auto;
+            display: none;
+        }
+        .image-preview.show { display: block; }
+        .image-remove {
+            background: var(--error);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        
         .features-list { display: flex; flex-direction: column; gap: 8px; }
-        .feature-item { display: flex; gap: 8px; }
+        .feature-item { display: flex; gap: 8px; align-items: center; }
         .feature-item input { flex: 1; }
-        .btn-remove { background: var(--error); color: white; border: none; padding: 8px 12px; border-radius: var(--radius-sm); cursor: pointer; }
+        .btn-remove { 
+            background: var(--error); color: white; border: none; 
+            padding: 8px 12px; border-radius: var(--radius-sm); 
+            cursor: pointer; width: 36px; height: 36px;
+        }
+        .btn-remove:hover { background: #dc2626; }
+        
         .course-list { display: flex; flex-direction: column; gap: 12px; }
-        .course-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--gray-50); border-radius: var(--radius-md); }
+        .course-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 16px; background: var(--white); 
+            border-radius: var(--radius-md); 
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-fast);
+        }
+        .course-item:hover { box-shadow: var(--shadow-md); }
+        .course-item .info { display: flex; align-items: center; gap: 12px; }
+        .course-item .thumb { 
+            width: 60px; height: 60px; border-radius: var(--radius-sm); 
+            object-fit: cover; background: var(--gray-200);
+        }
         .course-item .actions { display: flex; gap: 8px; }
-        .course-item .actions button { padding: 6px 12px; border: none; border-radius: var(--radius-sm); cursor: pointer; }
+        .course-item .actions button { 
+            padding: 8px 16px; border: none; border-radius: var(--radius-sm); 
+            cursor: pointer; font-weight: 500;
+        }
         .course-item .actions .edit { background: var(--sky-blue); color: var(--primary-blue); }
-        .course-item .actions .delete { background: var(--error); color: white; }
-        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .course-item .actions .delete { background: #fee2e2; color: var(--error); }
+        .course-item .actions .edit:hover { background: var(--primary-blue); color: white; }
+        .course-item .actions .delete:hover { background: var(--error); color: white; }
+        
+        .status-badge { 
+            padding: 4px 12px; border-radius: 20px; 
+            font-size: 0.8rem; font-weight: 600; 
+        }
         .status-badge.published { background: #d1fae5; color: #065f46; }
-        .status-badge.draft { background: #fee2e2; color: #991b1b; }
-        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
+        .status-badge.draft { background: #fef3c7; color: #92400e; }
+        
+        .checkbox-group {
+            display: flex;
+            gap: 24px;
+            margin-top: 8px;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) { 
+            .form-row { grid-template-columns: 1fr; }
+            .course-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .course-item .actions { width: 100%; }
+            .course-item .actions button { flex: 1; }
+        }
     </style>
 </head>
 <body class="admin-body">
+    <!-- Loading -->
+    <div id="loader" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.9);z-index:9999;display:none;align-items:center;justify-content:center;">
+        <i class="fas fa-spinner fa-spin" style="font-size:3rem;color:var(--primary-blue);"></i>
+    </div>
+
     <aside class="admin-sidebar">
         <div class="admin-logo"><a href="../index"><i class="fas fa-graduation-cap"></i> Djohparichat</a></div>
         <nav class="admin-nav">
@@ -50,76 +142,108 @@
             </ul>
         </nav>
     </aside>
+    
     <main class="admin-main">
         <header class="admin-header">
             <h1>จัดการคอร์สเรียน</h1>
             <div class="admin-user"><span id="adminEmail">admin@djohparichat.site</span><div class="admin-avatar"><i class="fas fa-user"></i></div></div>
         </header>
+        
         <div class="admin-content">
             <div class="admin-section">
                 <div class="section-header">
-                    <h2 id="formTitle">เพิ่มคอร์สใหม่</h2>
-                    <button class="btn btn-outline" id="cancelEdit" style="display:none;">ยกเลิก</button>
+                    <h2 id="formTitle"><i class="fas fa-plus-circle"></i> เพิ่มคอร์สใหม่</h2>
+                    <button class="btn btn-outline" id="cancelEdit" style="display:none;"><i class="fas fa-times"></i> ยกเลิก</button>
                 </div>
+                
                 <form id="courseForm" class="admin-form">
                     <input type="hidden" id="courseId">
+                    
                     <div class="form-row">
                         <div class="form-group">
                             <label>ชื่อคอร์ส (ไทย) *</label>
-                            <input type="text" id="titleTh" required>
+                            <input type="text" id="titleTh" required placeholder="เช่น ChatGPT สำหรับผู้เริ่มต้น">
                         </div>
                         <div class="form-group">
                             <label>ชื่อคอร์ส (อังกฤษ)</label>
-                            <input type="text" id="titleEn">
+                            <input type="text" id="titleEn" placeholder="เช่น ChatGPT for Beginners">
+                            <small>เว้นว่างไว้เพื่อแปลอัตโนมัติ</small>
                         </div>
                     </div>
+                    
                     <div class="form-row">
                         <div class="form-group">
                             <label>คำอธิบาย (ไทย) *</label>
-                            <textarea id="descTh" rows="3" required></textarea>
+                            <textarea id="descTh" rows="3" required placeholder="อธิบายเกี่ยวกับคอร์สนี้..."></textarea>
                         </div>
                         <div class="form-group">
                             <label>คำอธิบาย (อังกฤษ)</label>
-                            <textarea id="descEn" rows="3"></textarea>
+                            <textarea id="descEn" rows="3" placeholder="Course description..."></textarea>
+                            <small>เว้นว่างไว้เพื่อแปลอัตโนมัติ</small>
                         </div>
                     </div>
+                    
+                    <!-- Image Upload -->
+                    <div class="form-group">
+                        <label>รูปปกคอร์ส (แนะนำ: 800x600 px หรืออัตราส่วน 4:3)</label>
+                        <div class="image-upload" id="imageUpload">
+                            <i class="fas fa-cloud-upload-alt" style="font-size:2.5rem;color:var(--gray-400);margin-bottom:10px;"></i>
+                            <p>คลิกเพื่ออัปโหลดรูปภาพ หรือลากไฟล์มาที่นี่</p>
+                            <small>รองรับ: JPG, PNG, WebP (สูงสุด 5MB)</small>
+                            <img id="imagePreview" class="image-preview" alt="Preview">
+                            <button type="button" class="image-remove" id="removeImage" style="display:none;"><i class="fas fa-trash"></i> ลบรูป</button>
+                        </div>
+                        <input type="file" id="courseImage" accept="image/*" style="display:none;">
+                        <input type="hidden" id="imageUrl">
+                    </div>
+                    
                     <div class="form-row">
                         <div class="form-group">
-                            <label>ไอคอน (Font Awesome class)</label>
+                            <label>ไอคอน (Font Awesome)</label>
                             <input type="text" id="icon" placeholder="fa-robot" value="fa-robot">
+                            <small>เช่น fa-robot, fa-brain, fa-code</small>
                         </div>
                         <div class="form-group">
                             <label>ราคา (บาท)</label>
-                            <input type="number" id="price" min="0" value="0">
-                            <label style="margin-top:8px;"><input type="checkbox" id="isFree"> คอร์สฟรี</label>
+                            <input type="number" id="price" min="0" value="0" placeholder="0">
                         </div>
                     </div>
-                    <div class="form-group">
+                    
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" id="isFree"> คอร์สฟรี</label>
+                        <label><input type="checkbox" id="isFeatured"> แสดงเป็นคอร์สแนะนำ</label>
+                        <label><input type="checkbox" id="isPublished" checked> เผยแพร่ทันที</label>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top:16px;">
                         <label>คุณสมบัติ/สิ่งที่ได้เรียน</label>
                         <div class="features-list" id="featuresList">
-                            <div class="feature-item"><input type="text" class="feature-th" placeholder="ภาษาไทย"><input type="text" class="feature-en" placeholder="English"><button type="button" class="btn-remove" onclick="removeFeature(this)">×</button></div>
+                            <div class="feature-item">
+                                <input type="text" class="feature-th" placeholder="ภาษาไทย (เช่น เรียนรู้พื้นฐาน ChatGPT)">
+                                <input type="text" class="feature-en" placeholder="English (เช่น Learn ChatGPT basics)">
+                                <button type="button" class="btn-remove" onclick="removeFeature(this)" title="ลบ"><i class="fas fa-times"></i></button>
+                            </div>
                         </div>
-                        <button type="button" class="btn btn-outline btn-sm" onclick="addFeature()" style="margin-top:8px;">+ เพิ่มคุณสมบัติ</button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="addFeature()" style="margin-top:8px;">
+                            <i class="fas fa-plus"></i> เพิ่มคุณสมบัติ
+                        </button>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label><input type="checkbox" id="isFeatured"> แสดงเป็นคอร์สแนะนำ</label>
-                        </div>
-                        <div class="form-group">
-                            <label><input type="checkbox" id="isPublished" checked> เผยแพร่ทันที</label>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> บันทึกคอร์ส</button>
+                    
+                    <button type="submit" class="btn btn-primary" style="margin-top:24px;width:100%;padding:14px;">
+                        <i class="fas fa-save"></i> บันทึกคอร์ส
+                    </button>
                 </form>
             </div>
+            
             <div class="admin-section">
-                <h2>คอร์สทั้งหมด</h2>
+                <h2><i class="fas fa-list"></i> คอร์สทั้งหมด</h2>
                 <div id="coursesList" class="course-list">
-                    <p style="color:var(--gray-500)">กำลังโหลด...</p>
+                    <p style="color:var(--gray-500);text-align:center;padding:40px;"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</p>
                 </div>
             </div>
         </div>
     </main>
+
     <script type="module">
         import { config } from '../lib/config.js';
         const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
@@ -127,7 +251,8 @@
         // Check admin
         const { data: { session } } = await supabase.auth.getSession();
         if (!session || !(config.adminEmail?.includes?.(session.user.email) || Array.isArray(config.adminEmail) && config.adminEmail.includes(session.user.email))) {
-            alert('ไม่มีสิทธิ์เข้าถึง'); window.location.href = '../index';
+            alert('ไม่มีสิทธิ์เข้าถึง'); 
+            window.location.href = '../index';
         }
         document.getElementById('adminEmail').textContent = session.user.email;
         
@@ -135,120 +260,330 @@
         const form = document.getElementById('courseForm');
         const coursesList = document.getElementById('coursesList');
         const featuresList = document.getElementById('featuresList');
+        const imageUpload = document.getElementById('imageUpload');
+        const courseImage = document.getElementById('courseImage');
+        const imagePreview = document.getElementById('imagePreview');
+        const removeImage = document.getElementById('removeImage');
+        const imageUrl = document.getElementById('imageUrl');
+        
+        // Translation dictionary (แบบง่าย)
+        const translations = {
+            'ChatGPT สำหรับผู้เริ่มต้น': 'ChatGPT for Beginners',
+            'เรียนรู้พื้นฐานการใช้งาน ChatGPT': 'Learn the basics of using ChatGPT',
+            'สร้างสรรค์ภาพด้วย AI': 'Create Images with AI',
+            'เรียนรู้การใช้ Midjourney': 'Learn to use Midjourney',
+            'AI สำหรับธุรกิจ': 'AI for Business',
+            'นำ AI ไปใช้เพิ่มประสิทธิภาพ': 'Apply AI to improve efficiency'
+        };
+        
+        // Auto-translate function
+        function autoTranslate(thText) {
+            if (!thText) return '';
+            // Check dictionary first
+            if (translations[thText]) return translations[thText];
+            // Simple fallback: just return Thai text (you can integrate Google Translate API later)
+            return thText;
+        }
+        
+        // Image upload handling
+        imageUpload.addEventListener('click', () => courseImage.click());
+        
+        courseImage.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // Validate
+            if (!file.type.startsWith('image/')) {
+                alert('กรุณาเลือกไฟล์รูปภาพ');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                alert('ไฟล์ใหญ่เกินไป (สูงสุด 5MB)');
+                return;
+            }
+            
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                imagePreview.classList.add('show');
+                imageUpload.classList.add('has-image');
+                removeImage.style.display = 'inline-block';
+                imageUrl.value = e.target.result; // Base64 for now (for production, upload to Supabase Storage)
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        removeImage.addEventListener('click', () => {
+            imagePreview.src = '';
+            imagePreview.classList.remove('show');
+            imageUpload.classList.remove('has-image');
+            removeImage.style.display = 'none';
+            courseImage.value = '';
+            imageUrl.value = '';
+        });
         
         // Add/remove features
         window.addFeature = () => {
             const div = document.createElement('div');
             div.className = 'feature-item';
-            div.innerHTML = `<input type="text" class="feature-th" placeholder="ภาษาไทย"><input type="text" class="feature-en" placeholder="English"><button type="button" class="btn-remove" onclick="removeFeature(this)">×</button>`;
+            div.innerHTML = `
+                <input type="text" class="feature-th" placeholder="ภาษาไทย">
+                <input type="text" class="feature-en" placeholder="English">
+                <button type="button" class="btn-remove" onclick="removeFeature(this)" title="ลบ"><i class="fas fa-times"></i></button>
+            `;
             featuresList.appendChild(div);
         };
-        window.removeFeature = (btn) => btn.parentElement.remove();
+        
+        window.removeFeature = (btn) => {
+            if (featuresList.children.length > 1) {
+                btn.parentElement.remove();
+            } else {
+                alert('ต้องมีอย่างน้อย 1 คุณสมบัติ');
+            }
+        };
         
         // Load courses
         async function loadCourses() {
-            const { data } = await supabase.from('courses').select('*').order('created_at', { ascending: false });
-            coursesList.innerHTML = data?.map(c => `
-                <div class="course-item">
-                    <div>
-                        <strong>${c.title_th}</strong>
-                        <span class="status-badge ${c.published ? 'published' : 'draft'}">${c.published ? 'เผยแพร่' : 'ร่าง'}</span>
+            try {
+                const { data, error } = await supabase.from('courses').select('*').order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                if (!data || data.length === 0) {
+                    coursesList.innerHTML = '<p style="color:var(--gray-500);text-align:center;padding:40px;"><i class="fas fa-inbox"></i> ยังไม่มีคอร์ส</p>';
+                    return;
+                }
+                
+                coursesList.innerHTML = data.map(c => `
+                    <div class="course-item">
+                        <div class="info">
+                            <img src="${c.image_url || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23e5e7eb%22 width=%22100%22 height=%22100%22/><text fill=%22%239ca3af%22 x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22>No Image</text></svg>'}" 
+                                 class="thumb" alt="${c.title_th}" 
+                                 onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23e5e7eb%22 width=%22100%22 height=%22100%22/><text fill=%22%239ca3af%22 x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22>No Image</text></svg>'">
+                            <div>
+                                <strong>${c.title_th}</strong>
+                                <br><small style="color:var(--gray-500)">${c.description_th?.substring(0, 60)}...</small>
+                                <br><span class="status-badge ${c.published ? 'published' : 'draft'}">${c.published ? 'เผยแพร่' : 'ร่าง'}</span>
+                                ${c.is_featured ? '<span class="status-badge" style="background:#dbeafe;color:#1d4ed8;margin-left:8px;">แนะนำ</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="edit" onclick="editCourse('${c.id}')"><i class="fas fa-edit"></i> แก้ไข</button>
+                            <button class="delete" onclick="deleteCourse('${c.id}')"><i class="fas fa-trash"></i> ลบ</button>
+                        </div>
                     </div>
-                    <div class="actions">
-                        <button class="edit" onclick="editCourse('${c.id}')">แก้ไข</button>
-                        <button class="delete" onclick="deleteCourse('${c.id}')">ลบ</button>
-                    </div>
-                </div>
-            `).join('') || '<p style="color:var(--gray-500)">ยังไม่มีคอร์ส</p>';
+                `).join('');
+                
+            } catch (error) {
+                console.error('Load error:', error);
+                coursesList.innerHTML = `<p style="color:var(--error);text-align:center;padding:40px;"><i class="fas fa-exclamation-circle"></i> โหลดข้อมูลไม่สำเร็จ: ${error.message}</p>`;
+            }
         }
         
         // Edit course
         window.editCourse = async (id) => {
-            const { data } = await supabase.from('courses').select('*').eq('id', id).single();
-            if (!data) return;
-            document.getElementById('formTitle').textContent = 'แก้ไขคอร์ส';
-            document.getElementById('courseId').value = data.id;
-            document.getElementById('titleTh').value = data.title_th;
-            document.getElementById('titleEn').value = data.title_en || '';
-            document.getElementById('descTh').value = data.description_th;
-            document.getElementById('descEn').value = data.description_en || '';
-            document.getElementById('icon').value = data.icon || 'fa-robot';
-            document.getElementById('price').value = data.price || 0;
-            document.getElementById('isFree').checked = data.is_free;
-            document.getElementById('isFeatured').checked = data.is_featured;
-            document.getElementById('isPublished').checked = data.published;
-            featuresList.innerHTML = '';
-            (data.features || []).forEach(f => {
-                const div = document.createElement('div');
-                div.className = 'feature-item';
-                div.innerHTML = `<input type="text" class="feature-th" value="${f.th}" placeholder="ภาษาไทย"><input type="text" class="feature-en" value="${f.en||''}" placeholder="English"><button type="button" class="btn-remove" onclick="removeFeature(this)">×</button>`;
-                featuresList.appendChild(div);
-            });
-            document.getElementById('cancelEdit').style.display = 'inline-block';
-            form.scrollIntoView({ behavior: 'smooth' });
+            try {
+                const { data, error } = await supabase.from('courses').select('*').eq('id', id).single();
+                if (error) throw error;
+                if (!data) return;
+                
+                document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit"></i> แก้ไขคอร์ส';
+                document.getElementById('courseId').value = data.id;
+                document.getElementById('titleTh').value = data.title_th || '';
+                document.getElementById('titleEn').value = data.title_en || '';
+                document.getElementById('descTh').value = data.description_th || '';
+                document.getElementById('descEn').value = data.description_en || '';
+                document.getElementById('icon').value = data.icon || 'fa-robot';
+                document.getElementById('price').value = data.price || 0;
+                document.getElementById('isFree').checked = data.is_free || false;
+                document.getElementById('isFeatured').checked = data.is_featured || false;
+                document.getElementById('isPublished').checked = data.published || false;
+                
+                // Load image
+                if (data.image_url) {
+                    imagePreview.src = data.image_url;
+                    imagePreview.classList.add('show');
+                    imageUpload.classList.add('has-image');
+                    removeImage.style.display = 'inline-block';
+                    imageUrl.value = data.image_url;
+                }
+                
+                // Load features
+                featuresList.innerHTML = '';
+                (data.features || []).forEach(f => {
+                    const div = document.createElement('div');
+                    div.className = 'feature-item';
+                    div.innerHTML = `
+                        <input type="text" class="feature-th" value="${f.th || ''}" placeholder="ภาษาไทย">
+                        <input type="text" class="feature-en" value="${f.en || ''}" placeholder="English">
+                        <button type="button" class="btn-remove" onclick="removeFeature(this)" title="ลบ"><i class="fas fa-times"></i></button>
+                    `;
+                    featuresList.appendChild(div);
+                });
+                // Ensure at least one feature row
+                if ((data.features || []).length === 0) {
+                    window.addFeature();
+                }
+                
+                document.getElementById('cancelEdit').style.display = 'inline-block';
+                form.scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                console.error('Edit error:', error);
+                alert('ไม่สามารถโหลดข้อมูลคอร์ส: ' + error.message);
+            }
         };
         
         // Delete course
         window.deleteCourse = async (id) => {
-            if (!confirm('ยืนยันการลบคอร์สนี้?')) return;
-            await supabase.from('courses').delete().eq('id', id);
-            loadCourses();
+            if (!confirm('ยืนยันการลบคอร์สนี้?\nการกระทำนี้จะไม่สามารถกู้คืนได้')) return;
+            
+            try {
+                const { error } = await supabase.from('courses').delete().eq('id', id);
+                if (error) throw error;
+                
+                alert('ลบคอร์สสำเร็จ');
+                loadCourses();
+                
+            } catch (error) {
+                console.error('Delete error:', error);
+                alert('ลบคอร์สไม่สำเร็จ: ' + error.message);
+            }
         };
         
         // Submit form
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const features = [];
-            document.querySelectorAll('.feature-item').forEach(item => {
-                const th = item.querySelector('.feature-th').value.trim();
-                const en = item.querySelector('.feature-en').value.trim();
-                if (th) features.push({ th, en });
-            });
-            const course = {
-                title_th: document.getElementById('titleTh').value,
-                title_en: document.getElementById('titleEn').value || null,
-                description_th: document.getElementById('descTh').value,
-                description_en: document.getElementById('descEn').value || null,
-                icon: document.getElementById('icon').value || 'fa-robot',
-                price: parseInt(document.getElementById('price').value) || 0,
-                is_free: document.getElementById('isFree').checked,
-                is_featured: document.getElementById('isFeatured').checked,
-                published: document.getElementById('isPublished').checked,
-                features: features,
-                updated_at: new Date().toISOString()
-            };
-            const id = document.getElementById('courseId').value;
-            const { error } = id 
-                ? await supabase.from('courses').update(course).eq('id', id)
-                : await supabase.from('courses').insert([{ ...course, created_at: new Date().toISOString() }]);
-            if (error) { alert('บันทึกไม่สำเร็จ: ' + error.message); return; }
-            alert('บันทึกสำเร็จ!');
-            form.reset();
-            document.getElementById('courseId').value = '';
-            document.getElementById('formTitle').textContent = 'เพิ่มคอร์สใหม่';
-            document.getElementById('cancelEdit').style.display = 'none';
-            featuresList.innerHTML = '<div class="feature-item"><input type="text" class="feature-th" placeholder="ภาษาไทย"><input type="text" class="feature-en" placeholder="English"><button type="button" class="btn-remove" onclick="removeFeature(this)">×</button></div>';
-            loadCourses();
+            
+            // Show loader
+            document.getElementById('loader').style.display = 'flex';
+            
+            try {
+                // Collect features
+                const features = [];
+                document.querySelectorAll('.feature-item').forEach(item => {
+                    const th = item.querySelector('.feature-th').value.trim();
+                    const en = item.querySelector('.feature-en').value.trim();
+                    if (th) {
+                        features.push({ 
+                            th: th, 
+                            en: en || autoTranslate(th) 
+                        });
+                    }
+                });
+                
+                // Auto-translate if English fields are empty
+                const titleEnVal = document.getElementById('titleEn').value.trim() || autoTranslate(document.getElementById('titleTh').value);
+                const descEnVal = document.getElementById('descEn').value.trim() || autoTranslate(document.getElementById('descTh').value);
+                
+                const course = {
+                    title_th: document.getElementById('titleTh').value.trim(),
+                    title_en: titleEnVal,
+                    description_th: document.getElementById('descTh').value.trim(),
+                    description_en: descEnVal,
+                    icon: document.getElementById('icon').value || 'fa-robot',
+                    image_url: imageUrl.value || null,
+                    price: parseInt(document.getElementById('price').value) || 0,
+                    is_free: document.getElementById('isFree').checked,
+                    is_featured: document.getElementById('isFeatured').checked,
+                    published: document.getElementById('isPublished').checked,
+                    features: features,
+                    updated_at: new Date().toISOString()
+                };
+                
+                const id = document.getElementById('courseId').value;
+                let error;
+                
+                if (id) {
+                    // Update existing
+                    const result = await supabase.from('courses').update(course).eq('id', id);
+                    error = result.error;
+                } else {
+                    // Insert new
+                    const result = await supabase.from('courses').insert([{ 
+                        ...course, 
+                        created_at: new Date().toISOString() 
+                    }]);
+                    error = result.error;
+                }
+                
+                if (error) throw error;
+                
+                alert('บันทึกคอร์สสำเร็จ!');
+                
+                // Reset form
+                form.reset();
+                document.getElementById('courseId').value = '';
+                document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle"></i> เพิ่มคอร์สใหม่';
+                document.getElementById('cancelEdit').style.display = 'none';
+                
+                // Reset image
+                imagePreview.src = '';
+                imagePreview.classList.remove('show');
+                imageUpload.classList.remove('has-image');
+                removeImage.style.display = 'none';
+                imageUrl.value = '';
+                courseImage.value = '';
+                
+                // Reset features
+                featuresList.innerHTML = `
+                    <div class="feature-item">
+                        <input type="text" class="feature-th" placeholder="ภาษาไทย">
+                        <input type="text" class="feature-en" placeholder="English">
+                        <button type="button" class="btn-remove" onclick="removeFeature(this)" title="ลบ"><i class="fas fa-times"></i></button>
+                    </div>
+                `;
+                
+                // Reload list
+                await loadCourses();
+                
+            } catch (error) {
+                console.error('Save error:', error);
+                alert('บันทึกไม่สำเร็จ: ' + error.message);
+            } finally {
+                // Hide loader
+                document.getElementById('loader').style.display = 'none';
+            }
         });
         
         // Cancel edit
         document.getElementById('cancelEdit').addEventListener('click', () => {
             form.reset();
             document.getElementById('courseId').value = '';
-            document.getElementById('formTitle').textContent = 'เพิ่มคอร์สใหม่';
+            document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle"></i> เพิ่มคอร์สใหม่';
             document.getElementById('cancelEdit').style.display = 'none';
-            featuresList.innerHTML = '<div class="feature-item"><input type="text" class="feature-th" placeholder="ภาษาไทย"><input type="text" class="feature-en" placeholder="English"><button type="button" class="btn-remove" onclick="removeFeature(this)">×</button></div>';
+            
+            // Reset image
+            imagePreview.src = '';
+            imagePreview.classList.remove('show');
+            imageUpload.classList.remove('has-image');
+            removeImage.style.display = 'none';
+            imageUrl.value = '';
+            courseImage.value = '';
+            
+            // Reset features
+            featuresList.innerHTML = `
+                <div class="feature-item">
+                    <input type="text" class="feature-th" placeholder="ภาษาไทย">
+                    <input type="text" class="feature-en" placeholder="English">
+                    <button type="button" class="btn-remove" onclick="removeFeature(this)" title="ลบ"><i class="fas fa-times"></i></button>
+                </div>
+            `;
         });
         
         // Logout
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
             e.preventDefault();
-            await supabase.auth.signOut();
-            window.location.href = '../index';
+            if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
+                await supabase.auth.signOut();
+                window.location.href = '../index';
+            }
         });
         
         // Init
-        loadCourses();
+        console.log('Courses admin page loaded');
+        await loadCourses();
     </script>
 </body>
 </html>
