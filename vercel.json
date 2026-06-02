@@ -1,29 +1,15 @@
 {
   "version": 2,
   "rewrites": [
-    {
-      "source": "/admin/:path((?!.*\\.).*)",
-      "destination": "/admin/:path.html"
-    },
-    {
-      "source": "/pages/:path((?!.*\\.).*)",
-      "destination": "/pages/:path.html"
-    },
-    {
-      "source": "/:path((?!.*\\.).*)",
-      "destination": "/:path.html"
-    }
+    { "source": "/admin/:path((?!.*\\.).*)", "destination": "/admin/:path.html" },
+    { "source": "/pages/:path((?!.*\\.).*)", "destination": "/pages/:path.html" },
+    { "source": "/:path((?!.*\\.).*)", "destination": "/:path.html" }
   ],
   "redirects": [],
   "headers": [
     {
       "source": "/assets/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     }
   ]
 }
