@@ -3,14 +3,467 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>การตั้งค่า | Admin - Djohparichat</title>
+    <title>จัดการหน้าเกี่ยวกับเรา | Admin - Djohparichat</title>
+    
+    <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* ========== SETTINGS LAYOUT ========== */
+        .settings-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        @media (max-width: 1024px) {
+            .settings-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* ========== EDITOR PANEL ========== */
+        .editor-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+        
+        .editor-section {
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .editor-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .editor-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .editor-section-title i {
+            color: #1e88e5;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: #475569;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #1e88e5;
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+        }
+        
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        @media (max-width: 640px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Image Upload */
+        .image-upload {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 32px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+        
+        .image-upload:hover {
+            border-color: #1e88e5;
+            background: #f0f9ff;
+        }
+        
+        .image-upload i {
+            font-size: 3rem;
+            color: #94a3b8;
+            margin-bottom: 12px;
+            display: block;
+        }
+        
+        .image-upload-title {
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 4px;
+        }
+        
+        .image-upload-desc {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        
+        .image-upload input[type="file"] {
+            display: none;
+        }
+        
+        .current-image {
+            margin-top: 16px;
+            text-align: center;
+        }
+        
+        .current-image img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .current-image small {
+            display: block;
+            color: #64748b;
+            margin-top: 8px;
+            font-size: 0.85rem;
+        }
+        
+        /* ========== PREVIEW PANEL ========== */
+        .preview-panel {
+            position: sticky;
+            top: 100px;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        
+        .preview-header {
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .preview-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .preview-header .preview-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .preview-body {
+            padding: 24px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+        
+        /* Preview Content Styles (เหมือนหน้า about จริง) */
+        .preview-about {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 32px;
+            align-items: center;
+        }
+        
+        @media (max-width: 768px) {
+            .preview-about {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .preview-image {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        
+        .preview-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            aspect-ratio: 4/5;
+            object-fit: cover;
+        }
+        
+        .preview-image-placeholder {
+            width: 100%;
+            aspect-ratio: 4/5;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1e88e5;
+            font-size: 4rem;
+        }
+        
+        .preview-experience-badge {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .preview-experience-badge .years {
+            display: block;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e88e5;
+            line-height: 1;
+        }
+        
+        .preview-experience-badge .text {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+        
+        .preview-content .preview-subtitle {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #f0f9ff;
+            color: #1e88e5;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .preview-content .preview-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 16px;
+            line-height: 1.3;
+        }
+        
+        .preview-content .preview-text {
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0 0 24px;
+        }
+        
+        .preview-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        @media (max-width: 480px) {
+            .preview-features {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .preview-feature {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        
+        .preview-feature-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1e88e5;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        
+        .preview-feature h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0 0 4px;
+        }
+        
+        .preview-feature p {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin: 0;
+            line-height: 1.4;
+        }
+        
+        /* ========== ACTION BAR ========== */
+        .action-bar {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 16px 28px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            z-index: 10;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
+        }
+        
+        .btn-outline {
+            background: white;
+            color: #64748b;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .btn-outline:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        /* ========== TOAST ========== */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            font-size: 0.9rem;
+            z-index: 10000;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        
+        /* ========== LOADING ========== */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            border-radius: 16px;
+        }
+        
+        .loading-overlay.hidden {
+            display: none;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #1e88e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body class="admin-body">
+    <!-- Sidebar -->
     <aside class="admin-sidebar">
         <div class="admin-logo"><h2>Djohparichat</h2></div>
         <nav class="admin-nav">
@@ -26,68 +479,585 @@
         </nav>
     </aside>
 
+    <!-- Main Content -->
     <main class="admin-main">
         <header class="admin-header">
-            <h1 data-th="การตั้งค่า" data-en="Settings">การตั้งค่า</h1>
+            <h1 data-th="จัดการหน้าเกี่ยวกับเรา" data-en="Manage About Page">จัดการหน้าเกี่ยวกับเรา</h1>
             <div class="admin-user">
-                <span data-th="ผู้ดูแลระบบ" data-en="Admin">ผู้ดูแลระบบ</span>
+                <span id="adminEmail">ผู้ดูแลระบบ</span>
                 <div style="width: 40px; height: 40px; background: var(--primary-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;"><i class="fas fa-user"></i></div>
             </div>
         </header>
 
-        <div class="admin-content">
-            <div class="admin-section">
-                <h2 data-th="ข้อมูลเว็บไซต์" data-en="Website Information">ข้อมูลเว็บไซต์</h2>
-                <form class="admin-form">
-                    <div class="admin-form-group">
-                        <label data-th="ชื่อเว็บไซต์ (ไทย)" data-en="Site Name (Thai)">ชื่อเว็บไซต์ (ไทย)</label>
-                        <input type="text" value="Djohparichat - เรียนรู้ AI และประกันชีวิต">
+        <div class="settings-container">
+            <!-- Editor Panel (Left) -->
+            <div class="editor-panel">
+                <form id="settingsForm">
+                    <!-- Main Image Section -->
+                    <div class="editor-section">
+                        <div class="editor-section-title">
+                            <i class="fas fa-image"></i>
+                            รูปภาพหลัก
+                        </div>
+                        
+                        <div class="image-upload" id="imageUploadZone">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <div class="image-upload-title">คลิกหรือลากไฟล์มาวางที่นี่</div>
+                            <div class="image-upload-desc">รองรับ JPG, PNG (สูงสุด 5MB)</div>
+                            <input type="file" id="mainImageInput" accept="image/*">
+                        </div>
+                        
+                        <div class="current-image" id="currentImageContainer" style="display:none;">
+                            <img src="" alt="Current" id="currentImagePreview">
+                            <small>รูปภาพปัจจุบัน</small>
+                        </div>
                     </div>
-                    <div class="admin-form-group">
-                        <label data-th="ชื่อเว็บไซต์ (อังกฤษ)" data-en="Site Name (English)">ชื่อเว็บไซต์ (อังกฤษ)</label>
-                        <input type="text" value="Djohparichat - Learn AI & Insurance">
+                    
+                    <!-- Title Section -->
+                    <div class="editor-section">
+                        <div class="editor-section-title">
+                            <i class="fas fa-heading"></i>
+                            หัวข้อหลัก
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>หัวข้อ (ไทย)</label>
+                                <input type="text" id="titleTh" data-key="title_th" placeholder="เช่น ผู้เชี่ยวชาญด้าน AI และประกันชีวิต">
+                            </div>
+                            <div class="form-group">
+                                <label>หัวข้อ (อังกฤษ)</label>
+                                <input type="text" id="titleEn" data-key="title_en" placeholder="เช่น AI & Life Insurance Expert">
+                            </div>
+                        </div>
                     </div>
-                    <div class="admin-form-group">
-                        <label data-th="คำอธิบายเว็บไซต์" data-en="Site Description">คำอธิบายเว็บไซต์</label>
-                        <textarea rows="3">ผู้เชี่ยวชาญด้าน AI และประกันชีวิต</textarea>
+                    
+                    <!-- Description Section -->
+                    <div class="editor-section">
+                        <div class="editor-section-title">
+                            <i class="fas fa-paragraph"></i>
+                            คำอธิบาย
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>คำอธิบาย (ไทย)</label>
+                            <textarea id="descTh" data-key="description_th" placeholder="เขียนคำอธิบายเกี่ยวกับบริษัทของคุณ..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>คำอธิบาย (อังกฤษ)</label>
+                            <textarea id="descEn" data-key="description_en" placeholder="Write about your company..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Experience Years -->
+                    <div class="editor-section">
+                        <div class="editor-section-title">
+                            <i class="fas fa-medal"></i>
+                            ป้ายประสบการณ์
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>จำนวนปี (เช่น 10+)</label>
+                            <input type="text" id="expYears" data-key="experience_years" placeholder="10+" maxlength="10">
+                        </div>
+                    </div>
+                    
+                    <!-- Features Section -->
+                    <div class="editor-section">
+                        <div class="editor-section-title">
+                            <i class="fas fa-list"></i>
+                            จุดเด่น (2 รายการ)
+                        </div>
+                        
+                        <!-- Feature 1 -->
+                        <div style="margin-bottom: 24px; padding: 16px; background: #f8fafc; border-radius: 10px;">
+                            <div style="font-weight: 600; color: #1e88e5; margin-bottom: 12px;">รายการที่ 1</div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>หัวข้อ (ไทย)</label>
+                                    <input type="text" id="feat1TitleTh" data-key="feature_1_title_th" placeholder="เช่น ได้รับการรับรอง">
+                                </div>
+                                <div class="form-group">
+                                    <label>หัวข้อ (อังกฤษ)</label>
+                                    <input type="text" id="feat1TitleEn" data-key="feature_1_title_en" placeholder="เช่น Certified">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>คำอธิบาย (ไทย)</label>
+                                    <input type="text" id="feat1DescTh" data-key="feature_1_desc_th" placeholder="เช่น ผู้เชี่ยวชาญด้าน AI และประกัน">
+                                </div>
+                                <div class="form-group">
+                                    <label>คำอธิบาย (อังกฤษ)</label>
+                                    <input type="text" id="feat1DescEn" data-key="feature_1_desc_en" placeholder="เช่น AI & Insurance expert">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Feature 2 -->
+                        <div style="padding: 16px; background: #f8fafc; border-radius: 10px;">
+                            <div style="font-weight: 600; color: #1e88e5; margin-bottom: 12px;">รายการที่ 2</div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>หัวข้อ (ไทย)</label>
+                                    <input type="text" id="feat2TitleTh" data-key="feature_2_title_th" placeholder="เช่น ใส่ใจทุกรายละเอียด">
+                                </div>
+                                <div class="form-group">
+                                    <label>หัวข้อ (อังกฤษ)</label>
+                                    <input type="text" id="feat2TitleEn" data-key="feature_2_title_en" placeholder="เช่น Attention to detail">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>คำอธิบาย (ไทย)</label>
+                                    <input type="text" id="feat2DescTh" data-key="feature_2_desc_th" placeholder="เช่น ดูแลด้วยความห่วงใย">
+                                </div>
+                                <div class="form-group">
+                                    <label>คำอธิบาย (อังกฤษ)</label>
+                                    <input type="text" id="feat2DescEn" data-key="feature_2_desc_en" placeholder="เช่น Care with concern">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
-            </div>
-
-            <div class="admin-section">
-                <h2 data-th="ข้อมูลติดต่อ" data-en="Contact Information">ข้อมูลติดต่อ</h2>
-                <form class="admin-form">
-                    <div class="admin-form-group">
-                        <label data-th="โทรศัพท์" data-en="Phone">โทรศัพท์</label>
-                        <input type="tel" value="+66 XX XXX XXXX">
-                    </div>
-                    <div class="admin-form-group">
-                        <label data-th="อีเมล" data-en="Email">อีเมล</label>
-                        <input type="email" value="contact@djohparichat.site">
-                    </div>
-                    <div class="admin-form-group">
-                        <label data-th="ที่อยู่" data-en="Address">ที่อยู่</label>
-                        <textarea rows="2">กรุงเทพมหานคร, ประเทศไทย</textarea>
-                    </div>
-                </form>
-            </div>
-
-            <div class="admin-section">
-                <h2 data-th="โลโก้เว็บไซต์" data-en="Website Logo">โลโก้เว็บไซต์</h2>
-                <div class="image-upload">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p data-th="คลิกหรือลากไฟล์มาวางที่นี่" data-en="Click or drag files here">คลิกหรือลากไฟล์มาวางที่นี่</p>
+                
+                <!-- Action Bar -->
+                <div class="action-bar">
+                    <button type="button" class="btn btn-outline" id="resetBtn">
+                        <i class="fas fa-undo"></i> รีเซ็ต
+                    </button>
+                    <button type="button" class="btn btn-primary" id="saveBtn">
+                        <i class="fas fa-save"></i> บันทึกการเปลี่ยนแปลง
+                    </button>
                 </div>
             </div>
-
-            <button class="btn btn-primary" style="margin-top: 20px;">
-                <i class="fas fa-save"></i>
-                <span data-th="บันทึกการตั้งค่า" data-en="Save Settings">บันทึกการตั้งค่า</span>
-            </button>
+            
+            <!-- Preview Panel (Right) -->
+            <div class="preview-panel">
+                <div class="preview-header">
+                    <h3><i class="fas fa-eye"></i> ตัวอย่างหน้าเว็บไซต์</h3>
+                    <span class="preview-badge">Live Preview</span>
+                </div>
+                <div class="preview-body">
+                    <div class="preview-about">
+                        <!-- Preview Image -->
+                        <div class="preview-image">
+                            <img src="" alt="Preview" id="previewImage" style="display:none;">
+                            <div class="preview-image-placeholder" id="previewImagePlaceholder">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div class="preview-experience-badge">
+                                <span class="years" id="previewExpYears">10+</span>
+                                <span class="text">ปีประสบการณ์</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Preview Content -->
+                        <div class="preview-content">
+                            <span class="preview-subtitle">เกี่ยวกับเรา</span>
+                            <h2 class="preview-title" id="previewTitle">กำลังโหลด...</h2>
+                            <p class="preview-text" id="previewDesc">กำลังโหลดเนื้อหา...</p>
+                            
+                            <div class="preview-features">
+                                <div class="preview-feature">
+                                    <div class="preview-feature-icon"><i class="fas fa-certificate"></i></div>
+                                    <div>
+                                        <h4 id="previewFeat1Title">กำลังโหลด...</h4>
+                                        <p id="previewFeat1Desc">กำลังโหลด...</p>
+                                    </div>
+                                </div>
+                                <div class="preview-feature">
+                                    <div class="preview-feature-icon"><i class="fas fa-heart"></i></div>
+                                    <div>
+                                        <h4 id="previewFeat2Title">กำลังโหลด...</h4>
+                                        <p id="previewFeat2Desc">กำลังโหลด...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
-    <button class="admin-mobile-toggle"><i class="fas fa-bars"></i></button>
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">บันทึกสำเร็จ!</span>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Scripts -->
     <script src="../assets/js/admin.js"></script>
+    
+    <!-- Settings Script -->
+    <script type="module">
+        // ========== CONFIG ==========
+        let config;
+        try {
+            const configModule = await import('../lib/config.js');
+            config = configModule.config;
+        } catch (e) {
+            config = {
+                supabaseUrl: 'https://srtsdminbdmxtvjgriev.supabase.co',
+                supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNydHNkbWluYmRteHR2amdyaWV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY4OTU2NzMsImV4cCI6MjA1MjQ3MTY3M30.XYZ123',
+                adminEmail: ['jusduy40@gmail.com']
+            };
+        }
+        
+        const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+        
+        // ========== STATE ==========
+        let currentUser = null;
+        let isAdmin = false;
+        let contentData = {};
+        let realtimeSubscription = null;
+
+        // ========== DOM ELEMENTS ==========
+        const form = document.getElementById('settingsForm');
+        const saveBtn = document.getElementById('saveBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const adminEmailEl = document.getElementById('adminEmail');
+        
+        // Form inputs
+        const inputs = {
+            'title_th': document.getElementById('titleTh'),
+            'title_en': document.getElementById('titleEn'),
+            'description_th': document.getElementById('descTh'),
+            'description_en': document.getElementById('descEn'),
+            'experience_years': document.getElementById('expYears'),
+            'feature_1_title_th': document.getElementById('feat1TitleTh'),
+            'feature_1_title_en': document.getElementById('feat1TitleEn'),
+            'feature_1_desc_th': document.getElementById('feat1DescTh'),
+            'feature_1_desc_en': document.getElementById('feat1DescEn'),
+            'feature_2_title_th': document.getElementById('feat2TitleTh'),
+            'feature_2_title_en': document.getElementById('feat2TitleEn'),
+            'feature_2_desc_th': document.getElementById('feat2DescTh'),
+            'feature_2_desc_en': document.getElementById('feat2DescEn'),
+        };
+        
+        // Preview elements
+        const preview = {
+            'title_th': document.getElementById('previewTitle'),
+            'description_th': document.getElementById('previewDesc'),
+            'experience_years': document.getElementById('previewExpYears'),
+            'feature_1_title_th': document.getElementById('previewFeat1Title'),
+            'feature_1_desc_th': document.getElementById('previewFeat1Desc'),
+            'feature_2_title_th': document.getElementById('previewFeat2Title'),
+            'feature_2_desc_th': document.getElementById('previewFeat2Desc'),
+        };
+        
+        // Image elements
+        const mainImageInput = document.getElementById('mainImageInput');
+        const imageUploadZone = document.getElementById('imageUploadZone');
+        const currentImageContainer = document.getElementById('currentImageContainer');
+        const currentImagePreview = document.getElementById('currentImagePreview');
+        const previewImage = document.getElementById('previewImage');
+        const previewImagePlaceholder = document.getElementById('previewImagePlaceholder');
+
+        // ========== AUTH CHECK ==========
+        async function checkAuth() {
+            const { data } = await supabase.auth.getSession();
+            currentUser = data?.session?.user || null;
+            
+            if (!currentUser) {
+                window.location.href = 'login';
+                return;
+            }
+            
+            adminEmailEl.textContent = currentUser.email?.split('@')[0] || 'Admin';
+            
+            const adminEmails = Array.isArray(config.adminEmail) ? config.adminEmail : [config.adminEmail].filter(e => e);
+            isAdmin = adminEmails.length > 0 && adminEmails.includes(currentUser.email);
+            
+            if (!isAdmin) {
+                alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
+                window.location.href = '../index';
+            }
+        }
+
+        // ========== LOAD CONTENT ==========
+        async function loadContent() {
+            showLoading(true);
+            
+            const { data, error } = await supabase
+                .from('about_content')
+                .select('*');
+            
+            showLoading(false);
+            
+            if (error) {
+                console.error('Load error:', error);
+                showToast('โหลดข้อมูลไม่สำเร็จ: ' + error.message, 'error');
+                return;
+            }
+            
+            // Map data
+            contentData = {};
+            data.forEach(item => {
+                contentData[item.key] = item.value;
+            });
+            
+            // Fill form inputs
+            Object.keys(inputs).forEach(key => {
+                if (inputs[key] && contentData[key]) {
+                    inputs[key].value = contentData[key];
+                }
+            });
+            
+            // Update preview
+            updatePreview();
+            
+            // Update image
+            if (contentData['main_image']) {
+                currentImagePreview.src = contentData['main_image'];
+                previewImage.src = contentData['main_image'];
+                currentImagePreview.style.display = 'block';
+                previewImage.style.display = 'block';
+                currentImageContainer.style.display = 'block';
+                previewImagePlaceholder.style.display = 'none';
+            }
+        }
+
+        // ========== UPDATE PREVIEW ==========
+        function updatePreview() {
+            // Update text previews
+            Object.keys(preview).forEach(key => {
+                if (preview[key] && inputs[key]) {
+                    preview[key].textContent = inputs[key].value || preview[key].dataset.placeholder || '';
+                }
+            });
+        }
+
+        // ========== SAVE CONTENT ==========
+        async function saveContent() {
+            showLoading(true);
+            
+            let hasError = false;
+            
+            // Save text fields
+            for (const [key, input] of Object.entries(inputs)) {
+                if (input && input.value !== contentData[key]) {
+                    const { error } = await supabase
+                        .from('about_content')
+                        .upsert({ 
+                            key, 
+                            value: input.value, 
+                            type: 'text',
+                            updated_at: new Date().toISOString()
+                        });
+                    
+                    if (error) {
+                        console.error(`Error saving ${key}:`, error);
+                        hasError = true;
+                    }
+                }
+            }
+            
+            showLoading(false);
+            
+            if (hasError) {
+                showToast('บันทึกบางส่วนไม่สำเร็จ', 'error');
+            } else {
+                showToast('บันทึกสำเร็จ!', 'success');
+                // Reload to get fresh data
+                await loadContent();
+            }
+        }
+
+        // ========== IMAGE UPLOAD ==========
+        async function handleImageUpload(file) {
+            if (!file) return;
+            
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('ไฟล์ใหญ่เกินไป (สูงสุด 5MB)', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                // Upload to Supabase Storage
+                const fileExt = file.name.split('.').pop();
+                const fileName = `about-main-${Date.now()}.${fileExt}`;
+                
+                const { error: uploadError } = await supabase.storage
+                    .from('about-images')
+                    .upload(fileName, file);
+                
+                if (uploadError) throw uploadError;
+                
+                // Get public URL
+                const { data: { publicUrl } } = supabase.storage
+                    .from('about-images')
+                    .getPublicUrl(fileName);
+                
+                // Update database
+                const { error: dbError } = await supabase
+                    .from('about_content')
+                    .upsert({ 
+                        key: 'main_image', 
+                        value: publicUrl, 
+                        type: 'image',
+                        updated_at: new Date().toISOString()
+                    });
+                
+                if (dbError) throw dbError;
+                
+                // Update UI
+                currentImagePreview.src = publicUrl;
+                previewImage.src = publicUrl;
+                currentImagePreview.style.display = 'block';
+                previewImage.style.display = 'block';
+                currentImageContainer.style.display = 'block';
+                previewImagePlaceholder.style.display = 'none';
+                
+                contentData['main_image'] = publicUrl;
+                
+                showToast('อัปโหลดรูปภาพสำเร็จ!', 'success');
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                showToast('อัปโหลดไม่สำเร็จ: ' + error.message, 'error');
+            }
+            
+            showLoading(false);
+            mainImageInput.value = '';
+        }
+
+        // ========== REALTIME UPDATES ==========
+        function setupRealtime() {
+            realtimeSubscription = supabase
+                .channel('about_content_admin')
+                .on('postgres_changes', {
+                    event: '*',
+                    schema: 'public',
+                    table: 'about_content'
+                }, (payload) => {
+                    if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
+                        const { key, value, type } = payload.new;
+                        
+                        // Update form if it exists
+                        if (inputs[key]) {
+                            inputs[key].value = value;
+                        }
+                        
+                        // Update preview
+                        if (preview[key]) {
+                            preview[key].textContent = value;
+                        }
+                        
+                        // Update image
+                        if (key === 'main_image' && type === 'image') {
+                            currentImagePreview.src = value;
+                            previewImage.src = value;
+                            currentImagePreview.style.display = 'block';
+                            previewImage.style.display = 'block';
+                            currentImageContainer.style.display = 'block';
+                            previewImagePlaceholder.style.display = 'none';
+                        }
+                        
+                        // Update local data
+                        contentData[key] = value;
+                    }
+                })
+                .subscribe();
+        }
+
+        // ========== EVENT LISTENERS ==========
+        function setupListeners() {
+            // Input change -> update preview
+            Object.values(inputs).forEach(input => {
+                if (input) {
+                    input.addEventListener('input', updatePreview);
+                }
+            });
+            
+            // Save button
+            saveBtn.addEventListener('click', saveContent);
+            
+            // Reset button
+            resetBtn.addEventListener('click', async () => {
+                if (confirm('ต้องการรีเซ็ตฟอร์มเป็นค่าเดิมจากฐานข้อมูล?')) {
+                    await loadContent();
+                    showToast('รีเซ็ตสำเร็จ', 'success');
+                }
+            });
+            
+            // Image upload - click
+            imageUploadZone.addEventListener('click', () => mainImageInput.click());
+            
+            // Image upload - drag & drop
+            imageUploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                imageUploadZone.style.borderColor = '#1e88e5';
+                imageUploadZone.style.background = '#f0f9ff';
+            });
+            
+            imageUploadZone.addEventListener('dragleave', () => {
+                imageUploadZone.style.borderColor = '#cbd5e1';
+                imageUploadZone.style.background = '#f8fafc';
+            });
+            
+            imageUploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                imageUploadZone.style.borderColor = '#cbd5e1';
+                imageUploadZone.style.background = '#f8fafc';
+                
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    handleImageUpload(file);
+                }
+            });
+            
+            // Image input change
+            mainImageInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) handleImageUpload(file);
+            });
+        }
+
+        // ========== UTILS ==========
+        function showToast(message, type = 'success') {
+            toastMessage.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        function showLoading(show) {
+            if (show) {
+                loadingOverlay.classList.remove('hidden');
+                saveBtn.disabled = true;
+            } else {
+                loadingOverlay.classList.add('hidden');
+                saveBtn.disabled = false;
+            }
+        }
+
+        // ========== INIT ==========
+        async function init() {
+            await checkAuth();
+            await loadContent();
+            setupListeners();
+            setupRealtime();
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
 </body>
 </html>
