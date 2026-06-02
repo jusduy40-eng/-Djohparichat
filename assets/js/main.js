@@ -404,3 +404,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Optional: Add custom handling
     });
 });
+// ลบ .html จากทุกอัตโนมัติ
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('a[href]').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href.endsWith('.html') && !href.startsWith('http')) {
+            link.setAttribute('href', href.replace('.html', ''));
+        }
+    });
+});
