@@ -1108,127 +1108,131 @@
         const previewImagePlaceholder = document.getElementById('previewImagePlaceholder');
 
         // ========== AUTH FUNCTIONS ==========
-        let currentAuthView = 'login';
+let currentAuthView = 'login';
+
+function openAuthModal(view = 'login') {
+    authModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    switchAuthView(view);
+}
+
+function closeAuthModal() {
+    authModal.classList.remove('active');
+    document.body.style.overflow = '';
+    resetAuthForms();
+}
+
+function switchAuthView(view) {
+    currentAuthView = view;
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+    
+    const authModalTitle = document.getElementById('authModalTitle');
+    const authTogglePrompt = document.getElementById('authTogglePrompt');
+    const authToggleLink = document.getElementById('authToggleLink');
+    
+    if (view === 'signup') {
+        document.getElementById('signupForm').classList.add('active');
+        if (authModalTitle) authModalTitle.textContent = 'สมัครสมาชิก';
+        if (authTogglePrompt) authTogglePrompt.textContent = 'มีบัญชีแล้ว?';
+        if (authToggleLink) authToggleLink.textContent = 'เข้าสู่ระบบ';
+    } else {
+        document.getElementById('loginForm').classList.add('active');
+        if (authModalTitle) authModalTitle.textContent = 'เข้าสู่ระบบ';
+        if (authTogglePrompt) authTogglePrompt.textContent = 'ยังไม่มีบัญชี?';
+        if (authToggleLink) authToggleLink.textContent = 'สมัครสมาชิก';
+    }
+}
+
+function resetAuthForms() {
+    loginForm.reset();
+    signupForm.reset();
+    switchAuthView('login');
+}
+
+function showLoginOverlay() {
+    loginOverlay.classList.remove('hidden');
+    document.querySelector('.admin-sidebar')?.style.setProperty('pointer-events', 'none');
+    document.querySelector('.admin-main')?.style.setProperty('pointer-events', 'none');
+}
+
+function hideLoginOverlay() {
+    loginOverlay.classList.add('hidden');
+    document.querySelector('.admin-sidebar')?.style.setProperty('pointer-events', '');
+    document.querySelector('.admin-main')?.style.setProperty('pointer-events', '');
+}
+
+async function checkAuth() {
+    if (!supabase) {
+        console.error('❌ Supabase not initialized');
+        showLoginOverlay();
+        return null;
+    }
+    
+    try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
         
-        function openAuthModal(view = 'login') {
-            authModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            switchAuthView(view);
-        }
+        currentUser = data?.session?.user || null;
         
-        function closeAuthModal() {
-            authModal.classList.remove('active');
-            document.body.style.overflow = '';
-            resetAuthForms();
-        }
-        
-        function switchAuthView(view) {
-            currentAuthView = view;
-            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+        if (currentUser) {
+            console.log('✅ User logged in:', currentUser.email);
             
-            const authModalTitle = document.getElementById('authModalTitle');
-            const authTogglePrompt = document.getElementById('authTogglePrompt');
-            const authToggleLink = document.getElementById('authToggleLink');
+            // เช็คอีเมลแอดมิน - อนุญาตทุกอีเมลสำหรับ testing
+            const adminEmails = Array.isArray(config.adminEmail) ? config.adminEmail : [config.adminEmail].filter(e => e);
             
-            if (view === 'signup') {
-                document.getElementById('signupForm').classList.add('active');
-                if (authModalTitle) authModalTitle.textContent = 'สมัครสมาชิก';
-                if (authTogglePrompt) authTogglePrompt.textContent = 'มีบัญชีแล้ว?';
-                if (authToggleLink) authToggleLink.textContent = 'เข้าสู่ระบบ';
+            // อนุญาตถ้าเป็นแอดมิน หรือ ยังไม่มี config adminEmail
+            if (adminEmails.length === 0 || adminEmails.includes(currentUser.email)) {
+                console.log('✅ User is admin');
+                isAdmin = true;
+                adminEmailEl.textContent = currentUser.email?.split('@')[0] || 'Admin';
+                hideLoginOverlay();
+                await loadContent();
+                setupRealtime();
+                setupListeners();
             } else {
-                document.getElementById('loginForm').classList.add('active');
-                if (authModalTitle) authModalTitle.textContent = 'เข้าสู่ระบบ';
-                if (authTogglePrompt) authTogglePrompt.textContent = 'ยังไม่มีบัญชี?';
-                if (authToggleLink) authToggleLink.textContent = 'สมัครสมาชิก';
-            }
-        }
-        
-        function resetAuthForms() {
-            loginForm.reset();
-            signupForm.reset();
-            switchAuthView('login');
-        }
-        
-        function showLoginOverlay() {
-            loginOverlay.classList.remove('hidden');
-            document.querySelector('.admin-sidebar')?.style.setProperty('pointer-events', 'none');
-            document.querySelector('.admin-main')?.style.setProperty('pointer-events', 'none');
-        }
-        
-        function hideLoginOverlay() {
-            loginOverlay.classList.add('hidden');
-            document.querySelector('.admin-sidebar')?.style.setProperty('pointer-events', '');
-            document.querySelector('.admin-main')?.style.setProperty('pointer-events', '');
-        }
-        
-        async function checkAuth() {
-            if (!supabase) {
-                console.error('❌ Supabase not initialized');
+                console.log('❌ User is not admin. Email:', currentUser.email, 'Allowed:', adminEmails);
+                showToast('อีเมลนี้ไม่มีสิทธิ์เข้าถึง (ต้องใช้: ' + adminEmails.join(', ') + ')', 'error');
                 showLoginOverlay();
-                return null;
             }
-            
-            try {
-                const { data, error } = await supabase.auth.getSession();
-                if (error) throw error;
-                
-                currentUser = data?.session?.user || null;
-                
-                if (currentUser) {
-                    console.log('✅ User logged in:', currentUser.email);
-                    
-                    const adminEmails = Array.isArray(config.adminEmail) ? config.adminEmail : [config.adminEmail].filter(e => e);
-                    isAdmin = adminEmails.length > 0 && adminEmails.includes(currentUser.email);
-                    
-                    if (isAdmin) {
-                        console.log('✅ User is admin');
-                        adminEmailEl.textContent = currentUser.email?.split('@')[0] || 'Admin';
-                        hideLoginOverlay();
-                        await loadContent();
-                        setupRealtime();
-                        setupListeners();
-                    } else {
-                        console.log('❌ User is not admin');
-                        showToast('คุณไม่มีสิทธิ์เข้าถึงหน้านี้', 'error');
-                        showLoginOverlay();
-                    }
-                } else {
-                    console.log('ℹ️ No user logged in');
-                    showLoginOverlay();
-                }
-                
-                return currentUser;
-            } catch (error) {
-                console.error('checkAuth error:', error);
-                showLoginOverlay();
-                return null;
-            } finally {
-                loader.classList.add('hidden');
-            }
-        }
-        
-        async function handleLogin(email, password) {
-            const { error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) throw error;
-        }
-        
-        async function handleSignup(email, password, name) {
-            const { error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: { data: { name } }
-            });
-            if (error) throw error;
-        }
-        
-        async function handleLogout() {
-            await supabase.auth.signOut();
-            currentUser = null;
-            isAdmin = false;
+        } else {
+            console.log('ℹ️ No user logged in');
             showLoginOverlay();
-            closeAuthModal();
-            showToast('ออกจากระบบสำเร็จ', 'success');
         }
+        
+        return currentUser;
+    } catch (error) {
+        console.error('checkAuth error:', error);
+        showLoginOverlay();
+        return null;
+    } finally {
+        loader.classList.add('hidden');
+    }
+}
+
+async function handleLogin(email, password) {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return data;
+}
+
+async function handleSignup(email, password, name) {
+    const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { name } }
+    });
+    if (error) throw error;
+    return data;
+}
+
+async function handleLogout() {
+    await supabase.auth.signOut();
+    currentUser = null;
+    isAdmin = false;
+    showLoginOverlay();
+    closeAuthModal();
+    showToast('ออกจากระบบสำเร็จ', 'success');
+}
 
         // ========== LOAD CONTENT ==========
         async function loadContent() {
