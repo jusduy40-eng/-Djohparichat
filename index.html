@@ -11,9 +11,9 @@
     <meta property="og:url" content="https://djohparichat.site/">
     <meta property="og:title" content="Djohparichat | เรียนรู้ AI และประกันชีวิต">
     <meta property="og:description" content="ผู้เชี่ยวชาญด้าน AI และประกันชีวิต">
-    <meta property="og:image" content="assets/images/og-image.jpg">
+    <meta property="og:image" content="https://i.postimg.cc/cL0wD68y/1.webp">
     
-    <link rel="icon" type="image/png" href="https://i.postimg.cc/cL0wD68y/1.webp">
+    <link rel="icon" type="image/webp" href="https://i.postimg.cc/cL0wD68y/1.webp">
     <title>Djohparichat | เรียนรู้ AI และประกันชีวิต</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -466,6 +466,28 @@
             display: block;
         }
         
+        /* Hero Image Animation */
+        .hero-main-image {
+            transition: var(--transition-normal);
+            animation: float 6s ease-in-out infinite;
+        }
+        .hero-main-image:hover {
+            transform: scale(1.02);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* About Image */
+        .about-main-image {
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+        
         /* Mobile Responsive */
         @media (max-width: 480px) {
             .chat-widget {
@@ -487,6 +509,10 @@
             }
             .chat-window.active {
                 transform: translate(-50%, -50%) scale(1);
+            }
+            .hero-main-image {
+                max-width: 100%;
+                border-radius: var(--radius-md);
             }
         }
     </style>
@@ -622,7 +648,12 @@
                 </div>
                 <div class="hero-image">
                     <div class="image-wrapper">
-                        <div class="image-placeholder"><i class="fas fa-user-graduate"></i></div>
+                        <!-- ✅ รูปภาพหน้าแรก -->
+                        <img src="https://i.postimg.cc/cL0wD68y/1.webp" 
+                             alt="AI Expert - Djohparichat" 
+                             class="hero-main-image"
+                             style="width:100%;height:auto;max-width:500px;border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);object-fit:cover;">
+                        
                         <div class="floating-card card-1"><i class="fas fa-robot"></i><span>AI Expert</span></div>
                         <div class="floating-card card-2"><i class="fas fa-shield-alt"></i><span data-th="ประกันชีวิต" data-en="Life Insurance">ประกันชีวิต</span></div>
                     </div>
@@ -743,7 +774,10 @@
             <div class="about-wrapper">
                 <div class="about-image">
                     <div class="image-wrapper">
-                        <div class="image-placeholder main"><i class="fas fa-user-tie"></i></div>
+                        <!-- ✅ รูปภาพเกี่ยวกับเรา -->
+                        <img src="https://i.postimg.cc/MGrs21yM/2.webp" 
+                             alt="About Us - Djohparichat" 
+                             class="about-main-image">
                         <div class="experience-badge"><span class="years">10+</span><span class="text" data-th="ปีประสบการณ์" data-en="Years Experience">ปีประสบการณ์</span></div>
                     </div>
                 </div>
