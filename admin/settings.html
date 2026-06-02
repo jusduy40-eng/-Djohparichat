@@ -1023,7 +1023,9 @@
     <script type="module">
     // ========== CONFIG ==========
     let config;
-    let supabase;
+    
+    // ✅ เช็คก่อนว่า supabase มีหรือยัง (ถ้ามีจาก admin.js แล้วไม่ต้องสร้างใหม่)
+    let supabase = window.supabaseInstance || null;
     
     try {
         const configModule = await import('../lib/config.js');
@@ -1037,11 +1039,14 @@
         };
     }
     
-    // Initialize Supabase
+    // Initialize Supabase (เฉพาะถ้ายังไม่มี)
     try {
-        if (config && config.supabaseUrl && config.supabaseAnonKey) {
+        if (!supabase && config && config.supabaseUrl && config.supabaseAnonKey) {
             supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+            window.supabaseInstance = supabase; // เก็บไว้ใช้ร่วมกัน
             console.log('✅ Supabase initialized');
+        } else if (supabase) {
+            console.log('✅ Using existing Supabase instance');
         }
     } catch (e) {
         console.error('❌ Failed to initialize Supabase:', e);
@@ -1105,7 +1110,7 @@
     const previewImage = document.getElementById('previewImage');
     const previewImagePlaceholder = document.getElementById('previewImagePlaceholder');
 
-    // ========== AUTH CHECK (บังคับเช็คทุกครั้ง) ==========
+    // ========== AUTH CHECK ==========
     async function checkAuth() {
         if (!supabase) {
             console.error('❌ Supabase not initialized');
@@ -1183,7 +1188,6 @@
             currentUser = null;
             showToast('ออกจากระบบสำเร็จ', 'success');
             
-            // Redirect กลับไปหน้า login
             setTimeout(() => {
                 window.location.href = '../admin/login';
             }, 1000);
@@ -1251,23 +1255,40 @@
 
     // ========== SAVE CONTENT ==========
     async function saveContent() {
+        if (!supabase) {
+            showToast('ระบบไม่พร้อม', 'error');
+            return;
+        }
+        
         showLoading(true);
         
         let hasError = false;
+        let successCount = 0;
         
         for (const [key, input] of Object.entries(inputs)) {
             if (input && input.value !== contentData[key]) {
-                const { error } = await supabase
-                    .from('about_content')
-                    .upsert({ 
-                        key, 
-                        value: input.value, 
-                        type: 'text',
-                        updated_at: new Date().toISOString()
-                    });
-                
-                if (error) {
-                    console.error(`Error saving ${key}:`, error);
+                try {
+                    // ✅ แก้ไข: เพิ่ม onConflict: 'key'
+                    const { error } = await supabase
+                        .from('about_content')
+                        .upsert({ 
+                            key, 
+                            value: input.value, 
+                            type: 'text',
+                            updated_at: new Date().toISOString()
+                        }, {
+                            onConflict: 'key'  // สำคัญ!
+                        });
+                    
+                    if (error) {
+                        console.error(`Error saving ${key}:`, error);
+                        hasError = true;
+                    } else {
+                        successCount++;
+                        contentData[key] = input.value; // อัปเดตค่าใหม่
+                    }
+                } catch (err) {
+                    console.error(`Exception saving ${key}:`, err);
                     hasError = true;
                 }
             }
@@ -1275,11 +1296,14 @@
         
         showLoading(false);
         
-        if (hasError) {
-            showToast('บันทึกบางส่วนไม่สำเร็จ', 'error');
+        if (hasError && successCount === 0) {
+            showToast('บันทึกไม่สำเร็จ', 'error');
+        } else if (hasError) {
+            showToast(`บันทึกสำเร็จ ${successCount} รายการ (มีบางรายการไม่สำเร็จ)`, 'warning');
+        } else if (successCount > 0) {
+            showToast(`บันทึกสำเร็จ ${successCount} รายการ!`, 'success');
         } else {
-            showToast('บันทึกสำเร็จ!', 'success');
-            await loadContent();
+            showToast('ไม่มีข้อมูลเปลี่ยนแปลง', 'info');
         }
     }
 
@@ -1289,6 +1313,11 @@
         
         if (file.size > 5 * 1024 * 1024) {
             showToast('ไฟล์ใหญ่เกินไป (สูงสุด 5MB)', 'error');
+            return;
+        }
+        
+        if (!supabase) {
+            showToast('ระบบไม่พร้อม', 'error');
             return;
         }
         
@@ -1308,6 +1337,7 @@
                 .from('about-images')
                 .getPublicUrl(fileName);
             
+            // ✅ แก้ไข: เพิ่ม onConflict: 'key'
             const { error: dbError } = await supabase
                 .from('about_content')
                 .upsert({ 
@@ -1315,6 +1345,8 @@
                     value: publicUrl, 
                     type: 'image',
                     updated_at: new Date().toISOString()
+                }, {
+                    onConflict: 'key'  // สำคัญ!
                 });
             
             if (dbError) throw dbError;
