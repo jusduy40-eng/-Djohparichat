@@ -19,143 +19,595 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        /* ========== AUTH MODAL ========== */
-        .auth-modal, .enrollment-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center;
-            z-index: 10000; opacity: 0; visibility: hidden; transition: all 0.3s ease; padding: 20px;
+        /* ========== HEADER STYLES (เหมือน index.html) ========== */
+        .navbar {
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
-        .auth-modal.active, .enrollment-modal.active { opacity: 1; visibility: visible; }
-        .auth-modal-content, .enrollment-modal-content {
-            background: var(--white); border-radius: var(--radius-lg); width: 100%;
-            max-width: 500px; max-height: 90vh; overflow-y: auto; position: relative;
-            transform: translateY(20px); transition: transform 0.3s ease; box-shadow: var(--shadow-xl);
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
         }
-        .auth-modal.active .auth-modal-content, .enrollment-modal.active .enrollment-modal-content { transform: translateY(0); }
-        .modal-close {
-            position: absolute; top: 16px; right: 16px; width: 36px; height: 36px;
-            border: none; background: var(--gray-100); border-radius: var(--radius-full);
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            color: var(--gray-600); transition: var(--transition-fast); z-index: 10;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--primary-blue);
+            font-weight: 700;
+            font-size: 1.3rem;
         }
-        .modal-close:hover { background: var(--gray-200); color: var(--gray-900); }
-        .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); }
-        .modal-header h3 { margin: 0; font-size: 1.3rem; color: var(--gray-900); }
-        .modal-body { padding: 24px; }
-        .modal-footer { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 12px; }
-        
-        /* Form Styles */
-        .enrollment-form { display: flex; flex-direction: column; gap: 16px; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-group label { font-weight: 500; color: var(--gray-700); font-size: 0.9rem; }
-        .form-group input, .form-group select, .form-group textarea {
-            padding: 12px 16px; border: 2px solid var(--gray-200); border-radius: var(--radius-md);
-            font-size: 1rem; transition: var(--transition-fast); outline: none; font-family: inherit;
-        }
-        .form-group input:focus, .form-group textarea:focus {
-            border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
-        }
-        .form-group small { color: var(--gray-500); font-size: 0.8rem; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
-        
-        /* Payment Section */
-        .payment-section {
-            background: var(--gray-50);
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
             border-radius: var(--radius-md);
-            padding: 16px;
-            margin: 16px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
         }
-        .payment-methods { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
-        .payment-method {
-            flex: 1; min-width: 120px;
-            padding: 12px; border: 2px solid var(--gray-200);
-            border-radius: var(--radius-md); text-align: center;
-            cursor: pointer; transition: var(--transition-fast);
+        .nav-list {
+            display: flex;
+            list-style: none;
+            gap: 8px;
+            margin: 0;
+            padding: 0;
         }
-        .payment-method:hover, .payment-method.selected {
-            border-color: var(--primary-blue);
+        .nav-link {
+            padding: 8px 16px;
+            text-decoration: none;
+            color: var(--gray-700);
+            font-weight: 500;
+            border-radius: var(--radius-md);
+            transition: var(--transition-fast);
+        }
+        .nav-link:hover, .nav-link.active {
             background: var(--sky-blue);
             color: var(--primary-blue);
         }
-        .payment-method i { font-size: 1.5rem; margin-bottom: 8px; display: block; }
-        .payment-qr {
-            text-align: center; margin: 16px 0;
-            padding: 16px; background: white;
-            border-radius: var(--radius-md);
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
-        .payment-qr img { max-width: 200px; border-radius: var(--radius-sm); }
+        .language-switcher {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .lang-btn {
+            background: none;
+            border: none;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray-500);
+            border-radius: var(--radius-sm);
+            transition: var(--transition-fast);
+        }
+        .lang-btn.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+        .lang-divider {
+            color: var(--gray-300);
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: var(--radius-full);
+            background: var(--gray-50);
+            transition: var(--transition-fast);
+        }
+        .user-info:hover {
+            background: var(--gray-100);
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .user-name {
+            font-weight: 500;
+            color: var(--gray-800);
+            font-size: 0.9rem;
+        }
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--white);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            min-width: 200px;
+            padding: 8px 0;
+            z-index: 1000;
+            display: none;
+            animation: slideDown 0.2s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .user-dropdown.active {
+            display: block;
+        }
+        .user-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            color: var(--gray-700);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: var(--transition-fast);
+        }
+        .user-dropdown a:hover {
+            background: var(--gray-50);
+            color: var(--primary-blue);
+        }
+        .user-dropdown .divider {
+            height: 1px;
+            background: var(--gray-200);
+            margin: 4px 0;
+        }
+        .user-dropdown .logout {
+            color: var(--error);
+        }
+        .user-dropdown .logout i {
+            color: var(--error);
+        }
+        
+        /* ========== ENROLLMENT MODAL (ปรับปรุงใหม่) ========== */
+        .enrollment-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+        .enrollment-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .enrollment-modal-content {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            box-shadow: var(--shadow-xl);
+        }
+        .enrollment-modal.active .enrollment-modal-content {
+            transform: translateY(0);
+        }
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--gray-100);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-600);
+            transition: var(--transition-fast);
+            z-index: 10;
+        }
+        .modal-close:hover {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-200);
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--sky-blue) 100%);
+            color: white;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal-body {
+            padding: 24px;
+        }
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: var(--gray-50);
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        }
+        
+        /* Form Styles */
+        .enrollment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 0.9rem;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            transition: var(--transition-fast);
+            outline: none;
+            font-family: inherit;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+        }
+        .form-group small {
+            color: var(--gray-500);
+            font-size: 0.8rem;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 640px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Payment Section */
+        .payment-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin: 16px 0;
+            border: 2px solid var(--gray-200);
+        }
+        .payment-section h4 {
+            margin: 0 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray-900);
+        }
+        .price-display {
+            background: white;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+        .price-display .amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+        .payment-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+        @media (max-width: 480px) {
+            .payment-methods {
+                grid-template-columns: 1fr;
+            }
+        }
+        .payment-method {
+            padding: 20px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+        }
+        .payment-method:hover {
+            border-color: var(--primary-blue);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .payment-method.selected {
+            border-color: var(--primary-blue);
+            background: linear-gradient(135deg, var(--sky-blue) 0%, var(--primary-blue) 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        .payment-method i {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .payment-method div {
+            font-weight: 600;
+        }
+        .payment-qr {
+            text-align: center;
+            margin: 20px 0;
+            padding: 24px;
+            background: white;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+        }
+        .payment-qr img {
+            max-width: 250px;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--gray-200);
+            padding: 8px;
+        }
         .payment-info {
-            background: #fef3c7; border-left: 4px solid #f59e0b;
-            padding: 12px 16px; border-radius: var(--radius-sm);
-            margin: 12px 0; font-size: 0.9rem;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            margin: 16px 0;
+            font-size: 0.9rem;
+        }
+        .payment-info i {
+            color: #f59e0b;
+            margin-right: 8px;
+        }
+        .file-upload {
+            border: 2px dashed var(--gray-300);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            background: white;
+        }
+        .file-upload:hover {
+            border-color: var(--primary-blue);
+            background: var(--gray-50);
+        }
+        .file-upload i {
+            font-size: 2.5rem;
+            color: var(--gray-400);
+            margin-bottom: 12px;
+        }
+        .file-upload input[type="file"] {
+            display: none;
+        }
+        .preview-image {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: var(--radius-md);
+            margin-top: 12px;
+            box-shadow: var(--shadow-sm);
         }
         
         /* Success Screen */
         .success-screen {
-            text-align: center; padding: 20px;
+            text-align: center;
+            padding: 40px 20px;
         }
         .success-icon {
-            width: 80px; height: 80px;
-            background: #d1fae5; color: #065f46;
-            border-radius: 50%; display: flex;
-            align-items: center; justify-content: center;
-            font-size: 2rem; margin: 0 auto 20px;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 24px;
+            animation: successPulse 0.6s ease;
         }
-        .success-screen h4 { margin: 0 0 8px; color: var(--gray-900); }
-        .success-screen p { margin: 0 0 20px; color: var(--gray-600); }
+        @keyframes successPulse {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .success-screen h4 {
+            margin: 0 0 12px;
+            color: var(--gray-900);
+            font-size: 1.5rem;
+        }
+        .success-screen p {
+            margin: 0 0 24px;
+            color: var(--gray-600);
+            line-height: 1.6;
+        }
         
         /* Course Card */
         .course-card {
-            background: var(--white); border-radius: var(--radius-lg);
-            padding: 24px; box-shadow: var(--shadow-md);
-            transition: var(--transition-normal); position: relative;
-            display: flex; flex-direction: column; gap: 16px;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-normal);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
-        .course-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
-        .course-card.featured { border: 2px solid var(--primary-blue); }
+        .course-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        .course-card.featured {
+            border: 2px solid var(--primary-blue);
+        }
         .course-badge {
-            position: absolute; top: 16px; right: 16px;
-            padding: 4px 12px; background: var(--gradient-primary);
-            color: white; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 4px 12px;
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
         }
         .course-icon {
-            width: 60px; height: 60px; background: var(--sky-blue);
-            border-radius: var(--radius-md); display: flex;
-            align-items: center; justify-content: center;
-            font-size: 1.5rem; color: var(--primary-blue);
+            width: 60px;
+            height: 60px;
+            background: var(--sky-blue);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
         }
-        .course-title { font-size: 1.3rem; font-weight: 600; color: var(--gray-900); margin: 0; }
-        .course-description { color: var(--gray-600); font-size: 0.95rem; line-height: 1.5; margin: 0; }
-        .course-features { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
-        .course-features li { display: flex; align-items: center; gap: 8px; color: var(--gray-700); font-size: 0.9rem; }
-        .course-features li i { color: var(--success); font-size: 0.8rem; }
-        .course-price { font-size: 1.5rem; font-weight: 700; color: var(--primary-blue); margin: 8px 0; }
-        .course-price.free { color: var(--success); }
-        .course-actions { display: flex; gap: 8px; margin-top: auto; }
-        .course-actions .btn { flex: 1; }
+        .course-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin: 0;
+        }
+        .course-description {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+        .course-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .course-features li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray-700);
+            font-size: 0.9rem;
+        }
+        .course-features li i {
+            color: var(--success);
+            font-size: 0.8rem;
+        }
+        .course-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin: 8px 0;
+        }
+        .course-price.free {
+            color: var(--success);
+        }
+        .course-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: auto;
+        }
+        .course-actions .btn {
+            flex: 1;
+        }
         
         /* Admin Edit Button */
         .admin-edit-btn {
-            position: absolute; top: 16px; left: 16px;
-            width: 32px; height: 32px; background: var(--gray-200);
-            border: none; border-radius: var(--radius-sm); cursor: pointer;
-            display: none; align-items: center; justify-content: center;
-            color: var(--gray-700); transition: var(--transition-fast); z-index: 10;
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            width: 32px;
+            height: 32px;
+            background: var(--gray-200);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-700);
+            transition: var(--transition-fast);
+            z-index: 10;
         }
-        .admin-edit-btn:hover { background: var(--primary-blue); color: white; }
-        .course-card:hover .admin-edit-btn { display: flex; }
+        .admin-edit-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+        .course-card:hover .admin-edit-btn {
+            display: flex;
+        }
         
         /* Empty & Loading */
         .courses-empty, .courses-loading {
-            text-align: center; padding: 60px 20px; color: var(--gray-500);
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray-500);
         }
-        .courses-empty i, .courses-loading i { font-size: 3rem; margin-bottom: 16px; opacity: 0.5; }
+        .courses-empty i, .courses-loading i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
         
         /* Responsive */
         @media (max-width: 768px) {
-            .services-grid { grid-template-columns: 1fr; }
-            .enrollment-modal-content { max-width: calc(100vw - 32px); }
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            .enrollment-modal-content {
+                max-width: calc(100vw - 32px);
+                max-height: calc(100vh - 32px);
+            }
+            .nav-list {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -168,170 +620,7 @@
         </div>
     </div>
 
-    <!-- Auth Modal -->
-    <div id="authModal" class="auth-modal">
-        <div class="auth-modal-content">
-            <button class="modal-close" id="authModalClose"><i class="fas fa-times"></i></button>
-            <div class="modal-header">
-                <h3 id="authModalTitle">เข้าสู่ระบบ</h3>
-            </div>
-            <div class="modal-body">
-                <form id="loginForm" class="auth-form auth-form-view active">
-                    <div class="form-group">
-                        <label>อีเมล</label>
-                        <input type="email" id="loginEmail" required placeholder="example@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label>รหัสผ่าน</label>
-                        <input type="password" id="loginPassword" required placeholder="••••••••">
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width:100%">เข้าสู่ระบบ</button>
-                </form>
-                <form id="signupForm" class="auth-form auth-form-view">
-                    <div class="form-group">
-                        <label>ชื่อ-นามสกุล</label>
-                        <input type="text" id="signupName" required>
-                    </div>
-                    <div class="form-group">
-                        <label>อีเมล</label>
-                        <input type="email" id="signupEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label>รหัสผ่าน</label>
-                        <input type="password" id="signupPassword" required minlength="6">
-                        <small>อย่างน้อย 6 ตัวอักษร</small>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width:100%">สมัครสมาชิก</button>
-                </form>
-                <div style="text-align:center;margin-top:16px;">
-                    <a href="#" id="authToggleLink" style="color:var(--primary-blue);text-decoration:none;">ยังไม่มีบัญชี? สมัครสมาชิก</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Enrollment Modal -->
-    <div id="enrollmentModal" class="enrollment-modal">
-        <div class="enrollment-modal-content">
-            <button class="modal-close" id="enrollmentModalClose"><i class="fas fa-times"></i></button>
-            
-            <!-- Step 1: Form -->
-            <div id="enrollmentStep1">
-                <div class="modal-header">
-                    <h3><i class="fas fa-user-plus"></i> สมัครเรียน: <span id="enrollCourseName">-</span></h3>
-                </div>
-                <div class="modal-body">
-                    <form id="enrollmentForm" class="enrollment-form">
-                        <input type="hidden" id="enrollCourseId">
-                        <input type="hidden" id="enrollCoursePrice">
-                        <input type="hidden" id="enrollIsFree">
-                        
-                        <div class="form-group">
-                            <label>ชื่อ-นามสกุลจริง *</label>
-                            <input type="text" id="enrollFullName" required placeholder="เช่น สมชาย ใจดี">
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>ชื่อเล่น</label>
-                                <input type="text" id="enrollNickname" placeholder="เช่น เอ">
-                            </div>
-                            <div class="form-group">
-                                <label>อีเมล *</label>
-                                <input type="email" id="enrollEmail" required placeholder="example@email.com">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>ช่องทางติดต่อ *</label>
-                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                                <input type="text" id="enrollFacebook" placeholder="ลิงก์ Facebook" style="flex:1;min-width:200px;">
-                                <input type="text" id="enrollLine" placeholder="LINE ID" style="flex:1;min-width:150px;">
-                            </div>
-                            <small>กรอกอย่างน้อย 1 ช่องทาง</small>
-                        </div>
-                        
-                        <!-- Payment Section -->
-                        <div id="paymentSection" class="payment-section" style="display:none;">
-                            <h4 style="margin:0 0 12px;"><i class="fas fa-credit-card"></i> ชำระเงิน</h4>
-                            <p style="margin:0 0 12px;color:var(--gray-600);">
-                                ราคา: <strong id="enrollPriceDisplay">฿0</strong>
-                            </p>
-                            
-                            <label style="font-weight:500;">เลือกวิธีการชำระเงิน</label>
-                            <div class="payment-methods">
-                                <div class="payment-method selected" data-method="promptpay">
-                                    <i class="fas fa-qrcode"></i>
-                                    <div>PromptPay</div>
-                                </div>
-                                <div class="payment-method" data-method="bank_transfer">
-                                    <i class="fas fa-university"></i>
-                                    <div>โอนธนาคาร</div>
-                                </div>
-                            </div>
-                            
-                            <div class="payment-qr">
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect fill='%23f3f4f6' width='200' height='200'/%3E%3Ctext fill='%239ca3af' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='14'%3EQR Code%3C/text%3E%3C/svg%3E" alt="PromptPay QR" id="paymentQr">
-                                <p style="margin:12px 0 0;font-size:0.9rem;color:var(--gray-600);">
-                                    สแกนเพื่อชำระเงิน หรือใช้หมายเลข: <strong id="promptpayNumber">09X-XXX-XXXX</strong>
-                                </p>
-                            </div>
-                            
-                            <div class="payment-info">
-                                <i class="fas fa-info-circle"></i> 
-                                <strong>หมายเหตุ:</strong> หลังจากชำระเงินแล้ว กรุณาบันทึกสลิปและกด "ยืนยันการชำระเงิน" ด้านล่าง
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>อัปโหลดสลิปการชำระเงิน (ถ้ามี)</label>
-                                <input type="file" id="paymentSlip" accept="image/*">
-                            </div>
-                        </div>
-                        
-                        <div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:var(--radius-sm);margin:16px 0;">
-                            <i class="fas fa-shield-alt"></i> 
-                            <strong>ความเป็นส่วนตัว:</strong> ข้อมูลของคุณจะถูกใช้เพื่อจัดการการเรียนการสอนเท่านั้น
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-outline" id="enrollmentCancel">ยกเลิก</button>
-                    <button class="btn btn-primary" id="enrollmentSubmit">
-                        <span id="enrollmentSubmitText">สมัครเรียน</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Step 2: Success -->
-            <div id="enrollmentStep2" style="display:none;">
-                <div class="modal-body success-screen">
-                    <div class="success-icon"><i class="fas fa-check"></i></div>
-                    <h4 id="successTitle">สมัครเรียนสำเร็จ!</h4>
-                    <p id="successMessage">ขอบคุณที่สมัครเรียน คอร์สนี้พร้อมเริ่มเรียนแล้ว</p>
-                    
-                    <div id="freeAccess" style="display:none;">
-                        <a href="my-courses" id="startCourseBtn" class="btn btn-primary" style="width:100%;padding:14px;">
-                            <i class="fas fa-play-circle"></i> ไปหน้าคอร์สของฉัน
-                        </a>
-                    </div>
-                    
-                    <div id="paidPending" style="display:none;">
-                        <p style="font-size:0.9rem;color:var(--gray-600);">
-                            <i class="fas fa-clock"></i> ทีมงานกำลังตรวจสอบการชำระเงินของคุณ 
-                            คุณจะได้รับอีเมลยืนยันภายใน 24 ชั่วโมง
-                        </p>
-                    </div>
-                    
-                    <button class="btn btn-outline" id="backToCourses" style="margin-top:16px;">
-                        <i class="fas fa-arrow-left"></i> กลับไปหน้าคอร์ส
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Navigation -->
+    <!-- Navigation (เหมือน index.html) -->
     <nav id="navbar" class="navbar">
         <div class="container">
             <div class="nav-wrapper">
@@ -369,7 +658,7 @@
     </section>
 
     <!-- Courses Section -->
-    <section class="services" style="padding-top:80px;">
+    <section class="services" style="padding: 60px 0;">
         <div class="container">
             <div class="services-grid" id="coursesGrid">
                 <div class="courses-loading">
@@ -401,6 +690,7 @@
     <!-- Scripts -->
     <script src="../assets/js/language.js"></script>
     <script src="../assets/js/animations.js"></script>
+    <script src="../assets/js/main.js"></script>
     
     <!-- Auth & Enrollment Script -->
     <script type="module">
@@ -420,8 +710,6 @@
             const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
 
             // DOM Elements
-            const authModal = document.getElementById('authModal');
-            const enrollmentModal = document.getElementById('enrollmentModal');
             const userMenu = document.getElementById('userMenu');
             const adminLink = document.getElementById('adminLink');
             const coursesGrid = document.getElementById('coursesGrid');
@@ -432,15 +720,6 @@
             let selectedCourse = null;
 
             // ========== AUTH FUNCTIONS ==========
-            function openAuthModal() { 
-                authModal.classList.add('active'); 
-                document.body.style.overflow = 'hidden'; 
-            }
-            function closeAuthModal() { 
-                authModal.classList.remove('active'); 
-                document.body.style.overflow = ''; 
-            }
-            
             async function checkAuth() {
                 const { data } = await supabase.auth.getSession();
                 currentUser = data?.session?.user || null;
@@ -474,7 +753,7 @@
                     isAdmin = adminEmails.length > 0 && adminEmails.includes(currentUser.email);
                     adminLink.style.display = isAdmin ? 'block' : 'none';
                 } else {
-                    userMenu.innerHTML = `<button class="btn btn-primary btn-sm" onclick="openAuthModal()">เข้าสู่ระบบ</button>`;
+                    userMenu.innerHTML = `<button class="btn btn-primary btn-sm" onclick="window.location.href='../pages/auth'">เข้าสู่ระบบ</button>`;
                 }
                 return currentUser;
             }
@@ -487,6 +766,7 @@
                 document.getElementById('enrollmentStep1').style.display = 'block';
                 document.getElementById('enrollmentStep2').style.display = 'none';
                 document.getElementById('enrollmentForm').reset();
+                document.getElementById('slipPreview')?.remove();
                 
                 // Set course info
                 document.getElementById('enrollCourseName').textContent = course.title_th;
@@ -505,12 +785,12 @@
                     document.getElementById('enrollmentSubmitText').textContent = 'ยืนยันการชำระเงิน';
                 }
                 
-                enrollmentModal.classList.add('active');
+                document.getElementById('enrollmentModal').classList.add('active');
                 document.body.style.overflow = 'hidden';
             }
             
             function closeEnrollmentModal() {
-                enrollmentModal.classList.remove('active');
+                document.getElementById('enrollmentModal').classList.remove('active');
                 document.body.style.overflow = '';
                 selectedCourse = null;
             }
@@ -520,13 +800,13 @@
                 document.getElementById('enrollmentStep2').style.display = 'block';
                 
                 if (isFree) {
-                    document.getElementById('successTitle').textContent = '✅ สมัครเรียนสำเร็จ!';
-                    document.getElementById('successMessage').textContent = 'คอร์สนี้พร้อมเริ่มเรียนแล้ว คลิกด้านล่างเพื่อเข้าสู่บทเรียน';
+                    document.getElementById('successTitle').textContent = '✅ สมัครสมาชิกสำเร็จ!';
+                    document.getElementById('successMessage').textContent = 'ยินดีด้วย! คุณสามารถเริ่มเรียนคอร์สนี้ได้ทันที';
                     document.getElementById('freeAccess').style.display = 'block';
                     document.getElementById('paidPending').style.display = 'none';
                 } else {
-                    document.getElementById('successTitle').textContent = '📩 ยืนยันการชำระเงินแล้ว';
-                    document.getElementById('successMessage').textContent = 'ทีมงานกำลังตรวจสอบการชำระเงินของคุณ คุณจะได้รับอีเมลยืนยันภายใน 24 ชั่วโมง';
+                    document.getElementById('successTitle').textContent = '📩 ส่งข้อมูลเรียบร้อยแล้ว';
+                    document.getElementById('successMessage').textContent = 'ทีมงานกำลังตรวจสอบการชำระเงินของคุณ\nคุณจะได้รับอีเมลยืนยันภายใน 24 ชั่วโมง';
                     document.getElementById('freeAccess').style.display = 'none';
                     document.getElementById('paidPending').style.display = 'block';
                 }
@@ -608,7 +888,6 @@
                     
                     const isTH = document.documentElement.lang === 'th';
                     
-                    // สร้าง HTML สำหรับแต่ละคอร์ส
                     courses.forEach(course => {
                         const card = document.createElement('div');
                         card.className = 'course-card' + (course.is_featured ? ' featured' : '');
@@ -634,7 +913,7 @@
                         
                         const enrollBtn = currentUser 
                             ? '<button class="btn btn-primary enroll-btn">สมัครเรียน</button>'
-                            : '<button class="btn btn-primary" onclick="openAuthModal()">เข้าสู่ระบบเพื่อสมัคร</button>';
+                            : '<button class="btn btn-primary" onclick="window.location.href=\'../pages/auth\'">เข้าสู่ระบบเพื่อสมัคร</button>';
                         
                         card.innerHTML = 
                             editBtn + badge +
@@ -645,7 +924,6 @@
                             priceDisplay +
                             '<div class="course-actions">' + enrollBtn + '</div>';
                         
-                        // เพิ่ม event listener สำหรับปุ่มสมัครเรียน
                         const enrollButton = card.querySelector('.enroll-btn');
                         if (enrollButton) {
                             enrollButton.addEventListener('click', function() {
@@ -667,14 +945,9 @@
             };
             
             // ========== EVENT LISTENERS ==========
-            document.getElementById('authModalClose')?.addEventListener('click', closeAuthModal);
-            authModal?.addEventListener('click', function(e) { 
-                if (e.target === authModal) closeAuthModal(); 
-            });
-            
             document.getElementById('enrollmentModalClose')?.addEventListener('click', closeEnrollmentModal);
-            enrollmentModal?.addEventListener('click', function(e) { 
-                if (e.target === enrollmentModal) closeEnrollmentModal(); 
+            document.getElementById('enrollmentModal')?.addEventListener('click', function(e) { 
+                if (e.target === document.getElementById('enrollmentModal')) closeEnrollmentModal(); 
             });
             document.getElementById('enrollmentCancel')?.addEventListener('click', closeEnrollmentModal);
             document.getElementById('backToCourses')?.addEventListener('click', closeEnrollmentModal);
@@ -690,41 +963,27 @@
                 });
             });
             
-            // Auth form
-            document.getElementById('authToggleLink')?.addEventListener('click', function(e) {
-                e.preventDefault();
-                document.querySelectorAll('.auth-form-view').forEach(function(f) { 
-                    f.classList.toggle('active'); 
-                });
+            // File upload preview
+            const fileInput = document.getElementById('paymentSlip');
+            const fileUpload = document.querySelector('.file-upload');
+            fileUpload?.addEventListener('click', function() {
+                fileInput?.click();
             });
-            
-            document.getElementById('loginForm')?.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const { error } = await supabase.auth.signInWithPassword({
-                    email: document.getElementById('loginEmail').value,
-                    password: document.getElementById('loginPassword').value
-                });
-                if (error) {
-                    alert('เข้าสู่ระบบไม่สำเร็จ: ' + error.message);
-                } else { 
-                    closeAuthModal(); 
-                    checkAuth(); 
-                    loadCourses(); 
-                }
-            });
-            
-            document.getElementById('signupForm')?.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const { error } = await supabase.auth.signUp({
-                    email: document.getElementById('signupEmail').value,
-                    password: document.getElementById('signupPassword').value,
-                    options: { data: { name: document.getElementById('signupName').value } }
-                });
-                if (error) {
-                    alert('สมัครไม่สำเร็จ: ' + error.message);
-                } else { 
-                    alert('สมัครสำเร็จ! กรุณาตรวจสอบอีเมล'); 
-                    closeAuthModal(); 
+            fileInput?.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const existingPreview = document.getElementById('slipPreview');
+                        if (existingPreview) existingPreview.remove();
+                        
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'preview-image';
+                        img.id = 'slipPreview';
+                        fileUpload.parentNode.insertBefore(img, fileUpload.nextSibling);
+                    };
+                    reader.readAsDataURL(file);
                 }
             });
             
@@ -752,5 +1011,141 @@
             document.getElementById('loader').style.display = 'none';
         }
     </script>
+    
+    <!-- Enrollment Modal (ใหม่ - สวยงามและปลอดภัย) -->
+    <div id="enrollmentModal" class="enrollment-modal">
+        <div class="enrollment-modal-content">
+            <button class="modal-close" id="enrollmentModalClose"><i class="fas fa-times"></i></button>
+            
+            <!-- Step 1: Form -->
+            <div id="enrollmentStep1">
+                <div class="modal-header">
+                    <h3><i class="fas fa-user-plus"></i> <span id="enrollCourseName">-</span></h3>
+                </div>
+                <div class="modal-body">
+                    <form id="enrollmentForm" class="enrollment-form">
+                        <input type="hidden" id="enrollCourseId">
+                        <input type="hidden" id="enrollCoursePrice">
+                        <input type="hidden" id="enrollIsFree">
+                        
+                        <div class="form-group">
+                            <label>ชื่อ-นามสกุลจริง <span style="color:var(--error)">*</span></label>
+                            <input type="text" id="enrollFullName" required placeholder="เช่น สมชาย ใจดี">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>ชื่อเล่น</label>
+                                <input type="text" id="enrollNickname" placeholder="เช่น เอ">
+                            </div>
+                            <div class="form-group">
+                                <label>อีเมล <span style="color:var(--error)">*</span></label>
+                                <input type="email" id="enrollEmail" required placeholder="example@email.com">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>ช่องทางติดต่อ <span style="color:var(--error)">*</span></label>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                <input type="text" id="enrollFacebook" placeholder="ลิงก์ Facebook" style="flex:1;min-width:200px;">
+                                <input type="text" id="enrollLine" placeholder="LINE ID" style="flex:1;min-width:150px;">
+                            </div>
+                            <small>กรอกอย่างน้อย 1 ช่องทาง</small>
+                        </div>
+                        
+                        <!-- Payment Section -->
+                        <div id="paymentSection" class="payment-section" style="display:none;">
+                            <h4><i class="fas fa-credit-card"></i> ชำระเงิน</h4>
+                            
+                            <div class="price-display">
+                                <div style="color:var(--gray-600);margin-bottom:8px;">ราคาคอร์ส</div>
+                                <div class="amount" id="enrollPriceDisplay">฿0</div>
+                            </div>
+                            
+                            <label style="font-weight:600;display:block;margin-bottom:12px;">เลือกวิธีการชำระเงิน</label>
+                            <div class="payment-methods">
+                                <div class="payment-method selected" data-method="promptpay">
+                                    <i class="fas fa-qrcode"></i>
+                                    <div>PromptPay</div>
+                                </div>
+                                <div class="payment-method" data-method="bank_transfer">
+                                    <i class="fas fa-university"></i>
+                                    <div>โอนเงิน</div>
+                                </div>
+                            </div>
+                            
+                            <div class="payment-qr">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 250 250'%3E%3Crect fill='%23f3f4f6' width='250' height='250'/%3E%3Cg fill='%239ca3af'%3E%3Crect x='50' y='50' width='50' height='50'/%3E%3Crect x='150' y='50' width='50' height='50'/%3E%3Crect x='50' y='150' width='50' height='50'/%3E%3Crect x='150' y='150' width='50' height='50'/%3E%3Crect x='100' y='100' width='50' height='50'/%3E%3C/g%3E%3Ctext fill='%236b7280' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='14'%3EPromptPay QR%3C/text%3E%3C/svg%3E" alt="PromptPay QR" id="paymentQr">
+                                <p style="margin:16px 0 0;font-size:0.95rem;color:var(--gray-700);font-weight:600;">
+                                    สแกนเพื่อชำระเงิน
+                                </p>
+                                <p style="margin:8px 0 0;font-size:0.9rem;color:var(--gray-600);">
+                                    หรือหมายเลข: <strong style="color:var(--primary-blue);font-size:1.1rem;">09X-XXX-XXXX</strong>
+                                </p>
+                            </div>
+                            
+                            <div class="payment-info">
+                                <i class="fas fa-info-circle"></i> 
+                                <strong>ขั้นตอนการชำระเงิน:</strong><br>
+                                1. สแกน QR Code หรือโอนเงินตามหมายเลข<br>
+                                2. บันทึกสลิปการโอนเงิน<br>
+                                3. อัปโหลดสลิปด้านล่าง<br>
+                                4. กด "ยืนยันการชำระเงิน"
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>อัปโหลดสลิปการชำระเงิน</label>
+                                <div class="file-upload">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <div style="font-weight:600;margin-bottom:4px;">คลิกเพื่ออัปโหลดสลิป</div>
+                                    <div style="font-size:0.85rem;color:var(--gray-500);">รองรับไฟล์ JPG, PNG (สูงสุด 5MB)</div>
+                                    <input type="file" id="paymentSlip" accept="image/*">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:16px;border-radius:var(--radius-md);margin:16px 0;">
+                            <i class="fas fa-shield-alt" style="color:#f59e0b;margin-right:8px;"></i> 
+                            <strong>ความเป็นส่วนตัว:</strong> ข้อมูลของคุณจะถูกเก็บเป็นความลับและใช้เพื่อจัดการการเรียนการสอนเท่านั้น
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" id="enrollmentCancel">ยกเลิก</button>
+                    <button class="btn btn-primary" id="enrollmentSubmit">
+                        <span id="enrollmentSubmitText">สมัครเรียน</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Success -->
+            <div id="enrollmentStep2" style="display:none;">
+                <div class="modal-body success-screen">
+                    <div class="success-icon"><i class="fas fa-check"></i></div>
+                    <h4 id="successTitle">สมัครเรียนสำเร็จ!</h4>
+                    <p id="successMessage">ขอบคุณที่สมัครเรียน คอร์สนี้พร้อมเริ่มเรียนแล้ว</p>
+                    
+                    <div id="freeAccess" style="display:none;">
+                        <a href="my-courses" id="startCourseBtn" class="btn btn-primary" style="width:100%;padding:16px;font-size:1.05rem;">
+                            <i class="fas fa-play-circle"></i> ไปหน้าคอร์สของฉัน
+                        </a>
+                    </div>
+                    
+                    <div id="paidPending" style="display:none;">
+                        <div style="background:#dbeafe;border-left:4px solid #3b82f6;padding:16px;border-radius:var(--radius-md);margin:16px 0;text-align:left;">
+                            <i class="fas fa-clock" style="color:#3b82f6;margin-right:8px;"></i> 
+                            <strong>สถานะการชำระเงิน:</strong> รอการตรวจสอบ<br>
+                            <small>ทีมงานจะตรวจสอบภายใน 24 ชั่วโมง และจะส่งอีเมลยืนยันให้คุณ</small>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-outline" id="backToCourses" style="margin-top:16px;">
+                        <i class="fas fa-arrow-left"></i> กลับไปหน้าคอร์ส
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
