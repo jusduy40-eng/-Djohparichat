@@ -16,6 +16,144 @@
     
     <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-normal);
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        .stat-icon.stat-blue { background: var(--gradient-primary); }
+        .stat-icon.stat-gold { background: var(--gradient-gold); color: var(--gray-900); }
+        .stat-icon.stat-green { background: linear-gradient(135deg, #10b981, #059669); }
+        .stat-icon.stat-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .stat-info h3 {
+            margin: 0 0 4px;
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+        .stat-info .stat-number {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+        .stat-info .stat-change {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .stat-change.positive { color: #10b981; }
+        .stat-change.negative { color: #ef4444; }
+        
+        /* Table Styles */
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        .admin-table th {
+            background: var(--gray-50);
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 0.9rem;
+            border-bottom: 2px solid var(--gray-200);
+        }
+        .admin-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--gray-100);
+            color: var(--gray-700);
+            font-size: 0.95rem;
+        }
+        .admin-table tr:last-child td { border-bottom: none; }
+        .admin-table tr:hover { background: var(--gray-50); }
+        
+        /* Badge & Status */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-blue { background: #dbeafe; color: #1d4ed8; }
+        .badge-gold { background: #fef3c7; color: #92400e; }
+        .badge-green { background: #d1fae5; color: #065f46; }
+        .badge-purple { background: #ede9fe; color: #5b21b6; }
+        .badge-gray { background: var(--gray-200); color: var(--gray-600); }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status.published { background: #d1fae5; color: #065f46; }
+        .status.draft { background: #fef3c7; color: #92400e; }
+        
+        /* Buttons */
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: var(--transition-fast);
+            margin-right: 4px;
+        }
+        .btn-icon.edit { background: var(--sky-blue); color: var(--primary-blue); }
+        .btn-icon.edit:hover { background: var(--primary-blue); color: white; }
+        .btn-icon.delete { background: #fee2e2; color: var(--error); }
+        .btn-icon.delete:hover { background: var(--error); color: white; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .admin-table { font-size: 0.85rem; }
+            .admin-table th, .admin-table td { padding: 10px 8px; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body class="admin-body">
     
@@ -75,9 +213,7 @@
             </div>
             <div class="admin-user">
                 <span id="adminEmail">admin@djohparichat.site</span>
-                <div class="admin-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
+                <div class="admin-avatar"><i class="fas fa-user"></i></div>
             </div>
         </header>
 
@@ -209,34 +345,44 @@
         // ========================================
         
         async function checkAdminPermission() {
-            const { data: { session } } = await supabase.auth.getSession();
-            
-            // 1. เช็คการล็อกอิน
-            if (!session) {
-                alert('กรุณาเข้าสู่ระบบเพื่อเข้าถึงหน้านี้');
-                window.location.href = '../pages/auth.html';
-                return false;
-            }
-            
-            // 2. เช็คอีเมล Admin (กำหนดใน config)
-            const userEmail = session.user.email;
-            const adminEmails = Array.isArray(config.adminEmail) 
-                ? config.adminEmail 
-                : [config.adminEmail].filter(e => e);
-            
-            const isAdmin = adminEmails.length > 0 
-                ? adminEmails.includes(userEmail)
-                : true; // ถ้าไม่กำหนด adminEmail ให้อนุญาตทั้งหมด (สำหรับทดสอบ)
-            
-            if (!isAdmin) {
-                alert('⛔ คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (เฉพาะผู้ดูแลระบบเท่านั้น)');
+            try {
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                
+                if (sessionError) throw sessionError;
+                
+                // 1. เช็คการล็อกอิน
+                if (!session) {
+                    alert('กรุณาเข้าสู่ระบบเพื่อเข้าถึงหน้านี้');
+                    window.location.href = '../pages/auth.html';
+                    return false;
+                }
+                
+                // 2. เช็คอีเมล Admin (กำหนดใน config)
+                const userEmail = session.user.email;
+                const adminEmails = Array.isArray(config.adminEmail) 
+                    ? config.adminEmail 
+                    : [config.adminEmail].filter(e => e);
+                
+                const isAdmin = adminEmails.length > 0 
+                    ? adminEmails.includes(userEmail)
+                    : true; // ถ้าไม่กำหนด adminEmail ให้อนุญาตทั้งหมด (สำหรับทดสอบ)
+                
+                if (!isAdmin) {
+                    alert('⛔ คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (เฉพาะผู้ดูแลระบบเท่านั้น)');
+                    window.location.href = '../index.html';
+                    return false;
+                }
+                
+                // 3. เป็น Admin → แสดงอีเมล
+                document.getElementById('adminEmail').textContent = userEmail;
+                return true;
+                
+            } catch (error) {
+                console.error('Permission check error:', error);
+                alert('เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์');
                 window.location.href = '../index.html';
                 return false;
             }
-            
-            // 3. เป็น Admin → แสดงอีเมล
-            document.getElementById('adminEmail').textContent = userEmail;
-            return true;
         }
 
         // ========================================
@@ -245,34 +391,59 @@
         
         async function loadDashboardData() {
             try {
-                // 1. โหลดจำนวนคอร์ส
+                // 1. โหลดจำนวนคอร์สที่เผยแพร่แล้ว
                 const { count: coursesCount, error: coursesError } = await supabase
                     .from('courses')
                     .select('*', { count: 'exact', head: true })
                     .eq('published', true);
                 
-                if (coursesError) throw coursesError;
-                document.getElementById('totalCourses').textContent = coursesCount || 0;
+                if (coursesError) {
+                    console.warn('Courses count error:', coursesError);
+                    document.getElementById('totalCourses').textContent = '0';
+                } else {
+                    document.getElementById('totalCourses').textContent = coursesCount || 0;
+                }
 
-                // 2. โหลดจำนวนผู้สมัคร
+                // 2. โหลดจำนวนผู้สมัครเรียน
                 const { count: enrollCount, error: enrollError } = await supabase
                     .from('enrollments')
                     .select('*', { count: 'exact', head: true });
                 
-                if (enrollError) throw enrollError;
-                document.getElementById('totalEnrollments').textContent = enrollCount || 0;
+                if (enrollError) {
+                    console.warn('Enrollments count error:', enrollError);
+                    document.getElementById('totalEnrollments').textContent = '0';
+                } else {
+                    document.getElementById('totalEnrollments').textContent = enrollCount || 0;
+                }
 
-                // 3. โหลดข้อความใหม่ที่ยังไม่ตอบ
-                const { count: messagesCount, error: messagesError } = await supabase
-                    .from('contact_messages')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('status', 'new');
+                // 3. โหลดข้อความใหม่ที่ยังไม่ตอบ (จากตาราง support_tickets หรือ contact_messages)
+                let messagesCount = 0;
                 
-                if (messagesError) throw messagesError;
-                document.getElementById('newMessages').textContent = messagesCount || 0;
+                // ลองโหลดจาก support_tickets ก่อน (ระบบแชทใหม่)
+                const { count: chatCount, error: chatError } = await supabase
+                    .from('support_tickets')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('is_admin', false)
+                    .eq('deleted', false);
+                
+                if (!chatError) {
+                    messagesCount = chatCount || 0;
+                } else {
+                    // ถ้าไม่มีตาราง support_tickets ให้ลองโหลดจาก contact_messages
+                    const { count: contactCount, error: contactError } = await supabase
+                        .from('contact_messages')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('status', 'new');
+                    
+                    if (!contactError) {
+                        messagesCount = contactCount || 0;
+                    }
+                }
+                document.getElementById('newMessages').textContent = messagesCount;
 
-                // 4. ผู้เข้าชม (จำลองข้อมูล)
-                document.getElementById('totalVisitors').textContent = Math.floor(Math.random() * 200) + 50;
+                // 4. ผู้เข้าชม (จำลองข้อมูล - สามารถเชื่อมกับ analytics จริงได้)
+                const visitors = Math.floor(Math.random() * 200) + 50;
+                document.getElementById('totalVisitors').textContent = visitors;
 
             } catch (error) {
                 console.error('Error loading dashboard:', error);
@@ -316,20 +487,23 @@
                         ? (isTH ? 'เผยแพร่' : 'Published') 
                         : (isTH ? 'ร่าง' : 'Draft');
                     
+                    const title = isTH ? course.title_th : (course.title_en || course.title_th);
+                    const duration = isTH ? (course.duration_th || '-') : (course.duration_en || '-');
+                    
                     return `
                         <tr data-id="${course.id}">
                             <td>
-                                <strong>${isTH ? course.title_th : course.title_en}</strong>
-                                <br><small class="text-muted">${course.icon_class ? course.icon_class.replace('fas fa-', '') : '-'}</small>
+                                <strong>${title}</strong>
+                                <br><small class="text-muted">${course.icon ? course.icon.replace('fas fa-', '') : '-'}</small>
                             </td>
                             <td><span class="badge ${levelBadge.class}">${levelBadge.text}</span></td>
-                            <td>${isTH ? course.duration_th : course.duration_en}</td>
+                            <td>${duration}</td>
                             <td><span class="status ${statusClass}">${statusText}</span></td>
                             <td>
-                                <button class="btn-icon edit" onclick="editCourse('${course.id}')">
+                                <button class="btn-icon edit" onclick="editCourse('${course.id}')" title="แก้ไข">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn-icon delete" onclick="deleteCourse('${course.id}')">
+                                <button class="btn-icon delete" onclick="deleteCourse('${course.id}')" title="ลบ">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </td>
@@ -340,6 +514,7 @@
             } catch (error) {
                 console.error('Error loading courses:', error);
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center text-error">โหลดข้อมูลไม่สำเร็จ</td></tr>`;
+                showNotification('error', 'ไม่สามารถโหลดคอร์สได้');
             }
         }
 
@@ -351,6 +526,7 @@
             const tbody = document.getElementById('enrollmentsTableBody');
             
             try {
+                // โหลดข้อมูลการสมัครเรียน พร้อมข้อมูลคอร์สที่สัมพันธ์กัน
                 const { data: enrollments, error } = await supabase
                     .from('enrollments')
                     .select(`
@@ -382,8 +558,8 @@
                     
                     return `
                         <tr>
-                            <td><strong>${enroll.name}</strong></td>
-                            <td>${enroll.email}</td>
+                            <td><strong>${enroll.name || '-'}</strong></td>
+                            <td>${enroll.email || '-'}</td>
                             <td>${courseTitle}</td>
                             <td>${formatDate(enroll.created_at)}</td>
                             <td><span class="badge ${statusBadge.class}">${statusBadge.text}</span></td>
@@ -394,6 +570,7 @@
             } catch (error) {
                 console.error('Error loading enrollments:', error);
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center text-error">โหลดข้อมูลไม่สำเร็จ</td></tr>`;
+                showNotification('error', 'ไม่สามารถโหลดข้อมูลผู้สมัครได้');
             }
         }
 
@@ -414,16 +591,34 @@
 
         function showNotification(type, message) {
             const container = document.getElementById('notificationContainer');
+            if (!container) return;
+            
             const notification = document.createElement('div');
             notification.className = `admin-notification notification-${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background: ${type === 'success' ? '#d1fae5' : type === 'error' ? '#fee2e2' : '#dbeafe'};
+                color: ${type === 'success' ? '#065f46' : type === 'error' ? '#991b1b' : '#1d4ed8'};
+                border-radius: var(--radius-md);
+                box-shadow: var(--shadow-md);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
             notification.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
                 <span>${message}</span>
             `;
             container.appendChild(notification);
             
             setTimeout(() => {
                 notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.3s ease';
                 setTimeout(() => notification.remove(), 300);
             }, 4000);
         }
@@ -433,12 +628,12 @@
         // ========================================
         
         window.editCourse = function(courseId) {
-            showNotification('info', `แก้ไขคอร์ส: ${courseId}`);
+            showNotification('info', `กำลังแก้ไขคอร์ส: ${courseId}`);
             window.location.href = `courses.html?edit=${courseId}`;
         };
 
         window.deleteCourse = async function(courseId) {
-            if (!confirm('คุณแน่ใจหรือไม่ที่จะลบคอร์สนี้?')) return;
+            if (!confirm('คุณแน่ใจหรือไม่ที่จะลบคอร์สนี้?\nการกระทำนี้จะไม่สามารถกู้คืนได้')) return;
             
             try {
                 const { error } = await supabase
@@ -450,9 +645,10 @@
                 
                 showNotification('success', 'ลบคอร์สสำเร็จ');
                 loadRecentCourses();
+                loadDashboardData(); // อัปเดตจำนวนคอร์สในแดชบอร์ด
             } catch (err) {
                 console.error('Delete error:', err);
-                showNotification('error', 'ลบคอร์สไม่สำเร็จ');
+                showNotification('error', 'ลบคอร์สไม่สำเร็จ: ' + err.message);
             }
         };
 
@@ -463,6 +659,8 @@
         function initSidebar() {
             const sidebar = document.getElementById('adminSidebar');
             const mobileToggle = document.getElementById('mobileToggle');
+            
+            if (!mobileToggle || !sidebar) return;
             
             mobileToggle.addEventListener('click', () => {
                 sidebar.classList.toggle('open');
@@ -482,7 +680,7 @@
         // LOGOUT
         // ========================================
         
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+        document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
             e.preventDefault();
             
             if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
@@ -507,7 +705,7 @@
             document.querySelectorAll('[data-th][data-en]').forEach(el => {
                 const text = el.getAttribute(`data-${lang}`);
                 if (text) {
-                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
                         el.placeholder = text;
                     } else {
                         el.textContent = text;
@@ -521,25 +719,33 @@
         // ========================================
         
         async function init() {
-            // 🔐 1. ตรวจสอบสิทธิ์ Admin (สำคัญมาก - ต้องทำก่อน)
-            const isAdmin = await checkAdminPermission();
-            if (!isAdmin) return; // ไม่ใช่ Admin → หยุดทำงานทันที
-            
-            // 2. ตั้งค่าภาษา
-            initLanguage();
-            
-            // 3. ตั้งค่า Sidebar
-            initSidebar();
-            
-            // 4. โหลดข้อมูลแดชบอร์ด
-            await Promise.all([
-                loadDashboardData(),
-                loadRecentCourses(),
-                loadRecentEnrollments()
-            ]);
-            
-            // 5. ซ่อน Loader
-            document.getElementById('adminLoader').style.display = 'none';
+            try {
+                // 🔐 1. ตรวจสอบสิทธิ์ Admin (สำคัญมาก - ต้องทำก่อน)
+                const isAdmin = await checkAdminPermission();
+                if (!isAdmin) return; // ไม่ใช่ Admin → หยุดทำงานทันที
+                
+                // 2. ตั้งค่าภาษา
+                initLanguage();
+                
+                // 3. ตั้งค่า Sidebar
+                initSidebar();
+                
+                // 4. โหลดข้อมูลแดชบอร์ดพร้อมกันทั้งหมด
+                await Promise.all([
+                    loadDashboardData(),
+                    loadRecentCourses(),
+                    loadRecentEnrollments()
+                ]);
+                
+                // 5. ซ่อน Loader
+                const loader = document.getElementById('adminLoader');
+                if (loader) loader.style.display = 'none';
+                
+            } catch (error) {
+                console.error('Init error:', error);
+                document.getElementById('adminLoader').style.display = 'none';
+                showNotification('error', 'เกิดข้อผิดพลาดในการโหลดหน้าแดชบอร์ด');
+            }
         }
 
         // Run init when DOM is ready
