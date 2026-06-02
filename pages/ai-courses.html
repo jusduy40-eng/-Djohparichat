@@ -20,232 +20,142 @@
     
     <style>
         /* ========== AUTH MODAL ========== */
-        .auth-modal {
+        .auth-modal, .enrollment-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center;
             z-index: 10000; opacity: 0; visibility: hidden; transition: all 0.3s ease; padding: 20px;
         }
-        .auth-modal.active { opacity: 1; visibility: visible; }
-        .auth-modal-content {
+        .auth-modal.active, .enrollment-modal.active { opacity: 1; visibility: visible; }
+        .auth-modal-content, .enrollment-modal-content {
             background: var(--white); border-radius: var(--radius-lg); width: 100%;
-            max-width: 420px; max-height: 90vh; overflow-y: auto; position: relative;
+            max-width: 500px; max-height: 90vh; overflow-y: auto; position: relative;
             transform: translateY(20px); transition: transform 0.3s ease; box-shadow: var(--shadow-xl);
         }
-        .auth-modal.active .auth-modal-content { transform: translateY(0); }
-        .auth-modal-close {
+        .auth-modal.active .auth-modal-content, .enrollment-modal.active .enrollment-modal-content { transform: translateY(0); }
+        .modal-close {
             position: absolute; top: 16px; right: 16px; width: 36px; height: 36px;
             border: none; background: var(--gray-100); border-radius: var(--radius-full);
             cursor: pointer; display: flex; align-items: center; justify-content: center;
             color: var(--gray-600); transition: var(--transition-fast); z-index: 10;
         }
-        .auth-modal-close:hover { background: var(--gray-200); color: var(--gray-900); }
-        .auth-modal-header { padding: 24px 24px 0; text-align: center; }
-        .auth-modal-header h3 { font-size: 1.5rem; color: var(--gray-900); margin-bottom: 8px; }
-        .auth-modal-header p { color: var(--gray-600); margin: 0; font-size: 0.95rem; }
-        .auth-modal-body { padding: 24px; }
-        .auth-form { display: flex; flex-direction: column; gap: 16px; }
-        .auth-form .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .auth-form .form-group label { font-weight: 500; color: var(--gray-700); font-size: 0.9rem; }
-        .auth-form .form-group input {
+        .modal-close:hover { background: var(--gray-200); color: var(--gray-900); }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); }
+        .modal-header h3 { margin: 0; font-size: 1.3rem; color: var(--gray-900); }
+        .modal-body { padding: 24px; }
+        .modal-footer { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 12px; }
+        
+        /* Form Styles */
+        .enrollment-form { display: flex; flex-direction: column; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-weight: 500; color: var(--gray-700); font-size: 0.9rem; }
+        .form-group input, .form-group select, .form-group textarea {
             padding: 12px 16px; border: 2px solid var(--gray-200); border-radius: var(--radius-md);
-            font-size: 1rem; transition: var(--transition-fast); outline: none;
+            font-size: 1rem; transition: var(--transition-fast); outline: none; font-family: inherit;
         }
-        .auth-form .form-group input:focus {
+        .form-group input:focus, .form-group textarea:focus {
             border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
         }
-        .auth-form .form-options { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
-        .auth-form .form-options label { display: flex; align-items: center; gap: 6px; color: var(--gray-600); cursor: pointer; }
-        .auth-form .form-options a { color: var(--primary-blue); text-decoration: none; font-weight: 500; }
-        .auth-form .form-options a:hover { text-decoration: underline; }
-        .auth-form .btn-auth {
-            width: 100%; padding: 14px; background: var(--gradient-primary); color: var(--white);
-            border: none; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600;
-            cursor: pointer; transition: var(--transition-normal); display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .auth-form .btn-auth:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
-        .auth-form .btn-auth:disabled { opacity: 0.7; cursor: not-allowed; }
-        .auth-divider { text-align: center; margin: 16px 0; position: relative; }
-        .auth-divider::before {
-            content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--gray-200);
-        }
-        .auth-divider span { background: var(--white); padding: 0 12px; color: var(--gray-500); font-size: 0.9rem; position: relative; }
-        .auth-toggle { text-align: center; margin-top: 16px; font-size: 0.95rem; color: var(--gray-600); }
-        .auth-toggle a { color: var(--primary-blue); text-decoration: none; font-weight: 600; cursor: pointer; }
-        .auth-toggle a:hover { text-decoration: underline; }
-        .auth-message { padding: 12px 16px; border-radius: var(--radius-md); margin-bottom: 16px; font-size: 0.9rem; display: none; }
-        .auth-message.success { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
-        .auth-message.error { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
-        .auth-form-view { display: none; }
-        .auth-form-view.active { display: block; }
+        .form-group small { color: var(--gray-500); font-size: 0.8rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
         
-        /* ========== USER MENU ========== */
-        .user-menu { position: relative; display: flex; align-items: center; gap: 12px; }
-        .user-auth-buttons { display: flex; gap: 8px; }
-        .user-auth-buttons .btn { padding: 8px 16px; font-size: 0.9rem; }
-        .user-auth-buttons .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
-        .user-info { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .user-avatar {
-            width: 36px; height: 36px; background: var(--gradient-primary); border-radius: var(--radius-full);
-            display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: 600; font-size: 0.9rem;
+        /* Payment Section */
+        .payment-section {
+            background: var(--gray-50);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin: 16px 0;
         }
-        .user-name { font-weight: 500; color: var(--gray-800); font-size: 0.95rem; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .user-dropdown {
-            position: absolute; top: calc(100% + 8px); right: 0; background: var(--white);
-            border-radius: var(--radius-md); box-shadow: var(--shadow-lg); min-width: 200px;
-            padding: 8px 0; z-index: 1000; display: none; animation: slideDown 0.2s ease;
+        .payment-methods { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+        .payment-method {
+            flex: 1; min-width: 120px;
+            padding: 12px; border: 2px solid var(--gray-200);
+            border-radius: var(--radius-md); text-align: center;
+            cursor: pointer; transition: var(--transition-fast);
         }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .user-dropdown.active { display: block; }
-        .user-dropdown a {
-            display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--gray-700);
-            text-decoration: none; font-size: 0.95rem; transition: var(--transition-fast);
+        .payment-method:hover, .payment-method.selected {
+            border-color: var(--primary-blue);
+            background: var(--sky-blue);
+            color: var(--primary-blue);
         }
-        .user-dropdown a:hover { background: var(--gray-50); color: var(--primary-blue); }
-        .user-dropdown a i { width: 20px; text-align: center; color: var(--gray-400); }
-        .user-dropdown .divider { height: 1px; background: var(--gray-200); margin: 4px 0; }
-        .user-dropdown .logout { color: var(--error); }
-        .user-dropdown .logout i { color: var(--error); }
+        .payment-method i { font-size: 1.5rem; margin-bottom: 8px; display: block; }
+        .payment-qr {
+            text-align: center; margin: 16px 0;
+            padding: 16px; background: white;
+            border-radius: var(--radius-md);
+        }
+        .payment-qr img { max-width: 200px; border-radius: var(--radius-sm); }
+        .payment-info {
+            background: #fef3c7; border-left: 4px solid #f59e0b;
+            padding: 12px 16px; border-radius: var(--radius-sm);
+            margin: 12px 0; font-size: 0.9rem;
+        }
         
-        /* ========== COURSE CARD ========== */
+        /* Success Screen */
+        .success-screen {
+            text-align: center; padding: 20px;
+        }
+        .success-icon {
+            width: 80px; height: 80px;
+            background: #d1fae5; color: #065f46;
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 2rem; margin: 0 auto 20px;
+        }
+        .success-screen h4 { margin: 0 0 8px; color: var(--gray-900); }
+        .success-screen p { margin: 0 0 20px; color: var(--gray-600); }
+        
+        /* Course Card */
         .course-card {
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            box-shadow: var(--shadow-md);
-            transition: var(--transition-normal);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
+            background: var(--white); border-radius: var(--radius-lg);
+            padding: 24px; box-shadow: var(--shadow-md);
+            transition: var(--transition-normal); position: relative;
+            display: flex; flex-direction: column; gap: 16px;
         }
-        .course-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-        .course-card.featured {
-            border: 2px solid var(--primary-blue);
-        }
+        .course-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .course-card.featured { border: 2px solid var(--primary-blue); }
         .course-badge {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            padding: 4px 12px;
-            background: var(--gradient-primary);
-            color: white;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            position: absolute; top: 16px; right: 16px;
+            padding: 4px 12px; background: var(--gradient-primary);
+            color: white; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
         }
         .course-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--sky-blue);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: var(--primary-blue);
+            width: 60px; height: 60px; background: var(--sky-blue);
+            border-radius: var(--radius-md); display: flex;
+            align-items: center; justify-content: center;
+            font-size: 1.5rem; color: var(--primary-blue);
         }
-        .course-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--gray-900);
-            margin: 0;
-        }
-        .course-description {
-            color: var(--gray-600);
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin: 0;
-        }
-        .course-features {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .course-features li {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--gray-700);
-            font-size: 0.9rem;
-        }
-        .course-features li i {
-            color: var(--success);
-            font-size: 0.8rem;
-        }
-        .course-price {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-blue);
-            margin: 8px 0;
-        }
-        .course-price.free {
-            color: var(--success);
-        }
-        .course-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: auto;
-        }
-        .course-actions .btn {
-            flex: 1;
-        }
+        .course-title { font-size: 1.3rem; font-weight: 600; color: var(--gray-900); margin: 0; }
+        .course-description { color: var(--gray-600); font-size: 0.95rem; line-height: 1.5; margin: 0; }
+        .course-features { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+        .course-features li { display: flex; align-items: center; gap: 8px; color: var(--gray-700); font-size: 0.9rem; }
+        .course-features li i { color: var(--success); font-size: 0.8rem; }
+        .course-price { font-size: 1.5rem; font-weight: 700; color: var(--primary-blue); margin: 8px 0; }
+        .course-price.free { color: var(--success); }
+        .course-actions { display: flex; gap: 8px; margin-top: auto; }
+        .course-actions .btn { flex: 1; }
         
         /* Admin Edit Button */
         .admin-edit-btn {
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            width: 32px;
-            height: 32px;
-            background: var(--gray-200);
-            border: none;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            color: var(--gray-700);
-            transition: var(--transition-fast);
-            z-index: 10;
+            position: absolute; top: 16px; left: 16px;
+            width: 32px; height: 32px; background: var(--gray-200);
+            border: none; border-radius: var(--radius-sm); cursor: pointer;
+            display: none; align-items: center; justify-content: center;
+            color: var(--gray-700); transition: var(--transition-fast); z-index: 10;
         }
-        .admin-edit-btn:hover {
-            background: var(--primary-blue);
-            color: white;
-        }
-        .course-card:hover .admin-edit-btn {
-            display: flex;
-        }
+        .admin-edit-btn:hover { background: var(--primary-blue); color: white; }
+        .course-card:hover .admin-edit-btn { display: flex; }
         
-        /* Empty State */
-        .courses-empty {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--gray-500);
+        /* Empty & Loading */
+        .courses-empty, .courses-loading {
+            text-align: center; padding: 60px 20px; color: var(--gray-500);
         }
-        .courses-empty i {
-            font-size: 3rem;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-        
-        /* Loading */
-        .courses-loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--gray-500);
-        }
+        .courses-empty i, .courses-loading i { font-size: 3rem; margin-bottom: 16px; opacity: 0.5; }
         
         /* Responsive */
         @media (max-width: 768px) {
-            .services-grid {
-                grid-template-columns: 1fr;
-            }
+            .services-grid { grid-template-columns: 1fr; }
+            .enrollment-modal-content { max-width: calc(100vw - 32px); }
         }
     </style>
 </head>
@@ -261,51 +171,162 @@
     <!-- Auth Modal -->
     <div id="authModal" class="auth-modal">
         <div class="auth-modal-content">
-            <button class="auth-modal-close" id="authModalClose"><i class="fas fa-times"></i></button>
-            <div class="auth-modal-header">
+            <button class="modal-close" id="authModalClose"><i class="fas fa-times"></i></button>
+            <div class="modal-header">
                 <h3 id="authModalTitle">เข้าสู่ระบบ</h3>
-                <p id="authModalDesc">ยินดีต้อนรับกลับ! กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</p>
             </div>
-            <div class="auth-modal-body">
-                <!-- Login Form -->
+            <div class="modal-body">
                 <form id="loginForm" class="auth-form auth-form-view active">
-                    <div id="loginMessage" class="auth-message"></div>
                     <div class="form-group">
-                        <label for="loginEmail">อีเมล</label>
+                        <label>อีเมล</label>
                         <input type="email" id="loginEmail" required placeholder="example@email.com">
                     </div>
                     <div class="form-group">
-                        <label for="loginPassword">รหัสผ่าน</label>
+                        <label>รหัสผ่าน</label>
                         <input type="password" id="loginPassword" required placeholder="••••••••">
                     </div>
-                    <div class="form-options">
-                        <label><input type="checkbox" id="loginRemember"> จดจำฉัน</label>
-                        <a href="#" id="showForgotPassword">ลืมรหัสผ่าน?</a>
-                    </div>
-                    <button type="submit" class="btn-auth" id="loginBtn"><span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i></button>
+                    <button type="submit" class="btn btn-primary" style="width:100%">เข้าสู่ระบบ</button>
                 </form>
-                <!-- Sign Up Form -->
                 <form id="signupForm" class="auth-form auth-form-view">
-                    <div id="signupMessage" class="auth-message"></div>
                     <div class="form-group">
-                        <label for="signupName">ชื่อ-นามสกุล</label>
-                        <input type="text" id="signupName" required placeholder="สมชาย ใจดี">
+                        <label>ชื่อ-นามสกุล</label>
+                        <input type="text" id="signupName" required>
                     </div>
                     <div class="form-group">
-                        <label for="signupEmail">อีเมล</label>
-                        <input type="email" id="signupEmail" required placeholder="example@email.com">
+                        <label>อีเมล</label>
+                        <input type="email" id="signupEmail" required>
                     </div>
                     <div class="form-group">
-                        <label for="signupPassword">รหัสผ่าน</label>
-                        <input type="password" id="signupPassword" required placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6">
-                        <small style="color: var(--gray-500); font-size: 0.8rem;">ต้องมีความยาวอย่างน้อย 6 ตัวอักษร</small>
+                        <label>รหัสผ่าน</label>
+                        <input type="password" id="signupPassword" required minlength="6">
+                        <small>อย่างน้อย 6 ตัวอักษร</small>
                     </div>
-                    <div class="form-group">
-                        <label><input type="checkbox" id="signupTerms" required>
-                        <span>ฉันยอมรับ <a href="#" style="color: var(--primary-blue);">เงื่อนไขการใช้งาน</a> และ <a href="#" style="color: var(--primary-blue);">นโยบายความเป็นส่วนตัว</a></span></label>
-                    </div>
-                    <button type="submit" class="btn-auth" id="signupBtn"><span>สมัครสมาชิก</span><i class="fas fa-user-plus"></i></button>
+                    <button type="submit" class="btn btn-primary" style="width:100%">สมัครสมาชิก</button>
                 </form>
+                <div style="text-align:center;margin-top:16px;">
+                    <a href="#" id="authToggleLink" style="color:var(--primary-blue);text-decoration:none;">ยังไม่มีบัญชี? สมัครสมาชิก</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enrollment Modal -->
+    <div id="enrollmentModal" class="enrollment-modal">
+        <div class="enrollment-modal-content">
+            <button class="modal-close" id="enrollmentModalClose"><i class="fas fa-times"></i></button>
+            
+            <!-- Step 1: Form -->
+            <div id="enrollmentStep1">
+                <div class="modal-header">
+                    <h3><i class="fas fa-user-plus"></i> สมัครเรียน: <span id="enrollCourseName">-</span></h3>
+                </div>
+                <div class="modal-body">
+                    <form id="enrollmentForm" class="enrollment-form">
+                        <input type="hidden" id="enrollCourseId">
+                        <input type="hidden" id="enrollCoursePrice">
+                        <input type="hidden" id="enrollIsFree">
+                        
+                        <div class="form-group">
+                            <label>ชื่อ-นามสกุลจริง *</label>
+                            <input type="text" id="enrollFullName" required placeholder="เช่น สมชาย ใจดี">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>ชื่อเล่น</label>
+                                <input type="text" id="enrollNickname" placeholder="เช่น เอ">
+                            </div>
+                            <div class="form-group">
+                                <label>อีเมล *</label>
+                                <input type="email" id="enrollEmail" required placeholder="example@email.com">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>ช่องทางติดต่อ *</label>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                <input type="text" id="enrollFacebook" placeholder="ลิงก์ Facebook" style="flex:1;min-width:200px;">
+                                <input type="text" id="enrollLine" placeholder="LINE ID" style="flex:1;min-width:150px;">
+                            </div>
+                            <small>กรอกอย่างน้อย 1 ช่องทาง</small>
+                        </div>
+                        
+                        <!-- Payment Section (แสดงเฉพาะคอร์สเสียเงิน) -->
+                        <div id="paymentSection" class="payment-section" style="display:none;">
+                            <h4 style="margin:0 0 12px;"><i class="fas fa-credit-card"></i> ชำระเงิน</h4>
+                            <p style="margin:0 0 12px;color:var(--gray-600);">
+                                ราคา: <strong id="enrollPriceDisplay">฿0</strong>
+                            </p>
+                            
+                            <label style="font-weight:500;">เลือกวิธีการชำระเงิน</label>
+                            <div class="payment-methods">
+                                <div class="payment-method selected" data-method="promptpay">
+                                    <i class="fas fa-qrcode"></i>
+                                    <div>PromptPay</div>
+                                </div>
+                                <div class="payment-method" data-method="bank_transfer">
+                                    <i class="fas fa-university"></i>
+                                    <div>โอนธนาคาร</div>
+                                </div>
+                            </div>
+                            
+                            <div class="payment-qr">
+                                <img src="https://i.postimg.cc/9fKQw8vD/promptpay-qr-placeholder.png" alt="PromptPay QR" id="paymentQr">
+                                <p style="margin:12px 0 0;font-size:0.9rem;color:var(--gray-600);">
+                                    สแกนเพื่อชำระเงิน หรือใช้หมายเลข: <strong id="promptpayNumber">09X-XXX-XXXX</strong>
+                                </p>
+                            </div>
+                            
+                            <div class="payment-info">
+                                <i class="fas fa-info-circle"></i> 
+                                <strong>หมายเหตุ:</strong> หลังจากชำระเงินแล้ว กรุณาบันทึกสลิปและกด "ยืนยันการชำระเงิน" ด้านล่าง
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>อัปโหลดสลิปการชำระเงิน (ถ้ามี)</label>
+                                <input type="file" id="paymentSlip" accept="image/*">
+                            </div>
+                        </div>
+                        
+                        <div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:var(--radius-sm);margin:16px 0;">
+                            <i class="fas fa-shield-alt"></i> 
+                            <strong>ความเป็นส่วนตัว:</strong> ข้อมูลของคุณจะถูกใช้เพื่อจัดการการเรียนการสอนเท่านั้น
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" id="enrollmentCancel">ยกเลิก</button>
+                    <button class="btn btn-primary" id="enrollmentSubmit">
+                        <span id="enrollmentSubmitText">สมัครเรียน</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Success -->
+            <div id="enrollmentStep2" style="display:none;">
+                <div class="modal-body success-screen">
+                    <div class="success-icon"><i class="fas fa-check"></i></div>
+                    <h4 id="successTitle">สมัครเรียนสำเร็จ!</h4>
+                    <p id="successMessage">ขอบคุณที่สมัครเรียน คอร์สนี้พร้อมเริ่มเรียนแล้ว</p>
+                    
+                    <div id="freeAccess" style="display:none;">
+                        <a href="#" id="startCourseBtn" class="btn btn-primary" style="width:100%;padding:14px;">
+                            <i class="fas fa-play-circle"></i> เริ่มเรียนตอนนี้
+                        </a>
+                    </div>
+                    
+                    <div id="paidPending" style="display:none;">
+                        <p style="font-size:0.9rem;color:var(--gray-600);">
+                            <i class="fas fa-clock"></i> ทีมงานกำลังตรวจสอบการชำระเงินของคุณ 
+                            คุณจะได้รับอีเมลยืนยันภายใน 24 ชั่วโมง
+                        </p>
+                    </div>
+                    
+                    <button class="btn btn-outline" id="backToCourses" style="margin-top:16px;">
+                        <i class="fas fa-arrow-left"></i> กลับไปหน้าคอร์ส
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -348,20 +369,17 @@
     </section>
 
     <!-- Courses Section -->
-    <section class="services" style="padding-top: 80px;">
+    <section class="services" style="padding-top:80px;">
         <div class="container">
             <div class="services-grid" id="coursesGrid">
-                <!-- Loading -->
                 <div class="courses-loading">
                     <i class="fas fa-spinner fa-spin"></i>
-                    <p data-th="กำลังโหลดคอร์ส..." data-en="Loading courses...">กำลังโหลดคอร์ส...</p>
+                    <p>กำลังโหลดคอร์ส...</p>
                 </div>
             </div>
-            
-            <!-- Empty State (ซ่อนไว้ก่อน) -->
-            <div id="coursesEmpty" class="courses-empty" style="display: none;">
+            <div id="coursesEmpty" class="courses-empty" style="display:none;">
                 <i class="fas fa-graduation-cap"></i>
-                <p data-th="ยังไม่มีคอร์สในขณะนี้" data-en="No courses available yet">ยังไม่มีคอร์สในขณะนี้</p>
+                <p>ยังไม่มีคอร์สในขณะนี้</p>
             </div>
         </div>
     </section>
@@ -376,7 +394,7 @@
     </footer>
 
     <!-- Admin Link -->
-    <div class="admin-link" id="adminLink" style="display: none;">
+    <div class="admin-link" id="adminLink" style="display:none;">
         <a href="../admin/index" title="Admin Panel"><i class="fas fa-cog"></i></a>
     </div>
 
@@ -384,17 +402,14 @@
     <script src="../assets/js/language.js"></script>
     <script src="../assets/js/animations.js"></script>
     
-    <!-- Auth & Courses Script -->
+    <!-- Auth & Enrollment Script -->
     <script type="module">
         try {
-            // Import config with error handling
             let config;
             try {
                 const configModule = await import('../lib/config.js');
                 config = configModule.config;
-            } catch (importError) {
-                console.error('Failed to load config:', importError);
-                // Fallback config for testing
+            } catch (e) {
                 config = {
                     supabaseUrl: 'https://your-project.supabase.co',
                     supabaseAnonKey: 'your-anon-key',
@@ -402,273 +417,276 @@
                 };
             }
             
-            // Initialize Supabase
             const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
 
             // DOM Elements
             const authModal = document.getElementById('authModal');
-            const authModalClose = document.getElementById('authModalClose');
+            const enrollmentModal = document.getElementById('enrollmentModal');
             const userMenu = document.getElementById('userMenu');
             const adminLink = document.getElementById('adminLink');
-            const loginForm = document.getElementById('loginForm');
-            const signupForm = document.getElementById('signupForm');
             const coursesGrid = document.getElementById('coursesGrid');
             const coursesEmpty = document.getElementById('coursesEmpty');
             
             let currentUser = null;
             let isAdmin = false;
+            let selectedCourse = null;
 
-            // ========================================
-            // AUTH FUNCTIONS
-            // ========================================
+            // ========== AUTH FUNCTIONS ==========
+            function openAuthModal() { authModal.classList.add('active'); document.body.style.overflow = 'hidden'; }
+            function closeAuthModal() { authModal.classList.remove('active'); document.body.style.overflow = ''; }
             
-            let currentView = 'login';
-            function openAuthModal(view = 'login') {
-                authModal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-                switchAuthView(view);
-            }
-            function closeAuthModal() {
-                authModal.classList.remove('active');
-                document.body.style.overflow = '';
-                resetForms();
-            }
-            function switchAuthView(view) {
-                currentView = view;
-                document.querySelectorAll('.auth-form-view').forEach(f => f.classList.remove('active'));
-                document.querySelectorAll('.auth-message').forEach(m => { m.style.display = 'none'; m.textContent = ''; });
-                if (view === 'login') {
-                    document.getElementById('loginForm').classList.add('active');
-                    document.getElementById('authModalTitle').textContent = 'เข้าสู่ระบบ';
-                } else if (view === 'signup') {
-                    document.getElementById('signupForm').classList.add('active');
-                    document.getElementById('authModalTitle').textContent = 'สมัครสมาชิก';
-                }
-            }
-            function resetForms() { loginForm.reset(); signupForm.reset(); switchAuthView('login'); }
-
-            function renderUserMenu(user) {
-                if (user) {
-                    const initials = user.email?.charAt(0).toUpperCase() || 'U';
+            async function checkAuth() {
+                const { data } = await supabase.auth.getSession();
+                currentUser = data?.session?.user || null;
+                
+                if (currentUser) {
+                    const initials = currentUser.email?.charAt(0).toUpperCase() || 'U';
                     userMenu.innerHTML = `
                         <div class="user-info" id="userInfo">
                             <div class="user-avatar">${initials}</div>
-                            <span class="user-name">${user.email?.split('@')[0]}</span>
-                            <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: var(--gray-500);"></i>
-                        </div>
-                        <div class="user-dropdown" id="userDropdown">
-                            <a href="profile"><i class="fas fa-user-edit"></i> แก้ไขโปรไฟล์</a>
-                            <a href="my-courses"><i class="fas fa-graduation-cap"></i> ประวัติการเรียน</a>
-                            <div class="divider"></div>
-                            <a href="#" id="logoutBtn" class="logout"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+                            <span class="user-name">${currentUser.email?.split('@')[0]}</span>
                         </div>`;
-                    document.getElementById('userInfo').addEventListener('click', (e) => { 
-                        e.stopPropagation(); 
-                        document.getElementById('userDropdown').classList.toggle('active'); 
-                    });
-                    document.getElementById('logoutBtn')?.addEventListener('click', async (e) => { 
-                        e.preventDefault(); 
-                        await supabase.auth.signOut(); 
-                        renderUserMenu(null); 
-                        updateAdminLink(null);
-                        loadCourses();
-                    });
+                    
+                    const adminEmails = Array.isArray(config.adminEmail) ? config.adminEmail : [config.adminEmail].filter(e => e);
+                    isAdmin = adminEmails.length > 0 && adminEmails.includes(currentUser.email);
+                    adminLink.style.display = isAdmin ? 'block' : 'none';
                 } else {
-                    userMenu.innerHTML = `<div class="user-auth-buttons"><button class="btn btn-secondary btn-sm" id="openLoginBtn">เข้าสู่ระบบ</button><button class="btn btn-primary btn-sm" id="openSignupBtn">สมัครสมาชิก</button></div>`;
-                    document.getElementById('openLoginBtn')?.addEventListener('click', () => openAuthModal('login'));
-                    document.getElementById('openSignupBtn')?.addEventListener('click', () => openAuthModal('signup'));
+                    userMenu.innerHTML = `<button class="btn btn-primary btn-sm" onclick="openAuthModal()">เข้าสู่ระบบ</button>`;
                 }
+                return currentUser;
             }
 
-            function updateAdminLink(user) {
-                if (!adminLink) return;
-                const adminEmails = Array.isArray(config.adminEmail) ? config.adminEmail : [config.adminEmail].filter(e => e);
-                isAdmin = adminEmails.length > 0 && user?.email && adminEmails.includes(user.email);
-                adminLink.style.display = isAdmin ? 'block' : 'none';
-            }
-
-            async function handleLogin(email, password) {
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) throw error;
-            }
-            async function handleSignup(email, password, name) {
-                const { error } = await supabase.auth.signUp({ email, password, options: { data: { name } } });
-                if (error) throw error;
-            }
-            async function checkAuth() {
-                try {
-                    const { data } = await supabase.auth.getSession();
-                    currentUser = data?.session?.user || null;
-                    renderUserMenu(currentUser);
-                    updateAdminLink(currentUser);
-                    return data?.session;
-                } catch (error) { 
-                    console.error('Auth check error:', error); 
-                    renderUserMenu(null); 
-                    updateAdminLink(null); 
-                    return null; 
+            // ========== ENROLLMENT FUNCTIONS ==========
+            function openEnrollmentModal(course) {
+                selectedCourse = course;
+                
+                // Reset modal
+                document.getElementById('enrollmentStep1').style.display = 'block';
+                document.getElementById('enrollmentStep2').style.display = 'none';
+                document.getElementById('enrollmentForm').reset();
+                
+                // Set course info
+                document.getElementById('enrollCourseName').textContent = course.title_th;
+                document.getElementById('enrollCourseId').value = course.id;
+                document.getElementById('enrollCoursePrice').value = course.price || 0;
+                document.getElementById('enrollIsFree').value = course.is_free;
+                document.getElementById('enrollPriceDisplay').textContent = `฿${(course.price || 0).toLocaleString('th-TH')}`;
+                
+                // Show/hide payment section
+                const paymentSection = document.getElementById('paymentSection');
+                if (course.is_free) {
+                    paymentSection.style.display = 'none';
+                    document.getElementById('enrollmentSubmitText').textContent = 'สมัครเรียนฟรี';
+                } else {
+                    paymentSection.style.display = 'block';
+                    document.getElementById('enrollmentSubmitText').textContent = 'ยืนยันการชำระเงิน';
                 }
+                
+                enrollmentModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
             }
-
-            // Auth Event Listeners
-            authModalClose.addEventListener('click', closeAuthModal);
-            authModal.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
-            document.getElementById('authToggleLink')?.addEventListener('click', (e) => { e.preventDefault(); switchAuthView(currentView === 'login' ? 'signup' : 'login'); });
-            document.getElementById('showForgotPassword')?.addEventListener('click', (e) => { e.preventDefault(); alert('กรุณาติดต่อผู้ดูแลระบบเพื่อรีเซ็ตรหัสผ่าน'); });
-
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                const btn = document.getElementById('loginBtn');
-                btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังเข้าสู่ระบบ...';
-                try {
-                    await handleLogin(email, password);
-                    closeAuthModal(); await checkAuth(); loadCourses(); alert('เข้าสู่ระบบสำเร็จ!');
-                } catch (error) { alert('เข้าสู่ระบบไม่สำเร็จ: ' + error.message); }
-                finally { btn.disabled = false; btn.innerHTML = '<span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i>'; }
-            });
-
-            signupForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const name = document.getElementById('signupName').value;
-                const email = document.getElementById('signupEmail').value;
-                const password = document.getElementById('signupPassword').value;
-                const btn = document.getElementById('signupBtn');
-                if (password.length < 6) { alert('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร'); return; }
-                btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังสมัคร...';
-                try {
-                    await handleSignup(email, password, name);
-                    alert('สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี'); closeAuthModal();
-                } catch (error) { alert('สมัครสมาชิกไม่สำเร็จ: ' + error.message); }
-                finally { btn.disabled = false; btn.innerHTML = '<span>สมัครสมาชิก</span><i class="fas fa-user-plus"></i>'; }
-            });
-
-            // ========================================
-            // COURSES FUNCTIONS
-            // ========================================
             
+            function closeEnrollmentModal() {
+                enrollmentModal.classList.remove('active');
+                document.body.style.overflow = '';
+                selectedCourse = null;
+            }
+            
+            function showSuccessScreen(isFree) {
+                document.getElementById('enrollmentStep1').style.display = 'none';
+                document.getElementById('enrollmentStep2').style.display = 'block';
+                
+                if (isFree) {
+                    document.getElementById('successTitle').textContent = '✅ สมัครเรียนสำเร็จ!';
+                    document.getElementById('successMessage').textContent = 'คอร์สนี้พร้อมเริ่มเรียนแล้ว คลิกด้านล่างเพื่อเข้าสู่บทเรียน';
+                    document.getElementById('freeAccess').style.display = 'block';
+                    document.getElementById('paidPending').style.display = 'none';
+                } else {
+                    document.getElementById('successTitle').textContent = '📩 ยืนยันการชำระเงินแล้ว';
+                    document.getElementById('successMessage').textContent = 'ทีมงานกำลังตรวจสอบการชำระเงินของคุณ คุณจะได้รับอีเมลยืนยันภายใน 24 ชั่วโมง';
+                    document.getElementById('freeAccess').style.display = 'none';
+                    document.getElementById('paidPending').style.display = 'block';
+                }
+            }
+            
+            async function submitEnrollment(e) {
+                e.preventDefault();
+                
+                const submitBtn = document.getElementById('enrollmentSubmit');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังประมวลผล...';
+                
+                try {
+                    // Validate contact
+                    const facebook = document.getElementById('enrollFacebook').value.trim();
+                    const line = document.getElementById('enrollLine').value.trim();
+                    if (!facebook && !line) {
+                        alert('กรุณากรอกช่องทางติดต่ออย่างน้อย 1 ช่องทาง');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<span id="enrollmentSubmitText">สมัครเรียน</span><i class="fas fa-arrow-right"></i>';
+                        return;
+                    }
+                    
+                    const isFree = document.getElementById('enrollIsFree').value === 'true';
+                    const enrollmentData = {
+                        user_id: currentUser?.id,
+                        course_id: document.getElementById('enrollCourseId').value,
+                        full_name: document.getElementById('enrollFullName').value.trim(),
+                        nickname: document.getElementById('enrollNickname').value.trim(),
+                        email: document.getElementById('enrollEmail').value.trim(),
+                        contact_facebook: facebook,
+                        contact_line: line,
+                        contact_phone: '',
+                        course_price: parseInt(document.getElementById('enrollCoursePrice').value) || 0,
+                        is_free: isFree,
+                        payment_status: isFree ? 'paid' : 'pending',
+                        payment_method: isFree ? 'free' : 'promptpay',
+                        enrollment_status: isFree ? 'approved' : 'pending',
+                        access_granted: isFree,
+                        ip_address: '', // Can add later
+                        user_agent: navigator.userAgent,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    };
+                    
+                    const { error } = await supabase.from('enrollments').insert([enrollmentData]);
+                    if (error) throw error;
+                    
+                    // Show success
+                    showSuccessScreen(isFree);
+                    
+                    // If free course, enable "Start Course" button
+                    if (isFree) {
+                        document.getElementById('startCourseBtn').onclick = () => {
+                            alert('🎉 ยินดีด้วย! คุณได้เริ่มเรียนคอร์สนี้แล้ว');
+                            // TODO: Redirect to course content page
+                            // window.location.href = `course-content?id=${selectedCourse.id}`;
+                        };
+                    }
+                    
+                } catch (error) {
+                    console.error('Enrollment error:', error);
+                    alert('เกิดข้อผิดพลาด: ' + error.message);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span id="enrollmentSubmitText">สมัครเรียน</span><i class="fas fa-arrow-right"></i>';
+                }
+            }
+            
+            // ========== LOAD COURSES ==========
             async function loadCourses() {
                 try {
-                    console.log('Loading courses...');
-                    
-                    // Load courses from database
                     let query = supabase.from('courses').select('*').eq('published', true).order('created_at', { ascending: false });
-                    
-                    // If admin, show all courses (including unpublished)
-                    if (isAdmin) {
-                        console.log('Admin mode: showing all courses');
-                        query = supabase.from('courses').select('*').order('created_at', { ascending: false });
-                    }
+                    if (isAdmin) query = supabase.from('courses').select('*').order('created_at', { ascending: false });
                     
                     const { data: courses, error } = await query;
+                    if (error) throw error;
                     
-                    if (error) {
-                        console.error('Supabase query error:', error);
-                        throw error;
-                    }
-                    
-                    console.log('Courses loaded:', courses?.length || 0);
-                    
-                    // Hide loading
                     coursesGrid.innerHTML = '';
                     
                     if (!courses || courses.length === 0) {
                         coursesEmpty.style.display = 'block';
                         return;
                     }
-                    
                     coursesEmpty.style.display = 'none';
                     
                     const isTH = document.documentElement.lang === 'th';
                     
-                    // Render courses
                     coursesGrid.innerHTML = courses.map(course => {
                         const priceDisplay = course.is_free 
-                            ? `<span class="course-price free" data-th="ฟรี" data-en="Free">ฟรี</span>`
-                            : `<span class="course-price">฿${course.price?.toLocaleString('th-TH') || '0'}</span>`;
+                            ? `<span class="course-price free">ฟรี</span>`
+                            : `<span class="course-price">฿${(course.price || 0).toLocaleString('th-TH')}</span>`;
                         
-                        const badge = course.is_featured 
-                            ? `<span class="course-badge" data-th="แนะนำ" data-en="Recommended">แนะนำ</span>` 
-                            : '';
-                        
-                        const editBtn = isAdmin 
-                            ? `<button class="admin-edit-btn" onclick="editCourse('${course.id}')" title="แก้ไขคอร์ส"><i class="fas fa-edit"></i></button>`
-                            : '';
+                        const badge = course.is_featured ? `<span class="course-badge">แนะนำ</span>` : '';
+                        const editBtn = isAdmin ? `<button class="admin-edit-btn" onclick="editCourse('${course.id}')"><i class="fas fa-edit"></i></button>` : '';
                         
                         const enrollBtn = currentUser 
-                            ? `<a href="../pages/contact?course=${course.id}" class="btn btn-primary" data-th="สมัครเรียน" data-en="Enroll Now">สมัครเรียน</a>`
-                            : `<button class="btn btn-primary" onclick="openAuthModal('login')" data-th="เข้าสู่ระบบเพื่อสมัคร" data-en="Login to Enroll">เข้าสู่ระบบเพื่อสมัคร</button>`;
+                            ? `<button class="btn btn-primary" onclick="openEnrollmentModal(${JSON.stringify(course).replace(/'/g, "\\'")})">สมัครเรียน</button>`
+                            : `<button class="btn btn-primary" onclick="openAuthModal()">เข้าสู่ระบบเพื่อสมัคร</button>`;
                         
                         return `
-                            <div class="service-card course-card ${course.is_featured ? 'featured' : ''}" data-id="${course.id}">
-                                ${editBtn}
-                                ${badge}
-                                <div class="service-icon course-icon"><i class="fas ${course.icon || 'fa-robot'}"></i></div>
-                                <h3 class="service-title course-title">${isTH ? course.title_th : course.title_en || course.title_th}</h3>
-                                <p class="service-description course-description">${isTH ? course.description_th : course.description_en || course.description_th}</p>
-                                <ul class="service-features course-features">
-                                    ${course.features?.map(f => `<li><i class="fas fa-check"></i> <span>${isTH ? f.th : f.en || f.th}</span></li>`).join('') || ''}
+                            <div class="course-card ${course.is_featured ? 'featured' : ''}">
+                                ${editBtn}${badge}
+                                <div class="course-icon"><i class="fas ${course.icon || 'fa-robot'}"></i></div>
+                                <h3 class="course-title">${isTH ? course.title_th : course.title_en || course.title_th}</h3>
+                                <p class="course-description">${isTH ? course.description_th : course.description_en || course.description_th}</p>
+                                <ul class="course-features">
+                                    ${course.features?.map(f => `<li><i class="fas fa-check"></i> ${isTH ? f.th : f.en || f.th}</li>`).join('') || ''}
                                 </ul>
                                 ${priceDisplay}
-                                <div class="course-actions">
-                                    ${enrollBtn}
-                                </div>
+                                <div class="course-actions">${enrollBtn}</div>
                             </div>
                         `;
                     }).join('');
                     
                 } catch (error) {
                     console.error('Load courses error:', error);
-                    coursesGrid.innerHTML = `<div class="courses-empty"><i class="fas fa-exclamation-circle"></i><p>โหลดคอร์สไม่สำเร็จ: ${error.message}</p></div>`;
+                    coursesGrid.innerHTML = `<div class="courses-empty"><i class="fas fa-exclamation-circle"></i><p>โหลดคอร์สไม่สำเร็จ</p></div>`;
                 }
             }
-
-            // Make edit function global
-            window.editCourse = function(courseId) {
-                // Redirect to admin course editor
-                window.location.href = `../admin/courses?edit=${courseId}`;
-            };
-
-            // ========================================
-            // INIT
-            // ========================================
             
+            window.editCourse = (id) => window.location.href = `../admin/courses?edit=${id}`;
+            
+            // ========== EVENT LISTENERS ==========
+            document.getElementById('authModalClose')?.addEventListener('click', closeAuthModal);
+            authModal?.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
+            
+            document.getElementById('enrollmentModalClose')?.addEventListener('click', closeEnrollmentModal);
+            enrollmentModal?.addEventListener('click', (e) => { if (e.target === enrollmentModal) closeEnrollmentModal(); });
+            document.getElementById('enrollmentCancel')?.addEventListener('click', closeEnrollmentModal);
+            document.getElementById('backToCourses')?.addEventListener('click', closeEnrollmentModal);
+            document.getElementById('enrollmentForm')?.addEventListener('submit', submitEnrollment);
+            
+            // Payment method selection
+            document.querySelectorAll('.payment-method').forEach(method => {
+                method.addEventListener('click', function() {
+                    document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Auth form
+            document.getElementById('authToggleLink')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.auth-form-view').forEach(f => f.classList.toggle('active'));
+            });
+            
+            document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const { error } = await supabase.auth.signInWithPassword({
+                    email: document.getElementById('loginEmail').value,
+                    password: document.getElementById('loginPassword').value
+                });
+                if (error) alert('เข้าสู่ระบบไม่สำเร็จ: ' + error.message);
+                else { closeAuthModal(); checkAuth(); loadCourses(); }
+            });
+            
+            document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const { error } = await supabase.auth.signUp({
+                    email: document.getElementById('signupEmail').value,
+                    password: document.getElementById('signupPassword').value,
+                    options: { data: { name: document.getElementById('signupName').value } }
+                });
+                if (error) alert('สมัครไม่สำเร็จ: ' + error.message);
+                else { alert('สมัครสำเร็จ! กรุณาตรวจสอบอีเมล'); closeAuthModal(); }
+            });
+            
+            // ========== INIT ==========
             async function init() {
-                console.log('Initializing ai-courses page...');
+                await checkAuth();
+                await loadCourses();
                 
-                try {
-                    await checkAuth();
-                    await loadCourses();
-                    
-                    // Listen for auth changes
-                    supabase.auth.onAuthStateChange((event, session) => {
-                        console.log('Auth state changed:', event);
-                        currentUser = session?.user || null;
-                        renderUserMenu(currentUser);
-                        updateAdminLink(currentUser);
-                        loadCourses();
-                    });
-                    
-                } catch (error) {
-                    console.error('Init error:', error);
-                } finally {
-                    // Hide loader
-                    const loader = document.getElementById('loader');
-                    if (loader) loader.style.display = 'none';
-                }
+                supabase.auth.onAuthStateChange(() => { checkAuth(); loadCourses(); });
+                
+                document.getElementById('loader').style.display = 'none';
             }
             
-            // Run init when DOM is ready
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', init);
-            } else {
-                init();
-            }
-
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+            else init();
+            
         } catch (error) {
-            console.error('Initialization error:', error);
-            document.getElementById('userMenu').innerHTML = `<div class="user-auth-buttons"><button class="btn btn-secondary btn-sm" onclick="alert('ระบบกำลังมีปัญหา')">เข้าสู่ระบบ</button><button class="btn btn-primary btn-sm" onclick="alert('ระบบกำลังมีปัญหา')">สมัครสมาชิก</button></div>`;
+            console.error('Init error:', error);
             document.getElementById('loader').style.display = 'none';
         }
     </script>
