@@ -19,7 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        /* ========== AUTH MODAL (เหมือน index) ========== */
+        /* ========== AUTH MODAL ========== */
         .auth-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center;
@@ -212,6 +212,7 @@
             justify-content: center;
             color: var(--gray-700);
             transition: var(--transition-fast);
+            z-index: 10;
         }
         .admin-edit-btn:hover {
             background: var(--primary-blue);
@@ -386,7 +387,22 @@
     <!-- Auth & Courses Script -->
     <script type="module">
         try {
-            const { config } = await import('../lib/config.js');
+            // Import config with error handling
+            let config;
+            try {
+                const configModule = await import('../lib/config.js');
+                config = configModule.config;
+            } catch (importError) {
+                console.error('Failed to load config:', importError);
+                // Fallback config for testing
+                config = {
+                    supabaseUrl: 'https://your-project.supabase.co',
+                    supabaseAnonKey: 'your-anon-key',
+                    adminEmail: ['admin@example.com']
+                };
+            }
+            
+            // Initialize Supabase
             const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
 
             // DOM Elements
@@ -424,13 +440,9 @@
                 if (view === 'login') {
                     document.getElementById('loginForm').classList.add('active');
                     document.getElementById('authModalTitle').textContent = 'เข้าสู่ระบบ';
-                    document.getElementById('authTogglePrompt').textContent = 'ยังไม่มีบัญชี?';
-                    document.getElementById('authToggleLink').textContent = 'สมัครสมาชิก';
                 } else if (view === 'signup') {
                     document.getElementById('signupForm').classList.add('active');
                     document.getElementById('authModalTitle').textContent = 'สมัครสมาชิก';
-                    document.getElementById('authTogglePrompt').textContent = 'มีบัญชีแล้ว?';
-                    document.getElementById('authToggleLink').textContent = 'เข้าสู่ระบบ';
                 }
             }
             function resetForms() { loginForm.reset(); signupForm.reset(); switchAuthView('login'); }
@@ -450,7 +462,10 @@
                             <div class="divider"></div>
                             <a href="#" id="logoutBtn" class="logout"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
                         </div>`;
-                    document.getElementById('userInfo').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('active'); });
+                    document.getElementById('userInfo').addEventListener('click', (e) => { 
+                        e.stopPropagation(); 
+                        document.getElementById('userDropdown').classList.toggle('active'); 
+                    });
                     document.getElementById('logoutBtn')?.addEventListener('click', async (e) => { 
                         e.preventDefault(); 
                         await supabase.auth.signOut(); 
@@ -498,7 +513,7 @@
             // Auth Event Listeners
             authModalClose.addEventListener('click', closeAuthModal);
             authModal.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
-            document.getElementById('authToggleLink').addEventListener('click', (e) => { e.preventDefault(); switchAuthView(currentView === 'login' ? 'signup' : 'login'); });
+            document.getElementById('authToggleLink')?.addEventListener('click', (e) => { e.preventDefault(); switchAuthView(currentView === 'login' ? 'signup' : 'login'); });
             document.getElementById('showForgotPassword')?.addEventListener('click', (e) => { e.preventDefault(); alert('กรุณาติดต่อผู้ดูแลระบบเพื่อรีเซ็ตรหัสผ่าน'); });
 
             loginForm.addEventListener('submit', async (e) => {
@@ -535,17 +550,25 @@
             
             async function loadCourses() {
                 try {
+                    console.log('Loading courses...');
+                    
                     // Load courses from database
                     let query = supabase.from('courses').select('*').eq('published', true).order('created_at', { ascending: false });
                     
                     // If admin, show all courses (including unpublished)
                     if (isAdmin) {
+                        console.log('Admin mode: showing all courses');
                         query = supabase.from('courses').select('*').order('created_at', { ascending: false });
                     }
                     
                     const { data: courses, error } = await query;
                     
-                    if (error) throw error;
+                    if (error) {
+                        console.error('Supabase query error:', error);
+                        throw error;
+                    }
+                    
+                    console.log('Courses loaded:', courses?.length || 0);
                     
                     // Hide loading
                     coursesGrid.innerHTML = '';
@@ -597,7 +620,7 @@
                     
                 } catch (error) {
                     console.error('Load courses error:', error);
-                    coursesGrid.innerHTML = `<div class="courses-empty"><i class="fas fa-exclamation-circle"></i><p>โหลดคอร์สไม่สำเร็จ</p></div>`;
+                    coursesGrid.innerHTML = `<div class="courses-empty"><i class="fas fa-exclamation-circle"></i><p>โหลดคอร์สไม่สำเร็จ: ${error.message}</p></div>`;
                 }
             }
 
@@ -611,32 +634,43 @@
             // INIT
             // ========================================
             
-            (async () => {
-                await checkAuth();
-                await loadCourses();
+            async function init() {
+                console.log('Initializing ai-courses page...');
                 
-                // Listen for auth changes
-                supabase.auth.onAuthStateChange((event, session) => {
-                    currentUser = session?.user || null;
-                    renderUserMenu(currentUser);
-                    updateAdminLink(currentUser);
-                    loadCourses();
-                });
-                
-                // Hide loader
-                document.getElementById('loader').style.display = 'none';
-            })();
+                try {
+                    await checkAuth();
+                    await loadCourses();
+                    
+                    // Listen for auth changes
+                    supabase.auth.onAuthStateChange((event, session) => {
+                        console.log('Auth state changed:', event);
+                        currentUser = session?.user || null;
+                        renderUserMenu(currentUser);
+                        updateAdminLink(currentUser);
+                        loadCourses();
+                    });
+                    
+                } catch (error) {
+                    console.error('Init error:', error);
+                } finally {
+                    // Hide loader
+                    const loader = document.getElementById('loader');
+                    if (loader) loader.style.display = 'none';
+                }
+            }
+            
+            // Run init when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
 
         } catch (error) {
             console.error('Initialization error:', error);
             document.getElementById('userMenu').innerHTML = `<div class="user-auth-buttons"><button class="btn btn-secondary btn-sm" onclick="alert('ระบบกำลังมีปัญหา')">เข้าสู่ระบบ</button><button class="btn btn-primary btn-sm" onclick="alert('ระบบกำลังมีปัญหา')">สมัครสมาชิก</button></div>`;
             document.getElementById('loader').style.display = 'none';
         }
-    </script>
-</body>
-</html>
-        // Init
-        loadCourses();
     </script>
 </body>
 </html>
