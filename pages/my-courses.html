@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คอร์สของฉัน | Djohparichat</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <!-- Navigation -->
+    </nav>
+    
+    <section class="page-header">
+        <h1>คอร์สของฉัน</h1>
+    </section>
+    
+    <section class="container" style="padding: 40px 0;">
+        <div id="myCoursesList">
+            <p style="text-align:center;color:var(--gray-500);">กำลังโหลด...</p>
+        </div>
+    </section>
+    
+    <script type="module">
+        import { config } from '../lib/config.js';
+        const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+        
+        async function loadMyCourses() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                window.location.href = '../pages/auth';
+                return;
+            }
+            
+            const { data: enrollments } = await supabase
+                .from('enrollments')
+                .select(`
+                    *,
+                    courses (
+                        id,
+                        title_th,
+                        title_en,
+                        description_th,
+                        icon,
+                        is_free
+                    )
+                `)
+                .eq('user_id', session.user.id)
+                .eq('access_granted', true)
+                .order('created_at', { ascending: false });
+            
+            const container = document.getElementById('myCoursesList');
+            
+            if (!enrollments || enrollments.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center;padding:60px 20px;">
+                        <i class="fas fa-graduation-cap" style="font-size:3rem;color:var(--gray-300);margin-bottom:16px;"></i>
+                        <p style="color:var(--gray-500);">คุณยังไม่มีคอร์สเรียน</p>
+                        <a href="ai-courses" class="btn btn-primary" style="margin-top:16px;">ดูคอร์สทั้งหมด</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="services-grid">
+                    ${enrollments.map(enroll => `
+                        <div class="course-card">
+                            <div class="course-icon">
+                                <i class="fas ${enroll.courses.icon || 'fa-robot'}"></i>
+                            </div>
+                            <h3>${enroll.courses.title_th}</h3>
+                            <p>${enroll.courses.description_th}</p>
+                            <button class="btn btn-primary" onclick="startCourse('${enroll.course_id}')">
+                                <i class="fas fa-play"></i> เริ่มเรียน
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        function startCourse(courseId) {
+            alert('กำลังเข้าสู่คอร์ส: ' + courseId);
+            // TODO: Redirect to course content
+        }
+        
+        loadMyCourses();
+    </script>
+</body>
+</html>
