@@ -1,1 +1,1552 @@
 
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โปรไฟล์ของฉัน | Djohparichat</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --primary-blue: #1e88e5;
+            --sky-blue: #e3f2fd;
+            --gradient-primary: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+        
+        /* ========== HEADER ========== */
+        .navbar {
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--primary-blue);
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .nav-list {
+            display: flex;
+            list-style: none;
+            gap: 8px;
+            margin: 0;
+            padding: 0;
+        }
+        .nav-link {
+            padding: 8px 16px;
+            text-decoration: none;
+            color: var(--gray-700);
+            font-weight: 500;
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: var(--sky-blue);
+            color: var(--primary-blue);
+        }
+        
+        /* ========== PROFILE HEADER ========== */
+        .profile-header {
+            background: var(--gradient-primary);
+            padding: 60px 0 120px;
+            position: relative;
+            overflow: hidden;
+        }
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.3;
+        }
+        .profile-header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .profile-header h1 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        .profile-header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1rem;
+        }
+        
+        /* ========== PROFILE CONTENT ========== */
+        .profile-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+            margin-top: -80px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Profile Card */
+        .profile-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .profile-cover {
+            height: 200px;
+            background: var(--gradient-primary);
+            position: relative;
+            overflow: hidden;
+        }
+        .profile-cover-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-cover-edit {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            background: rgba(255,255,255,0.9);
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .profile-cover-edit:hover {
+            background: white;
+            transform: translateY(-2px);
+        }
+        .profile-avatar-section {
+            padding: 0 32px;
+            margin-top: -60px;
+            display: flex;
+            align-items: flex-end;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .profile-avatar-wrapper {
+            position: relative;
+        }
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: var(--shadow-lg);
+            object-fit: cover;
+            background: var(--gray-200);
+        }
+        .profile-avatar-edit {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 36px;
+            height: 36px;
+            background: var(--primary-blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .profile-avatar-edit:hover {
+            background: var(--gray-800);
+            transform: scale(1.1);
+        }
+        .profile-avatar-edit input[type="file"] {
+            display: none;
+        }
+        .profile-info-header {
+            padding-bottom: 24px;
+            flex: 1;
+        }
+        .profile-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+        .profile-email {
+            color: var(--gray-600);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .verified-badge {
+            background: var(--success);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        /* Tabs */
+        .profile-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--gray-200);
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .profile-tab {
+            padding: 16px 24px;
+            background: none;
+            border: none;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .profile-tab:hover {
+            color: var(--primary-blue);
+        }
+        .profile-tab.active {
+            color: var(--primary-blue);
+        }
+        .profile-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-blue);
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            padding: 32px;
+            animation: fadeIn 0.3s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Form Sections */
+        .form-section {
+            margin-bottom: 32px;
+        }
+        .form-section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-section-title i {
+            color: var(--primary-blue);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 640px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-weight: 500;
+            color: var(--gray-700);
+            font-size: 0.9rem;
+        }
+        .form-group label .required {
+            color: var(--error);
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+        }
+        .form-group input:disabled {
+            background: var(--gray-100);
+            cursor: not-allowed;
+        }
+        .form-group small {
+            color: var(--gray-500);
+            font-size: 0.8rem;
+        }
+        .form-hint {
+            background: var(--sky-blue);
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            color: var(--gray-700);
+            margin-top: 8px;
+        }
+        .form-hint i {
+            color: var(--primary-blue);
+            margin-right: 8px;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        .btn-outline {
+            background: white;
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+        .btn-outline:hover {
+            background: var(--sky-blue);
+        }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+        
+        /* Verification Badge */
+        .verification-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--gray-50);
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+        }
+        .verification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        .verification-icon.verified {
+            background: #d1fae5;
+            color: var(--success);
+        }
+        .verification-icon.pending {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+        .verification-icon.unverified {
+            background: #fee2e2;
+            color: var(--error);
+        }
+        .verification-info {
+            flex: 1;
+        }
+        .verification-title {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 2px;
+        }
+        .verification-desc {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+        
+        /* Security Level */
+        .security-level {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 24px;
+        }
+        .security-level-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .security-bar {
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .security-progress {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .security-tips {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        .security-tip {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            color: var(--gray-700);
+        }
+        .security-tip i {
+            width: 20px;
+            color: var(--success);
+        }
+        .security-tip.not-done i {
+            color: var(--gray-400);
+        }
+        
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            box-shadow: var(--shadow-xl);
+        }
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: var(--gray-900);
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--gray-100);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-600);
+            transition: all 0.2s ease;
+        }
+        .modal-close:hover {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
+        .modal-body {
+            padding: 24px;
+        }
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        /* OTP Input */
+        .otp-inputs {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 24px 0;
+        }
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .otp-input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+        }
+        
+        /* Alert */
+        .alert {
+            padding: 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid var(--success);
+        }
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid var(--warning);
+        }
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid var(--error);
+        }
+        .alert i {
+            font-size: 1.2rem;
+            margin-top: 2px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .profile-avatar-section {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .profile-tabs {
+                overflow-x: auto;
+            }
+            .tab-content {
+                padding: 20px;
+            }
+            .profile-cover {
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-wrapper">
+            <a href="../index" class="logo">
+                <span class="logo-icon"><i class="fas fa-graduation-cap"></i></span>
+                <span class="logo-text">Djohparichat</span>
+            </a>
+            <div class="nav-menu">
+                <ul class="nav-list">
+                    <li><a href="../index" class="nav-link">หน้าหลัก</a></li>
+                    <li><a href="services" class="nav-link">บริการ</a></li>
+                    <li><a href="ai-courses" class="nav-link">หลักสูตร AI</a></li>
+                    <li><a href="about" class="nav-link">เกี่ยวกับเรา</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Profile Header -->
+    <section class="profile-header">
+        <div class="profile-header-content">
+            <h1>โปรไฟล์ของฉัน</h1>
+            <p>จัดการข้อมูลส่วนตัวและการตั้งค่าบัญชี</p>
+        </div>
+    </section>
+
+    <!-- Profile Content -->
+    <div class="profile-content">
+        <!-- Profile Card -->
+        <div class="profile-card">
+            <!-- Cover Image -->
+            <div class="profile-cover">
+                <img src="https://via.placeholder.com/1200x200/1e88e5/ffffff?text=Cover+Photo" alt="Cover" class="profile-cover-img" id="coverImage">
+                <label class="profile-cover-edit">
+                    <i class="fas fa-camera"></i>
+                    <span>เปลี่ยนรูปปก</span>
+                    <input type="file" id="coverInput" accept="image/*" style="display:none;">
+                </label>
+            </div>
+            
+            <!-- Avatar & Info -->
+            <div class="profile-avatar-section">
+                <div class="profile-avatar-wrapper">
+                    <img src="https://via.placeholder.com/120/1e88e5/ffffff?text=AVATAR" alt="Avatar" class="profile-avatar" id="avatarImage">
+                    <label class="profile-avatar-edit">
+                        <i class="fas fa-camera"></i>
+                        <input type="file" id="avatarInput" accept="image/*">
+                    </label>
+                </div>
+                <div class="profile-info-header">
+                    <h2 class="profile-name" id="displayName">-</h2>
+                    <div class="profile-email">
+                        <i class="fas fa-envelope"></i>
+                        <span id="displayEmail">-</span>
+                        <span class="verified-badge" id="emailVerifiedBadge" style="display:none;">
+                            <i class="fas fa-check-circle"></i> ยืนยันแล้ว
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="profile-tabs">
+                <button class="profile-tab active" data-tab="general">
+                    <i class="fas fa-user"></i> ข้อมูลทั่วไป
+                </button>
+                <button class="profile-tab" data-tab="security">
+                    <i class="fas fa-shield-alt"></i> ความปลอดภัย
+                </button>
+                <button class="profile-tab" data-tab="verification">
+                    <i class="fas fa-check-circle"></i> ยืนยันตัวตน
+                </button>
+                <button class="profile-tab" data-tab="notifications">
+                    <i class="fas fa-bell"></i> การแจ้งเตือน
+                </button>
+            </div>
+            
+            <!-- Tab: General -->
+            <div class="tab-content active" id="tab-general">
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-user-circle"></i>
+                        ข้อมูลส่วนตัว
+                    </h3>
+                    <form id="profileForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>ชื่อ <span class="required">*</span></label>
+                                <input type="text" id="firstName" required placeholder="ชื่อจริง">
+                            </div>
+                            <div class="form-group">
+                                <label>นามสกุล <span class="required">*</span></label>
+                                <input type="text" id="lastName" required placeholder="นามสกุล">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>ชื่อเล่น</label>
+                                <input type="text" id="nickname" placeholder="ชื่อเล่น">
+                            </div>
+                            <div class="form-group">
+                                <label>วันเกิด</label>
+                                <input type="date" id="birthdate">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>เบอร์โทรศัพท์</label>
+                                <input type="tel" id="phone" placeholder="08X-XXX-XXXX">
+                                <small>ใช้สำหรับการติดต่อและยืนยันตัวตน</small>
+                            </div>
+                            <div class="form-group">
+                                <label>อาชีพ</label>
+                                <select id="occupation">
+                                    <option value="">เลือกอาชีพ</option>
+                                    <option value="student">นักเรียน/นักศึกษา</option>
+                                    <option value="employee">พนักงานบริษัท</option>
+                                    <option value="business">เจ้าของธุรกิจ</option>
+                                    <option value="freelance">ฟรีแลนซ์</option>
+                                    <option value="other">อื่นๆ</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>ที่อยู่</label>
+                            <textarea id="address" rows="3" placeholder="ที่อยู่ของคุณ"></textarea>
+                        </div>
+                        
+                        <div style="display:flex;gap:12px;margin-top:24px;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> บันทึกการเปลี่ยนแปลง
+                            </button>
+                            <button type="button" class="btn btn-outline" onclick="resetForm()">
+                                <i class="fas fa-undo"></i> ยกเลิก
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Tab: Security -->
+            <div class="tab-content" id="tab-security">
+                <div class="security-level">
+                    <div class="security-level-title">
+                        <span><i class="fas fa-shield-alt"></i> ระดับความปลอดภัยของบัญชี</span>
+                        <span id="securityLevelText" style="color:var(--primary-blue);font-weight:600;">ปานกลาง</span>
+                    </div>
+                    <div class="security-bar">
+                        <div class="security-progress" id="securityProgress" style="width:60%"></div>
+                    </div>
+                    <div class="security-tips">
+                        <div class="security-tip" id="tip-password">
+                            <i class="fas fa-check-circle"></i>
+                            <span>ตั้งรหัสผ่านที่แข็งแรง (8 ตัวอักษรขึ้นไป)</span>
+                        </div>
+                        <div class="security-tip" id="tip-email">
+                            <i class="fas fa-check-circle"></i>
+                            <span>ยืนยันอีเมล</span>
+                        </div>
+                        <div class="security-tip" id="tip-phone">
+                            <i class="fas fa-times-circle"></i>
+                            <span>ยืนยันเบอร์โทรศัพท์</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-key"></i>
+                        เปลี่ยนรหัสผ่าน
+                    </h3>
+                    <form id="passwordForm">
+                        <div class="form-group">
+                            <label>รหัสผ่านปัจจุบัน <span class="required">*</span></label>
+                            <input type="password" id="currentPassword" required placeholder="••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label>รหัสผ่านใหม่ <span class="required">*</span></label>
+                            <input type="password" id="newPassword" required placeholder="อย่างน้อย 8 ตัวอักษร" minlength="8">
+                            <small>ต้องมีอย่างน้อย 8 ตัวอักษร ประกอบด้วยตัวอักษรและตัวเลข</small>
+                        </div>
+                        <div class="form-group">
+                            <label>ยืนยันรหัสผ่านใหม่ <span class="required">*</span></label>
+                            <input type="password" id="confirmPassword" required placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-lock"></i> เปลี่ยนรหัสผ่าน
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-envelope"></i>
+                        เปลี่ยนอีเมล
+                    </h3>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>คำเตือน:</strong> การเปลี่ยนอีเมลจะต้องยืนยันอีเมลใหม่ก่อนจึงจะใช้งานได้
+                        </div>
+                    </div>
+                    <form id="emailChangeForm">
+                        <div class="form-group">
+                            <label>อีเมลปัจจุบัน</label>
+                            <input type="email" id="currentEmailDisplay" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>อีเมลใหม่ <span class="required">*</span></label>
+                            <input type="email" id="newEmail" required placeholder="newemail@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>รหัสผ่าน <span class="required">*</span></label>
+                            <input type="password" id="emailPassword" required placeholder="••••••••">
+                            <small>กรุณากรอกรหัสผ่านเพื่อยืนยันตัวตน</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> ส่งลิงก์ยืนยัน
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Tab: Verification -->
+            <div class="tab-content" id="tab-verification">
+                <div class="verification-status">
+                    <div class="verification-icon verified" id="emailVerificationIcon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="verification-info">
+                        <div class="verification-title">ยืนยันอีเมล</div>
+                        <div class="verification-desc" id="emailVerificationDesc">อีเมลของคุณได้รับการยืนยันแล้ว</div>
+                    </div>
+                </div>
+                
+                <div class="verification-status">
+                    <div class="verification-icon unverified" id="phoneVerificationIcon">
+                        <i class="fas fa-times"></i>
+                    </div>
+                    <div class="verification-info">
+                        <div class="verification-title">ยืนยันเบอร์โทรศัพท์</div>
+                        <div class="verification-desc" id="phoneVerificationDesc">ยังไม่ได้ยืนยันเบอร์โทรศัพท์</div>
+                    </div>
+                    <button class="btn btn-sm btn-primary" id="verifyPhoneBtn" onclick="openPhoneVerification()">
+                        <i class="fas fa-mobile-alt"></i> ยืนยันเลย
+                    </button>
+                </div>
+                
+                <div class="form-section" style="margin-top:32px;">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-id-card"></i>
+                        ยืนยันตัวตนด้วยบัตรประชาชน (Optional)
+                    </h3>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            การยืนยันตัวตนด้วยบัตรประชาชนจะช่วยเพิ่มความปลอดภัยและช่วยให้คุณเข้าถึงฟีเจอร์พิเศษได้
+                        </div>
+                    </div>
+                    <form id="idCardForm">
+                        <div class="form-group">
+                            <label>หมายเลขบัตรประชาชน 13 หลัก</label>
+                            <input type="text" id="idCardNumber" placeholder="X-XXXX-XXXXX-XX-X" maxlength="17">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>รูปหน้าบัตรประชาชน (ด้านหน้า)</label>
+                                <input type="file" id="idCardFront" accept="image/*">
+                            </div>
+                            <div class="form-group">
+                                <label>รูปหน้าบัตรประชาชน (ด้านหลัง)</label>
+                                <input type="file" id="idCardBack" accept="image/*">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> ส่งเอกสารยืนยัน
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Tab: Notifications -->
+            <div class="tab-content" id="tab-notifications">
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-envelope"></i>
+                        การแจ้งเตือนทางอีเมล
+                    </h3>
+                    <div class="form-group">
+                        <label style="display:flex;align-items:center;gap:12px;cursor:pointer;">
+                            <input type="checkbox" id="notifyCourse" checked style="width:20px;height:20px;">
+                            <div>
+                                <div style="font-weight:600;">คอร์สเรียนและการอบรม</div>
+                                <div style="font-size:0.9rem;color:var(--gray-600);">รับอีเมลเกี่ยวกับการอัปเดตคอร์ส การบ้าน และประกาศต่างๆ</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label style="display:flex;align-items:center;gap:12px;cursor:pointer;">
+                            <input type="checkbox" id="notifyPromotion" checked style="width:20px;height:20px;">
+                            <div>
+                                <div style="font-weight:600;">โปรโมชั่นและข้อเสนอพิเศษ</div>
+                                <div style="font-size:0.9rem;color:var(--gray-600);">รับอีเมลเกี่ยวกับส่วนลดและโปรโมชั่นพิเศษ</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label style="display:flex;align-items:center;gap:12px;cursor:pointer;">
+                            <input type="checkbox" id="notifySecurity" checked style="width:20px;height:20px;">
+                            <div>
+                                <div style="font-weight:600;">การแจ้งเตือนความปลอดภัย</div>
+                                <div style="font-size:0.9rem;color:var(--gray-600);">รับอีเมลเมื่อมีการเข้าสู่ระบบหรือเปลี่ยนรหัสผ่าน</div>
+                            </div>
+                        </label>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveNotificationSettings()">
+                        <i class="fas fa-save"></i> บันทึกการตั้งค่า
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Phone Verification Modal -->
+    <div class="modal" id="phoneVerificationModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closePhoneVerification()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-header">
+                <h3><i class="fas fa-mobile-alt"></i> ยืนยันเบอร์โทรศัพท์</h3>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info" style="background:#dbeafe;color:#1e40af;border-left:4px solid #3b82f6;">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        ระบบจะส่งรหัส OTP 6 หลักทาง SMS เพื่อยืนยันเบอร์โทรศัพท์ของคุณ
+                    </div>
+                </div>
+                
+                <form id="phoneVerificationForm">
+                    <div class="form-group">
+                        <label>เบอร์โทรศัพท์ <span class="required">*</span></label>
+                        <input type="tel" id="verifyPhoneInput" required placeholder="08X-XXX-XXXX" pattern="0[0-9]{9}">
+                        <small>กรุณากรอกเบอร์โทรศัพท์ที่ถูกต้อง</small>
+                    </div>
+                    
+                    <div id="otpSection" style="display:none;">
+                        <div class="form-group">
+                            <label>รหัส OTP <span class="required">*</span></label>
+                            <div class="otp-inputs">
+                                <input type="text" class="otp-input" maxlength="1" data-index="0">
+                                <input type="text" class="otp-input" maxlength="1" data-index="1">
+                                <input type="text" class="otp-input" maxlength="1" data-index="2">
+                                <input type="text" class="otp-input" maxlength="1" data-index="3">
+                                <input type="text" class="otp-input" maxlength="1" data-index="4">
+                                <input type="text" class="otp-input" maxlength="1" data-index="5">
+                            </div>
+                            <div style="text-align:center;margin-top:12px;">
+                                <small style="color:var(--gray-600);">
+                                    ไม่ได้รับรหัส? 
+                                    <a href="#" onclick="resendOTP()" style="color:var(--primary-blue);text-decoration:none;">ส่งใหม่</a>
+                                    <span id="resendTimer" style="margin-left:8px;color:var(--gray-500);">(60 วินาที)</span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closePhoneVerification()">ยกเลิก</button>
+                <button class="btn btn-primary" id="sendOTPBtn" onclick="sendOTP()">
+                    <i class="fas fa-paper-plane"></i> ส่งรหัส OTP
+                </button>
+                <button class="btn btn-success" id="verifyOTPBtn" onclick="verifyOTP()" style="display:none;">
+                    <i class="fas fa-check"></i> ยืนยัน
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/language.js"></script>
+    <script src="../assets/js/animations.js"></script>
+    
+    <script type="module">
+        import { config } from '../lib/config.js';
+        const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+        
+        let currentUser = null;
+        let userProfile = null;
+        let otpCode = '';
+        let resendTimer = null;
+
+        // ========== INIT ==========
+        async function init() {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!session) {
+                window.location.href = 'auth';
+                return;
+            }
+            
+            currentUser = session.user;
+            await loadUserProfile();
+            setupEventListeners();
+            updateSecurityLevel();
+        }
+
+        // ========== LOAD USER PROFILE ==========
+        async function loadUserProfile() {
+            // Load from database or use auth metadata
+            const { data, error } = await supabase
+                .from('user_profiles')
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .single();
+            
+            if (error && error.code !== 'PGRST116') {
+                console.error('Error loading profile:', error);
+            }
+            
+            userProfile = data || {};
+            
+            // Display user info
+            document.getElementById('displayName').textContent = 
+                userProfile.full_name || currentUser.email?.split('@')[0] || 'ผู้ใช้';
+            document.getElementById('displayEmail').textContent = currentUser.email || '-';
+            
+            // Fill form fields
+            if (userProfile) {
+                document.getElementById('firstName').value = userProfile.first_name || '';
+                document.getElementById('lastName').value = userProfile.last_name || '';
+                document.getElementById('nickname').value = userProfile.nickname || '';
+                document.getElementById('birthdate').value = userProfile.birthdate || '';
+                document.getElementById('phone').value = userProfile.phone || '';
+                document.getElementById('occupation').value = userProfile.occupation || '';
+                document.getElementById('address').value = userProfile.address || '';
+                
+                // Update verification status
+                if (userProfile.email_verified) {
+                    document.getElementById('emailVerifiedBadge').style.display = 'inline-flex';
+                    document.getElementById('emailVerificationIcon').className = 'verification-icon verified';
+                    document.getElementById('emailVerificationIcon').innerHTML = '<i class="fas fa-check"></i>';
+                    document.getElementById('emailVerificationDesc').textContent = 'อีเมลของคุณได้รับการยืนยันแล้ว';
+                } else {
+                    document.getElementById('emailVerifiedBadge').style.display = 'none';
+                    document.getElementById('emailVerificationIcon').className = 'verification-icon pending';
+                    document.getElementById('emailVerificationIcon').innerHTML = '<i class="fas fa-clock"></i>';
+                    document.getElementById('emailVerificationDesc').textContent = 'กรุณายืนยันอีเมลของคุณ';
+                }
+                
+                if (userProfile.phone_verified) {
+                    document.getElementById('phoneVerificationIcon').className = 'verification-icon verified';
+                    document.getElementById('phoneVerificationIcon').innerHTML = '<i class="fas fa-check"></i>';
+                    document.getElementById('phoneVerificationDesc').textContent = 'เบอร์โทรศัพท์ได้รับการยืนยันแล้ว';
+                    document.getElementById('verifyPhoneBtn').style.display = 'none';
+                }
+            }
+            
+            document.getElementById('currentEmailDisplay').value = currentUser.email || '';
+        }
+
+        // ========== EVENT LISTENERS ==========
+        function setupEventListeners() {
+            // Tabs
+            document.querySelectorAll('.profile-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.dataset.tab;
+                    switchTab(tabName);
+                });
+            });
+            
+            // Profile form
+            document.getElementById('profileForm')?.addEventListener('submit', saveProfile);
+            
+            // Password form
+            document.getElementById('passwordForm')?.addEventListener('submit', changePassword);
+            
+            // Email change form
+            document.getElementById('emailChangeForm')?.addEventListener('submit', requestEmailChange);
+            
+            // ID Card form
+            document.getElementById('idCardForm')?.addEventListener('submit', submitIDCard);
+            
+            // Avatar upload
+            document.getElementById('avatarInput')?.addEventListener('change', handleAvatarUpload);
+            
+            // Cover upload
+            document.getElementById('coverInput')?.addEventListener('change', handleCoverUpload);
+            
+            // OTP inputs auto-focus
+            document.querySelectorAll('.otp-input').forEach((input, index) => {
+                input.addEventListener('input', function() {
+                    if (this.value && index < 5) {
+                        document.querySelectorAll('.otp-input')[index + 1].focus();
+                    }
+                });
+                
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && !this.value && index > 0) {
+                        document.querySelectorAll('.otp-input')[index - 1].focus();
+                    }
+                });
+            });
+        }
+
+        // ========== TABS ==========
+        function switchTab(tabName) {
+            document.querySelectorAll('.profile-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.tab === tabName) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+
+        // ========== SAVE PROFILE ==========
+        async function saveProfile(e) {
+            e.preventDefault();
+            
+            const profileData = {
+                user_id: currentUser.id,
+                first_name: document.getElementById('firstName').value,
+                last_name: document.getElementById('lastName').value,
+                nickname: document.getElementById('nickname').value,
+                birthdate: document.getElementById('birthdate').value,
+                phone: document.getElementById('phone').value,
+                occupation: document.getElementById('occupation').value,
+                address: document.getElementById('address').value,
+                updated_at: new Date().toISOString()
+            };
+            
+            try {
+                const { error } = await supabase
+                    .from('user_profiles')
+                    .upsert(profileData);
+                
+                if (error) throw error;
+                
+                alert('บันทึกข้อมูลสำเร็จ!');
+                loadUserProfile();
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                alert('เกิดข้อผิดพลาด: ' + error.message);
+            }
+        }
+
+        // ========== CHANGE PASSWORD ==========
+        async function changePassword(e) {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                alert('รหัสผ่านใหม่ไม่ตรงกัน');
+                return;
+            }
+            
+            if (newPassword.length < 8) {
+                alert('รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร');
+                return;
+            }
+            
+            try {
+                // First, verify current password by trying to sign in
+                const { error: signInError } = await supabase.auth.signInWithPassword({
+                    email: currentUser.email,
+                    password: currentPassword
+                });
+                
+                if (signInError) {
+                    alert('รหัสผ่านปัจจุบันไม่ถูกต้อง');
+                    return;
+                }
+                
+                // Update password
+                const { error } = await supabase.auth.updateUser({
+                    password: newPassword
+                });
+                
+                if (error) throw error;
+                
+                alert('เปลี่ยนรหัสผ่านสำเร็จ!');
+                document.getElementById('passwordForm').reset();
+            } catch (error) {
+                console.error('Error changing password:', error);
+                alert('เกิดข้อผิดพลาด: ' + error.message);
+            }
+        }
+
+        // ========== REQUEST EMAIL CHANGE ==========
+        async function requestEmailChange(e) {
+            e.preventDefault();
+            
+            const newEmail = document.getElementById('newEmail').value;
+            const password = document.getElementById('emailPassword').value;
+            
+            // Verify password
+            const { error: signInError } = await supabase.auth.signInWithPassword({
+                email: currentUser.email,
+                password: password
+            });
+            
+            if (signInError) {
+                alert('รหัสผ่านไม่ถูกต้อง');
+                return;
+            }
+            
+            try {
+                // Send email change request
+                const { error } = await supabase.auth.updateUser({
+                    email: newEmail
+                });
+                
+                if (error) throw error;
+                
+                alert('ส่งลิงก์ยืนยันไปยังอีเมลใหม่แล้ว กรุณาตรวจสอบอีเมล');
+                document.getElementById('emailChangeForm').reset();
+            } catch (error) {
+                console.error('Error changing email:', error);
+                alert('เกิดข้อผิดพลาด: ' + error.message);
+            }
+        }
+
+        // ========== PHONE VERIFICATION ==========
+        window.openPhoneVerification = function() {
+            document.getElementById('phoneVerificationModal').classList.add('active');
+            document.getElementById('otpSection').style.display = 'none';
+            document.getElementById('sendOTPBtn').style.display = 'inline-flex';
+            document.getElementById('verifyOTPBtn').style.display = 'none';
+            document.getElementById('phoneVerificationForm').reset();
+        };
+        
+        window.closePhoneVerification = function() {
+            document.getElementById('phoneVerificationModal').classList.remove('active');
+            if (resendTimer) clearInterval(resendTimer);
+        };
+        
+        window.sendOTP = async function() {
+            const phone = document.getElementById('verifyPhoneInput').value;
+            
+            if (!phone || phone.length < 9) {
+                alert('กรุณากรอกเบอร์โทรศัพท์ที่ถูกต้อง');
+                return;
+            }
+            
+            // Generate random OTP (for demo)
+            otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+            console.log('OTP Code:', otpCode); // For testing
+            
+            // In production, send SMS via Twilio, MessageBird, etc.
+            alert('ส่งรหัส OTP แล้ว: ' + otpCode); // Remove in production
+            
+            document.getElementById('otpSection').style.display = 'block';
+            document.getElementById('sendOTPBtn').style.display = 'none';
+            document.getElementById('verifyOTPBtn').style.display = 'inline-flex';
+            
+            // Start resend timer
+            let seconds = 60;
+            resendTimer = setInterval(() => {
+                seconds--;
+                document.getElementById('resendTimer').textContent = `(${seconds} วินาที)`;
+                if (seconds <= 0) {
+                    clearInterval(resendTimer);
+                    document.getElementById('resendTimer').textContent = '';
+                }
+            }, 1000);
+        };
+        
+        window.resendOTP = function() {
+            if (document.getElementById('resendTimer').textContent.includes('0')) {
+                sendOTP();
+            }
+        };
+        
+        window.verifyOTP = async function() {
+            const otpInputs = document.querySelectorAll('.otp-input');
+            let otp = '';
+            otpInputs.forEach(input => otp += input.value);
+            
+            if (otp !== otpCode) {
+                alert('รหัส OTP ไม่ถูกต้อง กรุณาลองใหม่');
+                return;
+            }
+            
+            const phone = document.getElementById('verifyPhoneInput').value;
+            
+            try {
+                // Update user profile
+                const { error } = await supabase
+                    .from('user_profiles')
+                    .upsert({
+                        user_id: currentUser.id,
+                        phone: phone,
+                        phone_verified: true,
+                        updated_at: new Date().toISOString()
+                    });
+                
+                if (error) throw error;
+                
+                alert('ยืนยันเบอร์โทรศัพท์สำเร็จ!');
+                closePhoneVerification();
+                loadUserProfile();
+                updateSecurityLevel();
+            } catch (error) {
+                console.error('Error verifying phone:', error);
+                alert('เกิดข้อผิดพลาด: ' + error.message);
+            }
+        };
+
+        // ========== SECURITY LEVEL ==========
+        function updateSecurityLevel() {
+            let score = 0;
+            const maxScore = 3;
+            
+            // Check password strength (simplified)
+            score += 1;
+            document.getElementById('tip-password').classList.remove('not-done');
+            document.getElementById('tip-password').querySelector('i').className = 'fas fa-check-circle';
+            
+            // Check email verification
+            if (userProfile?.email_verified) {
+                score += 1;
+                document.getElementById('tip-email').classList.remove('not-done');
+                document.getElementById('tip-email').querySelector('i').className = 'fas fa-check-circle';
+            } else {
+                document.getElementById('tip-email').classList.add('not-done');
+                document.getElementById('tip-email').querySelector('i').className = 'fas fa-times-circle';
+            }
+            
+            // Check phone verification
+            if (userProfile?.phone_verified) {
+                score += 1;
+                document.getElementById('tip-phone').classList.remove('not-done');
+                document.getElementById('tip-phone').querySelector('i').className = 'fas fa-check-circle';
+            } else {
+                document.getElementById('tip-phone').classList.add('not-done');
+                document.getElementById('tip-phone').querySelector('i').className = 'fas fa-times-circle';
+            }
+            
+            const percentage = (score / maxScore) * 100;
+            document.getElementById('securityProgress').style.width = percentage + '%';
+            
+            let levelText = '';
+            let levelColor = '';
+            if (score === 3) {
+                levelText = 'สูงมาก';
+                levelColor = 'var(--success)';
+            } else if (score === 2) {
+                levelText = 'ปานกลาง';
+                levelColor = 'var(--warning)';
+            } else {
+                levelText = 'ต่ำ';
+                levelColor = 'var(--error)';
+            }
+            
+            document.getElementById('securityLevelText').textContent = levelText;
+            document.getElementById('securityLevelText').style.color = levelColor;
+        }
+
+        // ========== FILE UPLOADS ==========
+        async function handleAvatarUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 5 * 1024 * 1024) {
+                alert('ไฟล์ใหญ่เกินไป (สูงสุด 5MB)');
+                return;
+            }
+            
+            // Upload to Supabase Storage
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${currentUser.id}-${Date.now()}.${fileExt}`;
+            const { data, error } = await supabase.storage
+                .from('avatars')
+                .upload(fileName, file);
+            
+            if (error) {
+                console.error('Upload error:', error);
+                alert('อัปโหลดรูปไม่สำเร็จ');
+                return;
+            }
+            
+            // Get public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('avatars')
+                .getPublicUrl(fileName);
+            
+            // Update profile
+            await supabase
+                .from('user_profiles')
+                .upsert({
+                    user_id: currentUser.id,
+                    avatar_url: publicUrl,
+                    updated_at: new Date().toISOString()
+                });
+            
+            document.getElementById('avatarImage').src = publicUrl;
+            alert('อัปโหลดรูปโปรไฟล์สำเร็จ!');
+        }
+        
+        async function handleCoverUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 5 * 1024 * 1024) {
+                alert('ไฟล์ใหญ่เกินไป (สูงสุด 5MB)');
+                return;
+            }
+            
+            const fileExt = file.name.split('.').pop();
+            const fileName = `cover-${currentUser.id}-${Date.now()}.${fileExt}`;
+            const { data, error } = await supabase.storage
+                .from('covers')
+                .upload(fileName, file);
+            
+            if (error) {
+                console.error('Upload error:', error);
+                alert('อัปโหลดรูปปกไม่สำเร็จ');
+                return;
+            }
+            
+            const { data: { publicUrl } } = supabase.storage
+                .from('covers')
+                .getPublicUrl(fileName);
+            
+            await supabase
+                .from('user_profiles')
+                .upsert({
+                    user_id: currentUser.id,
+                    cover_url: publicUrl,
+                    updated_at: new Date().toISOString()
+                });
+            
+            document.getElementById('coverImage').src = publicUrl;
+            alert('อัปโหลดรูปปกสำเร็จ!');
+        }
+
+        // ========== NOTIFICATIONS ==========
+        window.saveNotificationSettings = function() {
+            alert('บันทึกการตั้งค่าการแจ้งเตือนสำเร็จ!');
+        };
+
+        // ========== UTILS ==========
+        window.resetForm = function() {
+            if (confirm('ต้องการยกเลิกการเปลี่ยนแปลง?')) {
+                loadUserProfile();
+            }
+        };
+        
+        async function submitIDCard(e) {
+            e.preventDefault();
+            alert('ฟังก์ชันนี้อยู่ระหว่างการพัฒนา');
+        }
+
+        // ========== INIT ON LOAD ==========
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
