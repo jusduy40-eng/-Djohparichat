@@ -19,7 +19,369 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        /* ========== ENROLLMENT MODAL (Modern Design) ========== */
+        /* ========== PAGE HEADER ========== */
+        .page-header {
+            background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+            color: white;
+            padding: 80px 0 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.3;
+        }
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin: 0 0 16px;
+            position: relative;
+            z-index: 1;
+            font-weight: 700;
+        }
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* ========== COURSES GRID ========== */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+            margin-top: 40px;
+        }
+        
+        .course-card {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            border: 2px solid transparent;
+        }
+        .course-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(30, 136, 229, 0.15);
+            border-color: #e3f2fd;
+        }
+        .course-card.featured {
+            border-color: #1e88e5;
+            box-shadow: 0 8px 30px rgba(30, 136, 229, 0.2);
+        }
+        
+        .course-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .course-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #1e88e5;
+            margin-bottom: 20px;
+        }
+        
+        .course-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 12px;
+        }
+        
+        .course-description {
+            color: #64748b;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0 0 20px;
+        }
+        
+        .course-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .course-features li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #475569;
+            font-size: 0.95rem;
+        }
+        
+        .course-features li i {
+            color: #10b981;
+            font-size: 1rem;
+        }
+        
+        .course-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e88e5;
+            margin: 0 0 20px;
+        }
+        
+        .course-price.free {
+            color: #10b981;
+        }
+        
+        .course-actions .btn {
+            width: 100%;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .course-actions .btn-primary {
+            background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
+        }
+        
+        .course-actions .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 136, 229, 0.4);
+        }
+        
+        /* ========== EMPTY & LOADING STATES ========== */
+        .courses-empty, .courses-loading {
+            text-align: center;
+            padding: 80px 20px;
+            color: #94a3b8;
+        }
+        
+        .courses-empty i, .courses-loading i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .courses-empty p, .courses-loading p {
+            font-size: 1.2rem;
+            margin: 0;
+        }
+        
+        /* ========== AUTH MODAL ========== */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+        
+        .auth-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .auth-modal-content {
+            background: white;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 450px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(30px) scale(0.95);
+            transition: transform 0.3s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .auth-modal.active .auth-modal-content {
+            transform: translateY(0) scale(1);
+        }
+        
+        .auth-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: rgba(0,0,0,0.05);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+        
+        .auth-modal-close:hover {
+            background: rgba(0,0,0,0.1);
+            transform: rotate(90deg);
+        }
+        
+        .auth-modal-header {
+            padding: 40px 32px 24px;
+            text-align: center;
+        }
+        
+        .auth-modal-header h3 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin: 0 0 8px;
+            font-weight: 700;
+        }
+        
+        .auth-modal-header p {
+            color: #64748b;
+            margin: 0;
+            font-size: 1rem;
+        }
+        
+        .auth-modal-body {
+            padding: 0 32px 32px;
+        }
+        
+        .auth-form {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .auth-form.active {
+            display: flex;
+        }
+        
+        .auth-form .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .auth-form .form-group label {
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.95rem;
+        }
+        
+        .auth-form .form-group input {
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        
+        .auth-form .form-group input:focus {
+            border-color: #1e88e5;
+            box-shadow: 0 0 0 4px rgba(30, 136, 229, 0.1);
+        }
+        
+        .auth-form .btn-auth {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .auth-form .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 136, 229, 0.4);
+        }
+        
+        .auth-divider {
+            text-align: center;
+            margin: 24px 0;
+            position: relative;
+        }
+        
+        .auth-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e2e8f0;
+        }
+        
+        .auth-divider span {
+            background: white;
+            padding: 0 16px;
+            color: #94a3b8;
+            font-size: 0.95rem;
+            position: relative;
+        }
+        
+        .auth-toggle {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #64748b;
+        }
+        
+        .auth-toggle a {
+            color: #1e88e5;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .auth-toggle a:hover {
+            text-decoration: underline;
+        }
+        
+        /* ========== ENROLLMENT MODAL ========== */
         .enrollment-modal {
             position: fixed;
             top: 0;
@@ -37,10 +399,12 @@
             transition: all 0.3s ease;
             padding: 20px;
         }
+        
         .enrollment-modal.active {
             opacity: 1;
             visibility: visible;
         }
+        
         .enrollment-modal-content {
             background: white;
             border-radius: 24px;
@@ -55,51 +419,11 @@
             display: flex;
             flex-direction: column;
         }
+        
         .enrollment-modal.active .enrollment-modal-content {
             transform: translateY(0) scale(1);
         }
         
-        /* Modal Header */
-        .modal-header {
-            padding: 32px;
-            background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        .modal-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: pulse 4s ease-in-out infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-        }
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.8rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            position: relative;
-            z-index: 1;
-        }
-        .modal-header h3 i {
-            font-size: 2rem;
-            background: rgba(255,255,255,0.2);
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
         .modal-close {
             position: absolute;
             top: 24px;
@@ -115,15 +439,33 @@
             justify-content: center;
             color: white;
             transition: all 0.2s ease;
-            z-index: 2;
+            z-index: 10;
             backdrop-filter: blur(10px);
         }
+        
         .modal-close:hover {
             background: rgba(255,255,255,0.3);
             transform: rotate(90deg);
         }
         
-        /* Modal Body */
+        .modal-header {
+            padding: 32px;
+            background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+        
         .modal-body {
             padding: 32px;
             overflow-y: auto;
@@ -131,18 +473,19 @@
             background: #f8fafc;
         }
         
-        /* Form Styles */
         .enrollment-form {
             display: flex;
             flex-direction: column;
             gap: 24px;
         }
+        
         .form-section {
             background: white;
             padding: 24px;
             border-radius: 16px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
+        
         .form-section-title {
             font-size: 1.1rem;
             font-weight: 600;
@@ -152,13 +495,16 @@
             align-items: center;
             gap: 10px;
         }
+        
         .form-section-title i {
             color: #1e88e5;
             font-size: 1.3rem;
         }
+        
         .form-group {
             margin-bottom: 20px;
         }
+        
         .form-group label {
             display: block;
             font-weight: 500;
@@ -166,10 +512,12 @@
             font-size: 0.95rem;
             margin-bottom: 8px;
         }
+        
         .form-group label .required {
             color: #ef4444;
             margin-left: 2px;
         }
+        
         .form-group input,
         .form-group select,
         .form-group textarea {
@@ -183,24 +531,26 @@
             font-family: inherit;
             background: white;
         }
+        
         .form-group input:focus,
         .form-group textarea:focus {
             border-color: #1e88e5;
             box-shadow: 0 0 0 4px rgba(30, 136, 229, 0.1);
             transform: translateY(-2px);
         }
+        
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
         }
+        
         @media (max-width: 640px) {
             .form-row {
                 grid-template-columns: 1fr;
             }
         }
         
-        /* Payment Section */
         .payment-section {
             background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             border: 2px solid #bae6fd;
@@ -208,6 +558,7 @@
             padding: 28px;
             margin: 8px 0;
         }
+        
         .price-card {
             background: white;
             padding: 24px;
@@ -217,12 +568,14 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             border: 2px solid #e0f2fe;
         }
+        
         .price-label {
             color: #64748b;
             font-size: 0.95rem;
             margin-bottom: 8px;
             font-weight: 500;
         }
+        
         .price-amount {
             font-size: 3rem;
             font-weight: 700;
@@ -232,17 +585,20 @@
             background-clip: text;
             line-height: 1;
         }
+        
         .payment-methods {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
             margin: 24px 0;
         }
+        
         @media (max-width: 480px) {
             .payment-methods {
                 grid-template-columns: 1fr;
             }
         }
+        
         .payment-method {
             padding: 24px 20px;
             border: 2px solid #e2e8f0;
@@ -254,6 +610,7 @@
             position: relative;
             overflow: hidden;
         }
+        
         .payment-method::before {
             content: '';
             position: absolute;
@@ -265,24 +622,29 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         }
+        
         .payment-method:hover {
             border-color: #1e88e5;
             transform: translateY(-4px);
             box-shadow: 0 8px 20px rgba(30, 136, 229, 0.2);
         }
+        
         .payment-method.selected {
             border-color: #1e88e5;
             box-shadow: 0 8px 24px rgba(30, 136, 229, 0.3);
         }
+        
         .payment-method.selected::before {
             opacity: 1;
         }
+        
         .payment-method.selected i,
         .payment-method.selected div {
             color: white;
             position: relative;
             z-index: 1;
         }
+        
         .payment-method i {
             font-size: 2.5rem;
             margin-bottom: 12px;
@@ -290,6 +652,7 @@
             display: block;
             transition: color 0.3s ease;
         }
+        
         .payment-method div {
             font-weight: 600;
             font-size: 1.05rem;
@@ -297,7 +660,6 @@
             transition: color 0.3s ease;
         }
         
-        /* QR Code Section */
         .qr-section {
             background: white;
             border-radius: 16px;
@@ -307,6 +669,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             border: 2px dashed #bae6fd;
         }
+        
         .qr-code-wrapper {
             display: inline-block;
             padding: 20px;
@@ -316,11 +679,13 @@
             margin: 16px 0;
             position: relative;
         }
+        
         .qr-code-wrapper img {
             max-width: 280px;
             border-radius: 12px;
             display: block;
         }
+        
         .qr-badge {
             position: absolute;
             top: -10px;
@@ -333,6 +698,7 @@
             font-weight: 600;
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
+        
         .promptpay-number {
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             padding: 16px 24px;
@@ -340,11 +706,13 @@
             margin: 16px 0;
             border: 2px solid #fbbf24;
         }
+        
         .promptpay-label {
             color: #92400e;
             font-size: 0.9rem;
             margin-bottom: 4px;
         }
+        
         .promptpay-value {
             color: #78350f;
             font-size: 1.5rem;
@@ -352,7 +720,6 @@
             letter-spacing: 2px;
         }
         
-        /* Info Box */
         .info-box {
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             border-left: 4px solid #f59e0b;
@@ -362,19 +729,23 @@
             display: flex;
             gap: 12px;
         }
+        
         .info-box i {
             color: #f59e0b;
             font-size: 1.5rem;
             flex-shrink: 0;
         }
+        
         .info-box-content {
             flex: 1;
         }
+        
         .info-box-title {
             font-weight: 600;
             color: #92400e;
             margin-bottom: 8px;
         }
+        
         .info-box ol {
             margin: 0;
             padding-left: 20px;
@@ -382,10 +753,10 @@
             line-height: 1.8;
         }
         
-        /* File Upload */
         .file-upload-wrapper {
             margin-top: 16px;
         }
+        
         .file-upload {
             border: 2px dashed #cbd5e1;
             border-radius: 16px;
@@ -395,29 +766,35 @@
             transition: all 0.3s ease;
             background: white;
         }
+        
         .file-upload:hover {
             border-color: #1e88e5;
             background: #f0f9ff;
             transform: translateY(-2px);
         }
+        
         .file-upload i {
             font-size: 3rem;
             color: #94a3b8;
             margin-bottom: 12px;
             display: block;
         }
+        
         .file-upload-title {
             font-weight: 600;
             color: #475569;
             margin-bottom: 4px;
         }
+        
         .file-upload-desc {
             font-size: 0.9rem;
             color: #94a3b8;
         }
+        
         .file-upload input[type="file"] {
             display: none;
         }
+        
         .preview-image {
             max-width: 100%;
             max-height: 250px;
@@ -427,7 +804,6 @@
             border: 3px solid white;
         }
         
-        /* Privacy Notice */
         .privacy-notice {
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             border-left: 4px solid #f59e0b;
@@ -438,24 +814,26 @@
             gap: 12px;
             align-items: flex-start;
         }
+        
         .privacy-notice i {
             color: #f59e0b;
             font-size: 1.5rem;
             flex-shrink: 0;
             margin-top: 2px;
         }
+        
         .privacy-notice strong {
             color: #92400e;
             display: block;
             margin-bottom: 4px;
         }
+        
         .privacy-notice p {
             color: #78350f;
             margin: 0;
             line-height: 1.6;
         }
         
-        /* Modal Footer */
         .modal-footer {
             padding: 24px 32px;
             background: white;
@@ -464,6 +842,7 @@
             justify-content: flex-end;
             gap: 12px;
         }
+        
         .btn {
             padding: 14px 28px;
             border: none;
@@ -477,35 +856,40 @@
             gap: 8px;
             font-family: inherit;
         }
+        
         .btn-primary {
             background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
             color: white;
             box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
         }
+        
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(30, 136, 229, 0.4);
         }
+        
         .btn-outline {
             background: white;
             color: #64748b;
             border: 2px solid #e2e8f0;
         }
+        
         .btn-outline:hover {
             background: #f8fafc;
             border-color: #cbd5e1;
         }
+        
         .btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none !important;
         }
         
-        /* Success Screen */
         .success-screen {
             text-align: center;
             padding: 48px 32px;
         }
+        
         .success-icon {
             width: 120px;
             height: 120px;
@@ -520,22 +904,26 @@
             animation: successPulse 0.6s ease;
             box-shadow: 0 12px 32px rgba(16, 185, 129, 0.3);
         }
+        
         @keyframes successPulse {
             0% { transform: scale(0); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
+        
         .success-screen h4 {
             margin: 0 0 16px;
             color: #1e293b;
             font-size: 2rem;
         }
+        
         .success-screen p {
             margin: 0 0 32px;
             color: #64748b;
             line-height: 1.8;
             font-size: 1.1rem;
         }
+        
         .status-card {
             background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
             border-left: 4px solid #3b82f6;
@@ -544,114 +932,37 @@
             margin: 24px 0;
             text-align: left;
         }
+        
         .status-card i {
             color: #3b82f6;
             font-size: 1.5rem;
             margin-right: 12px;
         }
+        
         .status-card strong {
             color: #1e40af;
             display: block;
             margin-bottom: 8px;
             font-size: 1.1rem;
         }
+        
         .status-card small {
             color: #3b82f6;
             line-height: 1.6;
         }
         
-        /* Course Cards */
-        .course-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            box-shadow: var(--shadow-md);
-            transition: var(--transition-normal);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .course-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-        .course-card.featured {
-            border: 2px solid var(--primary-blue);
-        }
-        .course-badge {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            padding: 4px 12px;
-            background: var(--gradient-primary);
-            color: white;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-        .course-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--sky-blue);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: var(--primary-blue);
-        }
-        .course-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--gray-900);
-            margin: 0;
-        }
-        .course-description {
-            color: var(--gray-600);
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin: 0;
-        }
-        .course-features {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .course-features li {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--gray-700);
-            font-size: 0.9rem;
-        }
-        .course-features li i {
-            color: var(--success);
-            font-size: 0.8rem;
-        }
-        .course-price {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-blue);
-            margin: 8px 0;
-        }
-        .course-price.free {
-            color: var(--success);
-        }
-        .course-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: auto;
-        }
-        .course-actions .btn {
-            flex: 1;
-        }
-        
         /* Responsive */
         @media (max-width: 768px) {
+            .page-header {
+                padding: 60px 0 40px;
+            }
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
             .modal-header {
                 padding: 24px;
             }
@@ -688,64 +999,7 @@
         </div>
     </div>
 
-    <!-- Auth Modal (เหมือน index.html) -->
-    <div id="authModal" class="auth-modal">
-        <div class="auth-modal-content">
-            <button class="auth-modal-close" id="authModalClose"><i class="fas fa-times"></i></button>
-            <div class="auth-modal-header">
-                <h3 id="authModalTitle">เข้าสู่ระบบ</h3>
-                <p id="authModalDesc">ยินดีต้อนรับกลับ! กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</p>
-            </div>
-            <div class="auth-modal-body">
-                <!-- Login Form -->
-                <form id="loginForm" class="auth-form auth-form-view active">
-                    <div id="loginMessage" class="auth-message"></div>
-                    <div class="form-group">
-                        <label for="loginEmail">อีเมล</label>
-                        <input type="email" id="loginEmail" required placeholder="example@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">รหัสผ่าน</label>
-                        <input type="password" id="loginPassword" required placeholder="••••••••">
-                    </div>
-                    <div class="form-options">
-                        <label><input type="checkbox" id="loginRemember"> จดจำฉัน</label>
-                        <a href="#" id="showForgotPassword">ลืมรหัสผ่าน?</a>
-                    </div>
-                    <button type="submit" class="btn-auth" id="loginBtn"><span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i></button>
-                </form>
-                <!-- Sign Up Form -->
-                <form id="signupForm" class="auth-form auth-form-view">
-                    <div id="signupMessage" class="auth-message"></div>
-                    <div class="form-group">
-                        <label for="signupName">ชื่อ-นามสกุล</label>
-                        <input type="text" id="signupName" required placeholder="สมชาย ใจดี">
-                    </div>
-                    <div class="form-group">
-                        <label for="signupEmail">อีเมล</label>
-                        <input type="email" id="signupEmail" required placeholder="example@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="signupPassword">รหัสผ่าน</label>
-                        <input type="password" id="signupPassword" required placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6">
-                        <small style="color: var(--gray-500); font-size: 0.8rem;">ต้องมีความยาวอย่างน้อย 6 ตัวอักษร</small>
-                    </div>
-                    <div class="form-group">
-                        <label><input type="checkbox" id="signupTerms" required>
-                        <span>ฉันยอมรับ <a href="#" style="color: var(--primary-blue);">เงื่อนไขการใช้งาน</a> และ <a href="#" style="color: var(--primary-blue);">นโยบายความเป็นส่วนตัว</a></span></label>
-                    </div>
-                    <button type="submit" class="btn-auth" id="signupBtn"><span>สมัครสมาชิก</span><i class="fas fa-user-plus"></i></button>
-                </form>
-                <div class="auth-divider"><span>หรือ</span></div>
-                <div class="auth-toggle" id="authToggleText">
-                    <span id="authTogglePrompt">ยังไม่มีบัญชี?</span>
-                    <a href="#" id="authToggleLink">สมัครสมาชิก</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Navigation (เหมือน index.html เป๊ะ) -->
+    <!-- Navigation -->
     <nav id="navbar" class="navbar">
         <div class="container">
             <div class="nav-wrapper">
@@ -773,6 +1027,59 @@
             </div>
         </div>
     </nav>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="auth-modal">
+        <div class="auth-modal-content">
+            <button class="auth-modal-close" id="authModalClose"><i class="fas fa-times"></i></button>
+            <div class="auth-modal-header">
+                <h3 id="authModalTitle">เข้าสู่ระบบ</h3>
+                <p id="authModalDesc">ยินดีต้อนรับกลับ! กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</p>
+            </div>
+            <div class="auth-modal-body">
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form active">
+                    <div class="form-group">
+                        <label>อีเมล</label>
+                        <input type="email" id="loginEmail" required placeholder="example@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>รหัสผ่าน</label>
+                        <input type="password" id="loginPassword" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn-auth" id="loginBtn">
+                        <span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i>
+                    </button>
+                </form>
+                
+                <!-- Sign Up Form -->
+                <form id="signupForm" class="auth-form">
+                    <div class="form-group">
+                        <label>ชื่อ-นามสกุล</label>
+                        <input type="text" id="signupName" required placeholder="สมชาย ใจดี">
+                    </div>
+                    <div class="form-group">
+                        <label>อีเมล</label>
+                        <input type="email" id="signupEmail" required placeholder="example@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>รหัสผ่าน</label>
+                        <input type="password" id="signupPassword" required placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6">
+                        <small style="color: #94a3b8; font-size: 0.85rem;">ต้องมีความยาวอย่างน้อย 6 ตัวอักษร</small>
+                    </div>
+                    <button type="submit" class="btn-auth" id="signupBtn">
+                        <span>สมัครสมาชิก</span><i class="fas fa-user-plus"></i>
+                    </button>
+                </form>
+                
+                <div class="auth-divider"><span>หรือ</span></div>
+                <div class="auth-toggle">
+                    <span id="authTogglePrompt">ยังไม่มีบัญชี?</span>
+                    <a href="#" id="authToggleLink">สมัครสมาชิก</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Page Header -->
     <section class="page-header">
@@ -1019,15 +1326,16 @@
             document.body.style.overflow = 'hidden';
             switchAuthView(view);
         }
+        
         function closeAuthModal() {
             authModal.classList.remove('active');
             document.body.style.overflow = '';
             resetAuthForms();
         }
+        
         function switchAuthView(view) {
             currentView = view;
-            document.querySelectorAll('.auth-form-view').forEach(f => f.classList.remove('active'));
-            document.querySelectorAll('.auth-message').forEach(m => { m.style.display = 'none'; m.textContent = ''; });
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
             if (view === 'login') {
                 document.getElementById('loginForm').classList.add('active');
                 document.getElementById('authModalTitle').textContent = 'เข้าสู่ระบบ';
@@ -1040,6 +1348,7 @@
                 document.getElementById('authToggleLink').textContent = 'เข้าสู่ระบบ';
             }
         }
+        
         function resetAuthForms() {
             loginForm.reset();
             signupForm.reset();
