@@ -1021,560 +1021,584 @@
     
     <!-- Settings Script -->
     <script type="module">
-        // ========== CONFIG ==========
-        let config;
-        let supabase;
-        
-        try {
-            const configModule = await import('../lib/config.js');
-            config = configModule.config;
-        } catch (e) {
-            console.warn('⚠️ Cannot load config.js, using fallback');
-            config = {
-                supabaseUrl: 'https://srtsdminbdmxtvjgriev.supabase.co',
-                supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNydHNkbWluYmRteHR2amdyaWV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY4OTU2NzMsImV4cCI6MjA1MjQ3MTY3M30.XYZ123',
-                adminEmail: ['jusduy40@gmail.com']
-            };
-        }
-        
-        // Initialize Supabase
-        try {
-            if (config && config.supabaseUrl && config.supabaseAnonKey) {
-                supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
-                console.log('✅ Supabase initialized');
-            }
-        } catch (e) {
-            console.error('❌ Failed to initialize Supabase:', e);
-        }
-        
-        // ========== STATE ==========
-        let currentUser = null;
-        let isAdmin = false;
-        let contentData = {};
-        let realtimeSubscription = null;
-
-        // ========== DOM ELEMENTS ==========
-        const loader = document.getElementById('loader');
-        const loginOverlay = document.getElementById('loginOverlay');
-        const authModal = document.getElementById('authModal');
-        const authModalClose = document.getElementById('authModalClose');
-        const loginForm = document.getElementById('loginForm');
-        const signupForm = document.getElementById('signupForm');
-        const openLoginBtn = document.getElementById('openLoginBtn');
-        const goHomeBtn = document.getElementById('goHomeBtn');
-        const sidebarLogout = document.getElementById('sidebarLogout');
-        
-        const form = document.getElementById('settingsForm');
-        const saveBtn = document.getElementById('saveBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const toast = document.getElementById('toast');
-        const toastMessage = document.getElementById('toastMessage');
-        const adminEmailEl = document.getElementById('adminEmail');
-        
-        // Form inputs
-        const inputs = {
-            'title_th': document.getElementById('titleTh'),
-            'title_en': document.getElementById('titleEn'),
-            'description_th': document.getElementById('descTh'),
-            'description_en': document.getElementById('descEn'),
-            'experience_years': document.getElementById('expYears'),
-            'feature_1_title_th': document.getElementById('feat1TitleTh'),
-            'feature_1_title_en': document.getElementById('feat1TitleEn'),
-            'feature_1_desc_th': document.getElementById('feat1DescTh'),
-            'feature_1_desc_en': document.getElementById('feat1DescEn'),
-            'feature_2_title_th': document.getElementById('feat2TitleTh'),
-            'feature_2_title_en': document.getElementById('feat2TitleEn'),
-            'feature_2_desc_th': document.getElementById('feat2DescTh'),
-            'feature_2_desc_en': document.getElementById('feat2DescEn'),
-        };
-        
-        // Preview elements
-        const preview = {
-            'title_th': document.getElementById('previewTitle'),
-            'description_th': document.getElementById('previewDesc'),
-            'experience_years': document.getElementById('previewExpYears'),
-            'feature_1_title_th': document.getElementById('previewFeat1Title'),
-            'feature_1_desc_th': document.getElementById('previewFeat1Desc'),
-            'feature_2_title_th': document.getElementById('previewFeat2Title'),
-            'feature_2_desc_th': document.getElementById('previewFeat2Desc'),
-        };
-        
-        // Image elements
-        const mainImageInput = document.getElementById('mainImageInput');
-        const imageUploadZone = document.getElementById('imageUploadZone');
-        const currentImageContainer = document.getElementById('currentImageContainer');
-        const currentImagePreview = document.getElementById('currentImagePreview');
-        const previewImage = document.getElementById('previewImage');
-        const previewImagePlaceholder = document.getElementById('previewImagePlaceholder');
-
-        // ========== AUTH FUNCTIONS ==========
-let currentAuthView = 'login';
-
-function openAuthModal(view = 'login') {
-    authModal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    switchAuthView(view);
-}
-
-function closeAuthModal() {
-    authModal.classList.remove('active');
-    document.body.style.overflow = '';
-    resetAuthForms();
-}
-
-function switchAuthView(view) {
-    currentAuthView = view;
-    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-    
-    const authModalTitle = document.getElementById('authModalTitle');
-    const authTogglePrompt = document.getElementById('authTogglePrompt');
-    const authToggleLink = document.getElementById('authToggleLink');
-    
-    if (view === 'signup') {
-        document.getElementById('signupForm').classList.add('active');
-        if (authModalTitle) authModalTitle.textContent = 'สมัครสมาชิก';
-        if (authTogglePrompt) authTogglePrompt.textContent = 'มีบัญชีแล้ว?';
-        if (authToggleLink) authToggleLink.textContent = 'เข้าสู่ระบบ';
-    } else {
-        document.getElementById('loginForm').classList.add('active');
-        if (authModalTitle) authModalTitle.textContent = 'เข้าสู่ระบบ';
-        if (authTogglePrompt) authTogglePrompt.textContent = 'ยังไม่มีบัญชี?';
-        if (authToggleLink) authToggleLink.textContent = 'สมัครสมาชิก';
-    }
-}
-
-function resetAuthForms() {
-    loginForm.reset();
-    signupForm.reset();
-    switchAuthView('login');
-}
-
-function showLoginOverlay() {
-    loginOverlay.classList.remove('hidden');
-    document.querySelector('.admin-sidebar')?.style.setProperty('pointer-events', 'none');
-    document.querySelector('.admin-main')?.style.setProperty('pointer-events', 'none');
-}
-
-function hideLoginOverlay() {
-    loginOverlay.classList.add('hidden');
-    document.querySelector('.admin-sidebar')?.style.setProperty('pointer-events', '');
-    document.querySelector('.admin-main')?.style.setProperty('pointer-events', '');
-}
-
-async function checkAuth() {
-    if (!supabase) {
-        console.error('❌ Supabase not initialized');
-        showLoginOverlay();
-        return null;
-    }
+    // ========== CONFIG ==========
+    let config;
+    let supabase;
     
     try {
-        const { data, error } = await supabase.auth.getSession();
-        if (error) throw error;
-        
-        currentUser = data?.session?.user || null;
-        
-        if (currentUser) {
-            console.log('✅ User logged in:', currentUser.email);
-            
-            // เช็คอีเมลแอดมิน - อนุญาตทุกอีเมลสำหรับ testing
-            const adminEmails = Array.isArray(config.adminEmail) ? config.adminEmail : [config.adminEmail].filter(e => e);
-            
-            // อนุญาตถ้าเป็นแอดมิน หรือ ยังไม่มี config adminEmail
-            if (adminEmails.length === 0 || adminEmails.includes(currentUser.email)) {
-                console.log('✅ User is admin');
-                isAdmin = true;
-                adminEmailEl.textContent = currentUser.email?.split('@')[0] || 'Admin';
-                hideLoginOverlay();
-                await loadContent();
-                setupRealtime();
-                setupListeners();
-            } else {
-                console.log('❌ User is not admin. Email:', currentUser.email, 'Allowed:', adminEmails);
-                showToast('อีเมลนี้ไม่มีสิทธิ์เข้าถึง (ต้องใช้: ' + adminEmails.join(', ') + ')', 'error');
-                showLoginOverlay();
-            }
-        } else {
-            console.log('ℹ️ No user logged in');
-            showLoginOverlay();
-        }
-        
-        return currentUser;
-    } catch (error) {
-        console.error('checkAuth error:', error);
-        showLoginOverlay();
-        return null;
-    } finally {
-        loader.classList.add('hidden');
+        const configModule = await import('../lib/config.js');
+        config = configModule.config;
+    } catch (e) {
+        console.warn('⚠️ Using fallback config');
+        config = {
+            supabaseUrl: 'https://srtsdminbdmxtvjgriev.supabase.co',
+            supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNydHNkbWluYmRteHR2amdyaWV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY4OTU2NzMsImV4cCI6MjA1MjQ3MTY3M30.XYZ123',
+            adminEmail: ['jusduy40@gmail.com']
+        };
     }
-}
-
-async function handleLogin(email, password) {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    return data;
-}
-
-async function handleSignup(email, password, name) {
-    const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { name } }
-    });
-    if (error) throw error;
-    return data;
-}
-
-async function handleLogout() {
-    await supabase.auth.signOut();
-    currentUser = null;
-    isAdmin = false;
-    showLoginOverlay();
-    closeAuthModal();
-    showToast('ออกจากระบบสำเร็จ', 'success');
-}
-
-        // ========== LOAD CONTENT ==========
-        async function loadContent() {
-            if (!supabase) return;
-            
-            try {
-                const { data, error } = await supabase
-                    .from('about_content')
-                    .select('*');
-                
-                if (error) {
-                    console.error('Load error:', error);
-                    showToast('โหลดข้อมูลไม่สำเร็จ: ' + error.message, 'error');
-                    return;
-                }
-                
-                contentData = {};
-                data.forEach(item => {
-                    contentData[item.key] = item.value;
-                });
-                
-                // Fill form inputs
-                Object.keys(inputs).forEach(key => {
-                    if (inputs[key] && contentData[key]) {
-                        inputs[key].value = contentData[key];
-                    }
-                });
-                
-                // Update preview
-                updatePreview();
-                
-                // Update image
-                if (contentData['main_image']) {
-                    currentImagePreview.src = contentData['main_image'];
-                    previewImage.src = contentData['main_image'];
-                    currentImagePreview.style.display = 'block';
-                    previewImage.style.display = 'block';
-                    currentImageContainer.style.display = 'block';
-                    previewImagePlaceholder.style.display = 'none';
-                }
-                
-            } catch (error) {
-                console.error('loadContent error:', error);
-                showToast('เกิดข้อผิดพลาด: ' + error.message, 'error');
-            }
+    
+    // Initialize Supabase
+    try {
+        if (config && config.supabaseUrl && config.supabaseAnonKey) {
+            supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+            console.log('✅ Supabase initialized');
         }
+    } catch (e) {
+        console.error('❌ Failed to initialize Supabase:', e);
+    }
+    
+    // ========== STATE ==========
+    let currentUser = null;
+    let isAdmin = false;
+    let contentData = {};
+    let realtimeSubscription = null;
+    let authInitialized = false; // ป้องกันการเช็คซ้ำ
 
-        // ========== UPDATE PREVIEW ==========
-        function updatePreview() {
-            Object.keys(preview).forEach(key => {
-                if (preview[key] && inputs[key]) {
-                    preview[key].textContent = inputs[key].value || '';
-                }
-            });
+    // ========== DOM ELEMENTS ==========
+    const loader = document.getElementById('loader');
+    const loginOverlay = document.getElementById('loginOverlay');
+    const authModal = document.getElementById('authModal');
+    const authModalClose = document.getElementById('authModalClose');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const openLoginBtn = document.getElementById('openLoginBtn');
+    const goHomeBtn = document.getElementById('goHomeBtn');
+    const sidebarLogout = document.getElementById('sidebarLogout');
+    
+    const form = document.getElementById('settingsForm');
+    const saveBtn = document.getElementById('saveBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    const adminEmailEl = document.getElementById('adminEmail');
+    
+    // Form inputs
+    const inputs = {
+        'title_th': document.getElementById('titleTh'),
+        'title_en': document.getElementById('titleEn'),
+        'description_th': document.getElementById('descTh'),
+        'description_en': document.getElementById('descEn'),
+        'experience_years': document.getElementById('expYears'),
+        'feature_1_title_th': document.getElementById('feat1TitleTh'),
+        'feature_1_title_en': document.getElementById('feat1TitleEn'),
+        'feature_1_desc_th': document.getElementById('feat1DescTh'),
+        'feature_1_desc_en': document.getElementById('feat1DescEn'),
+        'feature_2_title_th': document.getElementById('feat2TitleTh'),
+        'feature_2_title_en': document.getElementById('feat2TitleEn'),
+        'feature_2_desc_th': document.getElementById('feat2DescTh'),
+        'feature_2_desc_en': document.getElementById('feat2DescEn'),
+    };
+    
+    // Preview elements
+    const preview = {
+        'title_th': document.getElementById('previewTitle'),
+        'description_th': document.getElementById('previewDesc'),
+        'experience_years': document.getElementById('previewExpYears'),
+        'feature_1_title_th': document.getElementById('previewFeat1Title'),
+        'feature_1_desc_th': document.getElementById('previewFeat1Desc'),
+        'feature_2_title_th': document.getElementById('previewFeat2Title'),
+        'feature_2_desc_th': document.getElementById('previewFeat2Desc'),
+    };
+    
+    // Image elements
+    const mainImageInput = document.getElementById('mainImageInput');
+    const imageUploadZone = document.getElementById('imageUploadZone');
+    const currentImageContainer = document.getElementById('currentImageContainer');
+    const currentImagePreview = document.getElementById('currentImagePreview');
+    const previewImage = document.getElementById('previewImage');
+    const previewImagePlaceholder = document.getElementById('previewImagePlaceholder');
+
+    // ========== AUTH FUNCTIONS ==========
+    let currentAuthView = 'login';
+
+    function openAuthModal(view = 'login') {
+        authModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        switchAuthView(view);
+    }
+
+    function closeAuthModal() {
+        authModal.classList.remove('active');
+        document.body.style.overflow = '';
+        resetAuthForms();
+    }
+
+    function switchAuthView(view) {
+        currentAuthView = view;
+        document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+        
+        const authModalTitle = document.getElementById('authModalTitle');
+        const authTogglePrompt = document.getElementById('authTogglePrompt');
+        const authToggleLink = document.getElementById('authToggleLink');
+        
+        if (view === 'signup') {
+            document.getElementById('signupForm').classList.add('active');
+            if (authModalTitle) authModalTitle.textContent = 'สมัครสมาชิก';
+            if (authTogglePrompt) authTogglePrompt.textContent = 'มีบัญชีแล้ว?';
+            if (authToggleLink) authToggleLink.textContent = 'เข้าสู่ระบบ';
+        } else {
+            document.getElementById('loginForm').classList.add('active');
+            if (authModalTitle) authModalTitle.textContent = 'เข้าสู่ระบบ';
+            if (authTogglePrompt) authTogglePrompt.textContent = 'ยังไม่มีบัญชี?';
+            if (authToggleLink) authToggleLink.textContent = 'สมัครสมาชิก';
         }
+    }
 
-        // ========== SAVE CONTENT ==========
-        async function saveContent() {
-            showLoading(true);
-            
-            let hasError = false;
-            
-            for (const [key, input] of Object.entries(inputs)) {
-                if (input && input.value !== contentData[key]) {
-                    const { error } = await supabase
-                        .from('about_content')
-                        .upsert({ 
-                            key, 
-                            value: input.value, 
-                            type: 'text',
-                            updated_at: new Date().toISOString()
-                        });
-                    
-                    if (error) {
-                        console.error(`Error saving ${key}:`, error);
-                        hasError = true;
-                    }
-                }
-            }
-            
-            showLoading(false);
-            
-            if (hasError) {
-                showToast('บันทึกบางส่วนไม่สำเร็จ', 'error');
-            } else {
-                showToast('บันทึกสำเร็จ!', 'success');
-                await loadContent();
-            }
+    function resetAuthForms() {
+        loginForm.reset();
+        signupForm.reset();
+        switchAuthView('login');
+    }
+
+    function showLoginOverlay() {
+        loginOverlay.classList.remove('hidden');
+        document.querySelector('.admin-sidebar')?.style.setProperty('pointer-events', 'none');
+        document.querySelector('.admin-main')?.style.setProperty('pointer-events', 'none');
+    }
+
+    function hideLoginOverlay() {
+        loginOverlay.classList.add('hidden');
+        document.querySelector('.admin-sidebar')?.style.setProperty('pointer-events', '');
+        document.querySelector('.admin-main')?.style.setProperty('pointer-events', '');
+    }
+
+    // ✅ แก้ไข: เช็ค session ที่มีอยู่ (ไม่บังคับ login ใหม่)
+    async function checkAuth() {
+        if (authInitialized) return; // ป้องกันการเช็คซ้ำ
+        if (!supabase) {
+            console.error('❌ Supabase not initialized');
+            showLoginOverlay();
+            return;
         }
-
-        // ========== IMAGE UPLOAD ==========
-        async function handleImageUpload(file) {
-            if (!file) return;
+        
+        try {
+            const { data, error } = await supabase.auth.getSession();
             
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('ไฟล์ใหญ่เกินไป (สูงสุด 5MB)', 'error');
+            if (error) {
+                console.error('Session error:', error);
+                showLoginOverlay();
                 return;
             }
             
-            showLoading(true);
+            currentUser = data?.session?.user || null;
             
-            try {
-                const fileExt = file.name.split('.').pop();
-                const fileName = `about-main-${Date.now()}.${fileExt}`;
+            if (currentUser) {
+                console.log('✅ User already logged in:', currentUser.email);
                 
-                const { error: uploadError } = await supabase.storage
-                    .from('about-images')
-                    .upload(fileName, file);
+                // เช็คอีเมลแอดมิน
+                const adminEmails = Array.isArray(config.adminEmail) 
+                    ? config.adminEmail 
+                    : [config.adminEmail].filter(e => e);
                 
-                if (uploadError) throw uploadError;
-                
-                const { data: { publicUrl } } = supabase.storage
-                    .from('about-images')
-                    .getPublicUrl(fileName);
-                
-                const { error: dbError } = await supabase
-                    .from('about_content')
-                    .upsert({ 
-                        key: 'main_image', 
-                        value: publicUrl, 
-                        type: 'image',
-                        updated_at: new Date().toISOString()
-                    });
-                
-                if (dbError) throw dbError;
-                
-                currentImagePreview.src = publicUrl;
-                previewImage.src = publicUrl;
+                // อนุญาตถ้าเป็นแอดมิน หรือ ไม่มี config (สำหรับทดสอบ)
+                if (adminEmails.length === 0 || adminEmails.includes(currentUser.email)) {
+                    console.log('✅ User is admin');
+                    isAdmin = true;
+                    adminEmailEl.textContent = currentUser.email?.split('@')[0] || 'Admin';
+                    hideLoginOverlay();
+                    
+                    // โหลดข้อมูลและตั้งค่า
+                    await loadContent();
+                    setupRealtime();
+                    setupListeners();
+                } else {
+                    console.log('❌ User is not admin');
+                    showToast('อีเมลนี้ไม่มีสิทธิ์เข้าถึง', 'error');
+                    showLoginOverlay();
+                }
+            } else {
+                console.log('ℹ️ No active session - showing login');
+                showLoginOverlay();
+            }
+            
+        } catch (error) {
+            console.error('checkAuth error:', error);
+            showLoginOverlay();
+        } finally {
+            authInitialized = true;
+            loader.classList.add('hidden');
+        }
+    }
+
+    async function handleLogin(email, password) {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        return data;
+    }
+
+    async function handleSignup(email, password, name) {
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { name } }
+        });
+        if (error) throw error;
+        return data;
+    }
+
+    async function handleLogout() {
+        await supabase.auth.signOut();
+        currentUser = null;
+        isAdmin = false;
+        authInitialized = false;
+        showLoginOverlay();
+        closeAuthModal();
+        showToast('ออกจากระบบสำเร็จ', 'success');
+    }
+
+    // ========== LOAD CONTENT ==========
+    async function loadContent() {
+        if (!supabase) return;
+        
+        try {
+            const { data, error } = await supabase
+                .from('about_content')
+                .select('*');
+            
+            if (error) {
+                console.error('Load error:', error);
+                showToast('โหลดข้อมูลไม่สำเร็จ: ' + error.message, 'error');
+                return;
+            }
+            
+            contentData = {};
+            data.forEach(item => {
+                contentData[item.key] = item.value;
+            });
+            
+            // Fill form inputs
+            Object.keys(inputs).forEach(key => {
+                if (inputs[key] && contentData[key]) {
+                    inputs[key].value = contentData[key];
+                }
+            });
+            
+            // Update preview
+            updatePreview();
+            
+            // Update image
+            if (contentData['main_image']) {
+                currentImagePreview.src = contentData['main_image'];
+                previewImage.src = contentData['main_image'];
                 currentImagePreview.style.display = 'block';
                 previewImage.style.display = 'block';
                 currentImageContainer.style.display = 'block';
                 previewImagePlaceholder.style.display = 'none';
+            }
+            
+        } catch (error) {
+            console.error('loadContent error:', error);
+            showToast('เกิดข้อผิดพลาด: ' + error.message, 'error');
+        }
+    }
+
+    // ========== UPDATE PREVIEW ==========
+    function updatePreview() {
+        Object.keys(preview).forEach(key => {
+            if (preview[key] && inputs[key]) {
+                preview[key].textContent = inputs[key].value || '';
+            }
+        });
+    }
+
+    // ========== SAVE CONTENT ==========
+    async function saveContent() {
+        showLoading(true);
+        
+        let hasError = false;
+        
+        for (const [key, input] of Object.entries(inputs)) {
+            if (input && input.value !== contentData[key]) {
+                const { error } = await supabase
+                    .from('about_content')
+                    .upsert({ 
+                        key, 
+                        value: input.value, 
+                        type: 'text',
+                        updated_at: new Date().toISOString()
+                    });
                 
-                contentData['main_image'] = publicUrl;
-                
-                showToast('อัปโหลดรูปภาพสำเร็จ!', 'success');
-                
-            } catch (error) {
-                console.error('Upload error:', error);
-                showToast('อัปโหลดไม่สำเร็จ: ' + error.message, 'error');
-            }
-            
-            showLoading(false);
-            mainImageInput.value = '';
-        }
-
-        // ========== REALTIME UPDATES ==========
-        function setupRealtime() {
-            if (!supabase) return;
-            
-            realtimeSubscription = supabase
-                .channel('about_content_admin')
-                .on('postgres_changes', {
-                    event: '*',
-                    schema: 'public',
-                    table: 'about_content'
-                }, (payload) => {
-                    if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
-                        const { key, value, type } = payload.new;
-                        
-                        if (inputs[key]) {
-                            inputs[key].value = value;
-                        }
-                        
-                        if (preview[key]) {
-                            preview[key].textContent = value;
-                        }
-                        
-                        if (key === 'main_image' && type === 'image') {
-                            currentImagePreview.src = value;
-                            previewImage.src = value;
-                            currentImagePreview.style.display = 'block';
-                            previewImage.style.display = 'block';
-                            currentImageContainer.style.display = 'block';
-                            previewImagePlaceholder.style.display = 'none';
-                        }
-                        
-                        contentData[key] = value;
-                    }
-                })
-                .subscribe();
-        }
-
-        // ========== EVENT LISTENERS ==========
-        function setupListeners() {
-            // Input change -> update preview
-            Object.values(inputs).forEach(input => {
-                if (input) {
-                    input.addEventListener('input', updatePreview);
+                if (error) {
+                    console.error(`Error saving ${key}:`, error);
+                    hasError = true;
                 }
-            });
-            
-            // Save button
-            saveBtn.addEventListener('click', saveContent);
-            
-            // Reset button
-            resetBtn.addEventListener('click', async () => {
-                if (confirm('ต้องการรีเซ็ตฟอร์มเป็นค่าเดิมจากฐานข้อมูล?')) {
-                    await loadContent();
-                    showToast('รีเซ็ตสำเร็จ', 'success');
-                }
-            });
-            
-            // Image upload - click
-            imageUploadZone.addEventListener('click', () => mainImageInput.click());
-            
-            // Image upload - drag & drop
-            imageUploadZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                imageUploadZone.style.borderColor = '#1e88e5';
-                imageUploadZone.style.background = '#f0f9ff';
-            });
-            
-            imageUploadZone.addEventListener('dragleave', () => {
-                imageUploadZone.style.borderColor = '#cbd5e1';
-                imageUploadZone.style.background = '#f8fafc';
-            });
-            
-            imageUploadZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                imageUploadZone.style.borderColor = '#cbd5e1';
-                imageUploadZone.style.background = '#f8fafc';
-                
-                const file = e.dataTransfer.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    handleImageUpload(file);
-                }
-            });
-            
-            // Image input change
-            mainImageInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) handleImageUpload(file);
-            });
-        }
-
-        // ========== UTILS ==========
-        function showToast(message, type = 'success') {
-            toastMessage.textContent = message;
-            toast.className = `toast ${type} show`;
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-        
-        function showLoading(show) {
-            if (show) {
-                loader.classList.remove('hidden');
-                saveBtn.disabled = true;
-            } else {
-                loader.classList.add('hidden');
-                saveBtn.disabled = false;
             }
         }
-
-        // ========== AUTH EVENT LISTENERS ==========
-        authModalClose?.addEventListener('click', closeAuthModal);
-        authModal?.addEventListener('click', (e) => {
-            if (e.target === authModal) closeAuthModal();
-        });
         
-        document.getElementById('authToggleLink')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            switchAuthView(currentAuthView === 'login' ? 'signup' : 'login');
-        });
+        showLoading(false);
         
-        openLoginBtn?.addEventListener('click', () => openAuthModal('login'));
-        goHomeBtn?.addEventListener('click', () => {
-            window.location.href = '../index';
-        });
-        
-        sidebarLogout?.addEventListener('click', async (e) => {
-            e.preventDefault();
-            await handleLogout();
-        });
-        
-        loginForm?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const btn = document.getElementById('loginBtn');
-            
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังเข้าสู่ระบบ...';
-            
-            try {
-                await handleLogin(email, password);
-                closeAuthModal();
-                await checkAuth();
-            } catch (error) {
-                alert('เข้าสู่ระบบไม่สำเร็จ: ' + error.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i>';
-            }
-        });
-        
-        signupForm?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('signupName').value;
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
-            const btn = document.getElementById('signupBtn');
-            
-            if (password.length < 6) {
-                alert('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
-                return;
-            }
-            
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังสมัคร...';
-            
-            try {
-                await handleSignup(email, password, name);
-                alert('สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี');
-                closeAuthModal();
-            } catch (error) {
-                alert('สมัครสมาชิกไม่สำเร็จ: ' + error.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<span>สมัครสมาชิก</span><i class="fas fa-user-plus"></i>';
-            }
-        });
-
-        // ========== INIT ==========
-        async function init() {
-            await checkAuth();
-            
-            supabase?.auth.onAuthStateChange(async (event, session) => {
-                currentUser = session?.user || null;
-                if (currentUser) {
-                    await checkAuth();
-                }
-            });
-        }
-        
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
+        if (hasError) {
+            showToast('บันทึกบางส่วนไม่สำเร็จ', 'error');
         } else {
-            init();
+            showToast('บันทึกสำเร็จ!', 'success');
+            await loadContent();
         }
-    </script>
+    }
+
+    // ========== IMAGE UPLOAD ==========
+    async function handleImageUpload(file) {
+        if (!file) return;
+        
+        if (file.size > 5 * 1024 * 1024) {
+            showToast('ไฟล์ใหญ่เกินไป (สูงสุด 5MB)', 'error');
+            return;
+        }
+        
+        showLoading(true);
+        
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `about-main-${Date.now()}.${fileExt}`;
+            
+            const { error: uploadError } = await supabase.storage
+                .from('about-images')
+                .upload(fileName, file);
+            
+            if (uploadError) throw uploadError;
+            
+            const { data: { publicUrl } } = supabase.storage
+                .from('about-images')
+                .getPublicUrl(fileName);
+            
+            const { error: dbError } = await supabase
+                .from('about_content')
+                .upsert({ 
+                    key: 'main_image', 
+                    value: publicUrl, 
+                    type: 'image',
+                    updated_at: new Date().toISOString()
+                });
+            
+            if (dbError) throw dbError;
+            
+            currentImagePreview.src = publicUrl;
+            previewImage.src = publicUrl;
+            currentImagePreview.style.display = 'block';
+            previewImage.style.display = 'block';
+            currentImageContainer.style.display = 'block';
+            previewImagePlaceholder.style.display = 'none';
+            
+            contentData['main_image'] = publicUrl;
+            
+            showToast('อัปโหลดรูปภาพสำเร็จ!', 'success');
+            
+        } catch (error) {
+            console.error('Upload error:', error);
+            showToast('อัปโหลดไม่สำเร็จ: ' + error.message, 'error');
+        }
+        
+        showLoading(false);
+        mainImageInput.value = '';
+    }
+
+    // ========== REALTIME UPDATES ==========
+    function setupRealtime() {
+        if (!supabase) return;
+        
+        realtimeSubscription = supabase
+            .channel('about_content_admin')
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: 'about_content'
+            }, (payload) => {
+                if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
+                    const { key, value, type } = payload.new;
+                    
+                    if (inputs[key]) {
+                        inputs[key].value = value;
+                    }
+                    
+                    if (preview[key]) {
+                        preview[key].textContent = value;
+                    }
+                    
+                    if (key === 'main_image' && type === 'image') {
+                        currentImagePreview.src = value;
+                        previewImage.src = value;
+                        currentImagePreview.style.display = 'block';
+                        previewImage.style.display = 'block';
+                        currentImageContainer.style.display = 'block';
+                        previewImagePlaceholder.style.display = 'none';
+                    }
+                    
+                    contentData[key] = value;
+                }
+            })
+            .subscribe();
+    }
+
+    // ========== EVENT LISTENERS ==========
+    function setupListeners() {
+        // Input change -> update preview
+        Object.values(inputs).forEach(input => {
+            if (input) {
+                input.addEventListener('input', updatePreview);
+            }
+        });
+        
+        // Save button
+        saveBtn.addEventListener('click', saveContent);
+        
+        // Reset button
+        resetBtn.addEventListener('click', async () => {
+            if (confirm('ต้องการรีเซ็ตฟอร์มเป็นค่าเดิมจากฐานข้อมูล?')) {
+                await loadContent();
+                showToast('รีเซ็ตสำเร็จ', 'success');
+            }
+        });
+        
+        // Image upload - click
+        imageUploadZone.addEventListener('click', () => mainImageInput.click());
+        
+        // Image upload - drag & drop
+        imageUploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            imageUploadZone.style.borderColor = '#1e88e5';
+            imageUploadZone.style.background = '#f0f9ff';
+        });
+        
+        imageUploadZone.addEventListener('dragleave', () => {
+            imageUploadZone.style.borderColor = '#cbd5e1';
+            imageUploadZone.style.background = '#f8fafc';
+        });
+        
+        imageUploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            imageUploadZone.style.borderColor = '#cbd5e1';
+            imageUploadZone.style.background = '#f8fafc';
+            
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleImageUpload(file);
+            }
+        });
+        
+        // Image input change
+        mainImageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) handleImageUpload(file);
+        });
+    }
+
+    // ========== UTILS ==========
+    function showToast(message, type = 'success') {
+        toastMessage.textContent = message;
+        toast.className = `toast ${type} show`;
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+    
+    function showLoading(show) {
+        if (show) {
+            loader.classList.remove('hidden');
+            saveBtn.disabled = true;
+        } else {
+            loader.classList.add('hidden');
+            saveBtn.disabled = false;
+        }
+    }
+
+    // ========== AUTH EVENT LISTENERS ==========
+    authModalClose?.addEventListener('click', closeAuthModal);
+    authModal?.addEventListener('click', (e) => {
+        if (e.target === authModal) closeAuthModal();
+    });
+    
+    document.getElementById('authToggleLink')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchAuthView(currentAuthView === 'login' ? 'signup' : 'login');
+    });
+    
+    openLoginBtn?.addEventListener('click', () => openAuthModal('login'));
+    goHomeBtn?.addEventListener('click', () => {
+        window.location.href = '../index';
+    });
+    
+    sidebarLogout?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await handleLogout();
+    });
+    
+    loginForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const btn = document.getElementById('loginBtn');
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังเข้าสู่ระบบ...';
+        
+        try {
+            await handleLogin(email, password);
+            closeAuthModal();
+            // ไม่ต้องเรียก checkAuth อีก เพราะ onAuthStateChange จะทำงานเอง
+        } catch (error) {
+            alert('เข้าสู่ระบบไม่สำเร็จ: ' + error.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<span>เข้าสู่ระบบ</span><i class="fas fa-sign-in-alt"></i>';
+        }
+    });
+    
+    signupForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('signupName').value;
+        const email = document.getElementById('signupEmail').value;
+        const password = document.getElementById('signupPassword').value;
+        const btn = document.getElementById('signupBtn');
+        
+        if (password.length < 6) {
+            alert('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
+            return;
+        }
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังสมัคร...';
+        
+        try {
+            await handleSignup(email, password, name);
+            alert('สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี');
+            closeAuthModal();
+        } catch (error) {
+            alert('สมัครสมาชิกไม่สำเร็จ: ' + error.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<span>สมัครสมาชิก</span><i class="fas fa-user-plus"></i>';
+        }
+    });
+
+    // ========== INIT ==========
+    async function init() {
+        console.log('🚀 Settings page initializing...');
+        
+        // 1. เช็ค session ที่มีอยู่ (ไม่บังคับ login ใหม่)
+        await checkAuth();
+        
+        // 2. Listen auth state changes (เมื่อ login/logout)
+        supabase?.auth.onAuthStateChange(async (event, session) => {
+            console.log('🔄 Auth state changed:', event);
+            
+            if (event === 'SIGNED_IN' && session?.user) {
+                currentUser = session.user;
+                await checkAuth();
+            } else if (event === 'SIGNED_OUT') {
+                currentUser = null;
+                isAdmin = false;
+                showLoginOverlay();
+            }
+        });
+        
+        console.log('✅ Settings page initialized');
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+</script>
 </body>
 </html>
