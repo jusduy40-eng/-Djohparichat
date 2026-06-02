@@ -188,16 +188,16 @@
     <nav id="navbar" class="navbar">
         <div class="container">
             <div class="nav-wrapper">
-                <a href="../index.html" class="logo">
+                <a href="../index" class="logo">
                     <span class="logo-icon"><i class="fas fa-graduation-cap"></i></span>
                     <span class="logo-text">Djohparichat</span>
                 </a>
                 <div class="nav-menu" id="navMenu">
                     <ul class="nav-list">
-                        <li><a href="../index.html" class="nav-link" data-th="หน้าหลัก" data-en="Home">หน้าหลัก</a></li>
-                        <li><a href="services.html" class="nav-link active" data-th="บริการ" data-en="Services">บริการ</a></li>
-                        <li><a href="ai-courses.html" class="nav-link" data-th="หลักสูตร AI" data-en="AI Courses">หลักสูตร AI</a></li>
-                        <li><a href="about.html" class="nav-link" data-th="เกี่ยวกับเรา" data-en="About">เกี่ยวกับเรา</a></li>
+                        <li><a href="../index" class="nav-link" data-th="หน้าหลัก" data-en="Home">หน้าหลัก</a></li>
+                        <li><a href="services" class="nav-link active" data-th="บริการ" data-en="Services">บริการ</a></li>
+                        <li><a href="ai-courses" class="nav-link" data-th="หลักสูตร AI" data-en="AI Courses">หลักสูตร AI</a></li>
+                        <li><a href="about" class="nav-link" data-th="เกี่ยวกับเรา" data-en="About">เกี่ยวกับเรา</a></li>
                     </ul>
                 </div>
                 <div class="nav-actions">
@@ -234,7 +234,7 @@
                         <li><i class="fas fa-check"></i> <span data-th="เนื้อหาอัปเดตล่าสุด" data-en="Latest content">เนื้อหาอัปเดตล่าสุด</span></li>
                         <li><i class="fas fa-check"></i> <span data-th="ฝึกปฏิบัติจริง" data-en="Hands-on practice">ฝึกปฏิบัติจริง</span></li>
                     </ul>
-                    <a href="ai-courses.html" class="service-link">
+                    <a href="ai-courses" class="service-link">
                         <span data-th="ดูรายละเอียด" data-en="Learn More">ดูรายละเอียด</span>
                         <i class="fas fa-arrow-right"></i>
                     </a>
@@ -250,7 +250,7 @@
                         <li><i class="fas fa-check"></i> <span data-th="แผนประกันหลากหลาย" data-en="Various plans">แผนประกันหลากหลาย</span></li>
                         <li><i class="fas fa-check"></i> <span data-th="บริการหลังการขาย" data-en="After-sales service">บริการหลังการขาย</span></li>
                     </ul>
-                    <a href="insurance.html" class="service-link">
+                    <a href="insurance" class="service-link">
                         <span data-th="ดูรายละเอียด" data-en="Learn More">ดูรายละเอียด</span>
                         <i class="fas fa-arrow-right"></i>
                     </a>
@@ -270,7 +270,7 @@
 
     <!-- Admin Link (ซ่อนไว้ก่อน จะแสดงด้วย JS ถ้าเป็น Admin) -->
     <div class="admin-link" id="adminLink" style="display: none;">
-        <a href="../admin/index.html" title="Admin Panel"><i class="fas fa-cog"></i></a>
+        <a href="../admin/index" title="Admin Panel"><i class="fas fa-cog"></i></a>
     </div>
 
     <!-- Scripts -->
@@ -332,8 +332,8 @@
                             <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: var(--gray-500);"></i>
                         </div>
                         <div class="user-dropdown" id="userDropdown">
-                            <a href="../pages/profile.html"><i class="fas fa-user-edit"></i> แก้ไขโปรไฟล์</a>
-                            <a href="../pages/my-courses.html"><i class="fas fa-graduation-cap"></i> ประวัติการเรียน</a>
+                            <a href="../pages/profile"><i class="fas fa-user-edit"></i> แก้ไขโปรไฟล์</a>
+                            <a href="../pages/my-courses"><i class="fas fa-graduation-cap"></i> ประวัติการเรียน</a>
                             <div class="divider"></div>
                             <a href="#" id="logoutBtn" class="logout"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
                         </div>`;
@@ -363,7 +363,7 @@
                 if (error) throw error;
             }
             async function handleForgotPassword(email) {
-                const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/pages/auth.html#update-password` });
+                const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/pages/auth#update-password` });
                 if (error) throw error;
             }
             async function handleLogout() { await supabase.auth.signOut(); renderUserMenu(null); updateAdminLink(null); closeAuthModal(); }
