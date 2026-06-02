@@ -710,7 +710,9 @@
         }
         
         try {
+            console.log('🔍 Checking auth...');
             const { data, error } = await supabase.auth.getSession();
+            
             if (error) {
                 console.error('Auth error:', error);
                 return null;
@@ -725,10 +727,12 @@
                 isAdmin = adminEmails.length > 0 && adminEmails.includes(currentUser.email);
                 
                 if (isAdmin) {
-                    console.log('✅ User is admin');
+                    console.log('✅ User is admin - showing admin tools');
                     if (adminToolbar) adminToolbar.classList.add('active');
                     if (editImageBtn) editImageBtn.style.display = 'flex';
                     setupEditListeners();
+                } else {
+                    console.log('ℹ️ User is not admin');
                 }
             } else {
                 console.log('ℹ️ No user logged in');
@@ -750,6 +754,7 @@
         }
         
         try {
+            console.log('📥 Loading content from database...');
             const { data, error } = await supabase
                 .from('about_content')
                 .select('*');
@@ -762,23 +767,52 @@
             
             console.log('✅ Content loaded:', data);
             
+            if (!data || data.length === 0) {
+                console.warn('⚠️ No data found in about_content table');
+                showToast('ไม่พบข้อมูลในฐานข้อมูล', 'warning');
+                return;
+            }
+            
             contentData = {};
             data.forEach(item => {
                 contentData[item.key] = item.value;
             });
             
+            // Update Image
             if (contentData['main_image']) {
+                console.log('🖼️ Loading image:', contentData['main_image']);
                 mainImage.src = contentData['main_image'];
                 mainImage.style.display = 'block';
                 imagePlaceholder.style.display = 'none';
             }
-            if (contentData['title_th']) document.getElementById('titleContent').textContent = contentData['title_th'];
-            if (contentData['description_th']) document.getElementById('descriptionContent').textContent = contentData['description_th'];
-            if (contentData['experience_years']) experienceYears.textContent = contentData['experience_years'];
-            if (contentData['feature_1_title_th']) document.getElementById('feature1Title').textContent = contentData['feature_1_title_th'];
-            if (contentData['feature_1_desc_th']) document.getElementById('feature1Desc').textContent = contentData['feature_1_desc_th'];
-            if (contentData['feature_2_title_th']) document.getElementById('feature2Title').textContent = contentData['feature_2_title_th'];
-            if (contentData['feature_2_desc_th']) document.getElementById('feature2Desc').textContent = contentData['feature_2_desc_th'];
+            
+            // Update Text Content
+            if (contentData['title_th']) {
+                document.getElementById('titleContent').textContent = contentData['title_th'];
+                console.log('📝 Title loaded:', contentData['title_th']);
+            }
+            if (contentData['description_th']) {
+                document.getElementById('descriptionContent').textContent = contentData['description_th'];
+                console.log('📝 Description loaded');
+            }
+            if (contentData['experience_years']) {
+                experienceYears.textContent = contentData['experience_years'];
+                console.log('📝 Experience loaded:', contentData['experience_years']);
+            }
+            if (contentData['feature_1_title_th']) {
+                document.getElementById('feature1Title').textContent = contentData['feature_1_title_th'];
+            }
+            if (contentData['feature_1_desc_th']) {
+                document.getElementById('feature1Desc').textContent = contentData['feature_1_desc_th'];
+            }
+            if (contentData['feature_2_title_th']) {
+                document.getElementById('feature2Title').textContent = contentData['feature_2_title_th'];
+            }
+            if (contentData['feature_2_desc_th']) {
+                document.getElementById('feature2Desc').textContent = contentData['feature_2_desc_th'];
+            }
+            
+            console.log('✅ All content updated successfully');
             
         } catch (error) {
             console.error('loadContent error:', error);
@@ -790,6 +824,7 @@
     function setupRealtime() {
         if (!supabase) return;
         
+        console.log('🔄 Setting up realtime updates...');
         realtimeSubscription = supabase
             .channel('about_content_changes')
             .on('postgres_changes', {
@@ -807,6 +842,7 @@
     }
     
     function updateElement(key, value, type) {
+        console.log('🔄 Updating element:', key, value);
         if (type === 'image' && key === 'main_image') {
             mainImage.src = value;
             mainImage.style.display = 'block';
@@ -828,7 +864,7 @@
         }
     }
 
-    // ========== EDIT FUNCTIONS (COMPLETE) ==========
+    // ========== EDIT FUNCTIONS ==========
     function setupEditListeners() {
         if (toggleEditBtn) toggleEditBtn.addEventListener('click', toggleEditMode);
         if (saveAllBtn) saveAllBtn.addEventListener('click', saveAllChanges);
@@ -1041,13 +1077,18 @@
     async function init() {
         console.log('🚀 Initializing about page...');
         
+        // 1. เช็ค Auth ก่อน
         await checkAuth();
+        
+        // 2. โหลดข้อมูล (ทำทีหลัง Auth เสร็จ)
         await loadContent();
         
+        // 3. Setup Realtime (ถ้าเป็นแอดมิน)
         if (isAdmin) {
             setupRealtime();
         }
         
+        // 4. ซ่อน Loader
         const loader = document.getElementById('loader');
         if (loader) {
             loader.style.display = 'none';
