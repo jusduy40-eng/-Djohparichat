@@ -271,7 +271,7 @@
                             </div>
                             
                             <div class="payment-qr">
-                                <img src="https://i.postimg.cc/9fKQw8vD/promptpay-qr-placeholder.png" alt="PromptPay QR" id="paymentQr">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect fill='%23f3f4f6' width='200' height='200'/%3E%3Ctext fill='%239ca3af' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='14'%3EQR Code%3C/text%3E%3C/svg%3E" alt="PromptPay QR" id="paymentQr">
                                 <p style="margin:12px 0 0;font-size:0.9rem;color:var(--gray-600);">
                                     สแกนเพื่อชำระเงิน หรือใช้หมายเลข: <strong id="promptpayNumber">09X-XXX-XXXX</strong>
                                 </p>
@@ -311,8 +311,8 @@
                     <p id="successMessage">ขอบคุณที่สมัครเรียน คอร์สนี้พร้อมเริ่มเรียนแล้ว</p>
                     
                     <div id="freeAccess" style="display:none;">
-                        <a href="#" id="startCourseBtn" class="btn btn-primary" style="width:100%;padding:14px;">
-                            <i class="fas fa-play-circle"></i> เริ่มเรียนตอนนี้
+                        <a href="my-courses" id="startCourseBtn" class="btn btn-primary" style="width:100%;padding:14px;">
+                            <i class="fas fa-play-circle"></i> ไปหน้าคอร์สของฉัน
                         </a>
                     </div>
                     
@@ -432,8 +432,14 @@
             let selectedCourse = null;
 
             // ========== AUTH FUNCTIONS ==========
-            function openAuthModal() { authModal.classList.add('active'); document.body.style.overflow = 'hidden'; }
-            function closeAuthModal() { authModal.classList.remove('active'); document.body.style.overflow = ''; }
+            function openAuthModal() { 
+                authModal.classList.add('active'); 
+                document.body.style.overflow = 'hidden'; 
+            }
+            function closeAuthModal() { 
+                authModal.classList.remove('active'); 
+                document.body.style.overflow = ''; 
+            }
             
             async function checkAuth() {
                 const { data } = await supabase.auth.getSession();
@@ -445,7 +451,24 @@
                         <div class="user-info" id="userInfo">
                             <div class="user-avatar">${initials}</div>
                             <span class="user-name">${currentUser.email?.split('@')[0]}</span>
+                        </div>
+                        <div class="user-dropdown" id="userDropdown">
+                            <a href="my-courses"><i class="fas fa-graduation-cap"></i> คอร์สของฉัน</a>
+                            <div class="divider"></div>
+                            <a href="#" id="logoutBtn" class="logout"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
                         </div>`;
+                    
+                    document.getElementById('userInfo').addEventListener('click', (e) => { 
+                        e.stopPropagation(); 
+                        document.getElementById('userDropdown').classList.toggle('active'); 
+                    });
+                    
+                    document.getElementById('logoutBtn')?.addEventListener('click', async (e) => { 
+                        e.preventDefault(); 
+                        await supabase.auth.signOut(); 
+                        checkAuth(); 
+                        loadCourses();
+                    });
                     
                     const adminEmails = Array.isArray(config.adminEmail) ? config.adminEmail : [config.adminEmail].filter(e => e);
                     isAdmin = adminEmails.length > 0 && adminEmails.includes(currentUser.email);
@@ -470,7 +493,7 @@
                 document.getElementById('enrollCourseId').value = course.id;
                 document.getElementById('enrollCoursePrice').value = course.price || 0;
                 document.getElementById('enrollIsFree').value = course.is_free;
-                document.getElementById('enrollPriceDisplay').textContent = `฿${(course.price || 0).toLocaleString('th-TH')}`;
+                document.getElementById('enrollPriceDisplay').textContent = '฿' + (course.price || 0).toLocaleString('th-TH');
                 
                 // Show/hide payment section
                 const paymentSection = document.getElementById('paymentSection');
@@ -543,7 +566,7 @@
                         payment_method: isFree ? 'free' : 'promptpay',
                         enrollment_status: isFree ? 'approved' : 'pending',
                         access_granted: isFree,
-                        ip_address: '', // Can add later
+                        ip_address: '',
                         user_agent: navigator.userAgent,
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString()
@@ -554,15 +577,6 @@
                     
                     // Show success
                     showSuccessScreen(isFree);
-                    
-                    // If free course, enable "Start Course" button
-                    if (isFree) {
-                        document.getElementById('startCourseBtn').onclick = () => {
-                            alert('🎉 ยินดีด้วย! คุณได้เริ่มเรียนคอร์สนี้แล้ว');
-                            // TODO: Redirect to course content page
-                            // window.location.href = `course-content?id=${selectedCourse.id}`;
-                        };
-                    }
                     
                 } catch (error) {
                     console.error('Enrollment error:', error);
@@ -577,7 +591,9 @@
             async function loadCourses() {
                 try {
                     let query = supabase.from('courses').select('*').eq('published', true).order('created_at', { ascending: false });
-                    if (isAdmin) query = supabase.from('courses').select('*').order('created_at', { ascending: false });
+                    if (isAdmin) {
+                        query = supabase.from('courses').select('*').order('created_at', { ascending: false });
+                    }
                     
                     const { data: courses, error } = await query;
                     if (error) throw error;
@@ -592,84 +608,106 @@
                     
                     const isTH = document.documentElement.lang === 'th';
                     
-                    coursesGrid.innerHTML = courses.map(course => {
+                    coursesGrid.innerHTML = courses.map(function(course) {
                         const priceDisplay = course.is_free 
-                            ? `<span class="course-price free">ฟรี</span>`
-                            : `<span class="course-price">฿${(course.price || 0).toLocaleString('th-TH')}</span>`;
+                            ? '<span class="course-price free">ฟรี</span>'
+                            : '<span class="course-price">฿' + (course.price || 0).toLocaleString('th-TH') + '</span>';
                         
-                        const badge = course.is_featured ? `<span class="course-badge">แนะนำ</span>` : '';
-                        const editBtn = isAdmin ? `<button class="admin-edit-btn" onclick="editCourse('${course.id}')"><i class="fas fa-edit"></i></button>` : '';
+                        const badge = course.is_featured ? '<span class="course-badge">แนะนำ</span>' : '';
+                        const editBtn = isAdmin ? '<button class="admin-edit-btn" onclick="editCourse(\'' + course.id + '\')"><i class="fas fa-edit"></i></button>' : '';
                         
-                        const enrollBtn = currentUser 
-                            ? `<button class="btn btn-primary" onclick="openEnrollmentModal(${JSON.stringify(course).replace(/'/g, "\\'")})">สมัครเรียน</button>`
-                            : `<button class="btn btn-primary" onclick="openAuthModal()">เข้าสู่ระบบเพื่อสมัคร</button>`;
+                        let enrollBtn;
+                        if (currentUser) {
+                            enrollBtn = '<button class="btn btn-primary" onclick="openEnrollmentModal(' + JSON.stringify(course).replace(/'/g, "\\'") + ')">สมัครเรียน</button>';
+                        } else {
+                            enrollBtn = '<button class="btn btn-primary" onclick="openAuthModal()">เข้าสู่ระบบเพื่อสมัคร</button>';
+                        }
                         
-                        return `
-                            <div class="course-card ${course.is_featured ? 'featured' : ''}">
-                                ${editBtn}${badge}
-                                <div class="course-icon"><i class="fas ${course.icon || 'fa-robot'}"></i></div>
-                                <h3 class="course-title">${isTH ? course.title_th : course.title_en || course.title_th}</h3>
-                                <p class="course-description">${isTH ? course.description_th : course.description_en || course.description_th}</p>
-                                <ul class="course-features">
-                                    ${course.features?.map(f => `<li><i class="fas fa-check"></i> ${isTH ? f.th : f.en || f.th}</li>`).join('') || ''}
-                                </ul>
-                                ${priceDisplay}
-                                <div class="course-actions">${enrollBtn}</div>
-                            </div>
-                        `;
+                        return '<div class="course-card ' + (course.is_featured ? 'featured' : '') + '">' +
+                            editBtn + badge +
+                            '<div class="course-icon"><i class="fas ' + (course.icon || 'fa-robot') + '"></i></div>' +
+                            '<h3 class="course-title">' + (isTH ? course.title_th : course.title_en || course.title_th) + '</h3>' +
+                            '<p class="course-description">' + (isTH ? course.description_th : course.description_en || course.description_th) + '</p>' +
+                            '<ul class="course-features">' +
+                            (course.features ? course.features.map(function(f) { 
+                                return '<li><i class="fas fa-check"></i> ' + (isTH ? f.th : f.en || f.th) + '</li>'; 
+                            }).join('') : '') +
+                            '</ul>' +
+                            priceDisplay +
+                            '<div class="course-actions">' + enrollBtn + '</div>' +
+                        '</div>';
                     }).join('');
                     
                 } catch (error) {
                     console.error('Load courses error:', error);
-                    coursesGrid.innerHTML = `<div class="courses-empty"><i class="fas fa-exclamation-circle"></i><p>โหลดคอร์สไม่สำเร็จ</p></div>`;
+                    coursesGrid.innerHTML = '<div class="courses-empty"><i class="fas fa-exclamation-circle"></i><p>โหลดคอร์สไม่สำเร็จ</p></div>';
                 }
             }
             
-            window.editCourse = (id) => window.location.href = `../admin/courses?edit=${id}`;
+            window.editCourse = function(id) { 
+                window.location.href = '../admin/courses?edit=' + id; 
+            };
             
             // ========== EVENT LISTENERS ==========
             document.getElementById('authModalClose')?.addEventListener('click', closeAuthModal);
-            authModal?.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
+            authModal?.addEventListener('click', function(e) { 
+                if (e.target === authModal) closeAuthModal(); 
+            });
             
             document.getElementById('enrollmentModalClose')?.addEventListener('click', closeEnrollmentModal);
-            enrollmentModal?.addEventListener('click', (e) => { if (e.target === enrollmentModal) closeEnrollmentModal(); });
+            enrollmentModal?.addEventListener('click', function(e) { 
+                if (e.target === enrollmentModal) closeEnrollmentModal(); 
+            });
             document.getElementById('enrollmentCancel')?.addEventListener('click', closeEnrollmentModal);
             document.getElementById('backToCourses')?.addEventListener('click', closeEnrollmentModal);
             document.getElementById('enrollmentForm')?.addEventListener('submit', submitEnrollment);
             
             // Payment method selection
-            document.querySelectorAll('.payment-method').forEach(method => {
+            document.querySelectorAll('.payment-method').forEach(function(method) {
                 method.addEventListener('click', function() {
-                    document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+                    document.querySelectorAll('.payment-method').forEach(function(m) { 
+                        m.classList.remove('selected'); 
+                    });
                     this.classList.add('selected');
                 });
             });
             
             // Auth form
-            document.getElementById('authToggleLink')?.addEventListener('click', (e) => {
+            document.getElementById('authToggleLink')?.addEventListener('click', function(e) {
                 e.preventDefault();
-                document.querySelectorAll('.auth-form-view').forEach(f => f.classList.toggle('active'));
+                document.querySelectorAll('.auth-form-view').forEach(function(f) { 
+                    f.classList.toggle('active'); 
+                });
             });
             
-            document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+            document.getElementById('loginForm')?.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 const { error } = await supabase.auth.signInWithPassword({
                     email: document.getElementById('loginEmail').value,
                     password: document.getElementById('loginPassword').value
                 });
-                if (error) alert('เข้าสู่ระบบไม่สำเร็จ: ' + error.message);
-                else { closeAuthModal(); checkAuth(); loadCourses(); }
+                if (error) {
+                    alert('เข้าสู่ระบบไม่สำเร็จ: ' + error.message);
+                } else { 
+                    closeAuthModal(); 
+                    checkAuth(); 
+                    loadCourses(); 
+                }
             });
             
-            document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
+            document.getElementById('signupForm')?.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 const { error } = await supabase.auth.signUp({
                     email: document.getElementById('signupEmail').value,
                     password: document.getElementById('signupPassword').value,
                     options: { data: { name: document.getElementById('signupName').value } }
                 });
-                if (error) alert('สมัครไม่สำเร็จ: ' + error.message);
-                else { alert('สมัครสำเร็จ! กรุณาตรวจสอบอีเมล'); closeAuthModal(); }
+                if (error) {
+                    alert('สมัครไม่สำเร็จ: ' + error.message);
+                } else { 
+                    alert('สมัครสำเร็จ! กรุณาตรวจสอบอีเมล'); 
+                    closeAuthModal(); 
+                }
             });
             
             // ========== INIT ==========
@@ -677,13 +715,19 @@
                 await checkAuth();
                 await loadCourses();
                 
-                supabase.auth.onAuthStateChange(() => { checkAuth(); loadCourses(); });
+                supabase.auth.onAuthStateChange(function() { 
+                    checkAuth(); 
+                    loadCourses(); 
+                });
                 
                 document.getElementById('loader').style.display = 'none';
             }
             
-            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-            else init();
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
             
         } catch (error) {
             console.error('Init error:', error);
