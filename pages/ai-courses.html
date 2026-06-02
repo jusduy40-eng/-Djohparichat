@@ -1031,7 +1031,7 @@
     <!-- Auth Modal -->
     <div id="authModal" class="auth-modal">
         <div class="auth-modal-content">
-            <button class="auth-modal-close" id="authModalClose"><i class="fas fa-times"></i></button>
+            <button class="auth-modal-close" id="authModalClose" onclick="closeAuthModal()"><i class="fas fa-times"></i></button>
             <div class="auth-modal-header">
                 <h3 id="authModalTitle">เข้าสู่ระบบ</h3>
                 <p id="authModalDesc">ยินดีต้อนรับกลับ! กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</p>
@@ -1075,7 +1075,7 @@
                 <div class="auth-divider"><span>หรือ</span></div>
                 <div class="auth-toggle">
                     <span id="authTogglePrompt">ยังไม่มีบัญชี?</span>
-                    <a href="#" id="authToggleLink">สมัครสมาชิก</a>
+                    <a href="#" id="authToggleLink" onclick="toggleAuthView(); return false;">สมัครสมาชิก</a>
                 </div>
             </div>
         </div>
@@ -1117,7 +1117,7 @@
     <!-- Enrollment Modal -->
     <div id="enrollmentModal" class="enrollment-modal">
         <div class="enrollment-modal-content">
-            <button class="modal-close" id="enrollmentModalClose"><i class="fas fa-times"></i></button>
+            <button class="modal-close" id="enrollmentModalClose" onclick="closeEnrollmentModal()"><i class="fas fa-times"></i></button>
             
             <!-- Step 1: Form -->
             <div id="enrollmentStep1">
@@ -1177,11 +1177,11 @@
                             
                             <label style="font-weight:600;display:block;margin-bottom:16px;color:#475569;">เลือกวิธีการชำระเงิน</label>
                             <div class="payment-methods">
-                                <div class="payment-method selected" data-method="promptpay">
+                                <div class="payment-method selected" data-method="promptpay" onclick="selectPaymentMethod(this)">
                                     <i class="fas fa-qrcode"></i>
                                     <div>PromptPay</div>
                                 </div>
-                                <div class="payment-method" data-method="bank_transfer">
+                                <div class="payment-method" data-method="bank_transfer" onclick="selectPaymentMethod(this)">
                                     <i class="fas fa-university"></i>
                                     <div>โอนเงิน</div>
                                 </div>
@@ -1218,7 +1218,7 @@
                             
                             <div class="file-upload-wrapper">
                                 <label style="font-weight:600;color:#475569;display:block;margin-bottom:12px;">อัปโหลดสลิปการชำระเงิน (ไม่บังคับ)</label>
-                                <div class="file-upload">
+                                <div class="file-upload" onclick="document.getElementById('paymentSlip').click()">
                                     <i class="fas fa-cloud-upload-alt"></i>
                                     <div class="file-upload-title">คลิกเพื่ออัปโหลดสลิป</div>
                                     <div class="file-upload-desc">รองรับไฟล์ JPG, PNG (สูงสุด 5MB)</div>
@@ -1238,10 +1238,10 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-outline" id="enrollmentCancel">
+                    <button class="btn btn-outline" id="enrollmentCancel" onclick="closeEnrollmentModal()">
                         <i class="fas fa-times"></i> ยกเลิก
                     </button>
-                    <button class="btn btn-primary" id="enrollmentSubmit">
+                    <button class="btn btn-primary" id="enrollmentSubmit" type="button" onclick="submitEnrollment(event)">
                         <span id="enrollmentSubmitText">สมัครเรียน</span>
                         <i class="fas fa-arrow-right"></i>
                     </button>
@@ -1269,7 +1269,7 @@
                         </div>
                     </div>
                     
-                    <button class="btn btn-outline" id="backToCourses" style="margin-top:24px;">
+                    <button class="btn btn-outline" id="backToCourses" onclick="closeEnrollmentModal()" style="margin-top:24px;">
                         <i class="fas fa-arrow-left"></i> กลับไปหน้าคอร์ส
                     </button>
                 </div>
@@ -1282,6 +1282,81 @@
     <script src="../assets/js/animations.js"></script>
     <script src="../assets/js/main.js"></script>
     
+    <!-- Global Functions (ทำให้เรียกจาก HTML ได้) -->
+    <script>
+        // ========== GLOBAL AUTH FUNCTIONS ==========
+        window.openAuthModal = function(view) {
+            const authModal = document.getElementById('authModal');
+            if (authModal) {
+                authModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
+                const loginForm = document.getElementById('loginForm');
+                const signupForm = document.getElementById('signupForm');
+                const authModalTitle = document.getElementById('authModalTitle');
+                const authTogglePrompt = document.getElementById('authTogglePrompt');
+                const authToggleLink = document.getElementById('authToggleLink');
+                
+                if (view === 'signup') {
+                    loginForm.classList.remove('active');
+                    signupForm.classList.add('active');
+                    if (authModalTitle) authModalTitle.textContent = 'สมัครสมาชิก';
+                    if (authTogglePrompt) authTogglePrompt.textContent = 'มีบัญชีแล้ว?';
+                    if (authToggleLink) authToggleLink.textContent = 'เข้าสู่ระบบ';
+                } else {
+                    signupForm.classList.remove('active');
+                    loginForm.classList.add('active');
+                    if (authModalTitle) authModalTitle.textContent = 'เข้าสู่ระบบ';
+                    if (authTogglePrompt) authTogglePrompt.textContent = 'ยังไม่มีบัญชี?';
+                    if (authToggleLink) authToggleLink.textContent = 'สมัครสมาชิก';
+                }
+            }
+        };
+        
+        window.closeAuthModal = function() {
+            const authModal = document.getElementById('authModal');
+            if (authModal) {
+                authModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        };
+        
+        window.toggleAuthView = function() {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const authModalTitle = document.getElementById('authModalTitle');
+            const authTogglePrompt = document.getElementById('authTogglePrompt');
+            const authToggleLink = document.getElementById('authToggleLink');
+            
+            if (loginForm.classList.contains('active')) {
+                loginForm.classList.remove('active');
+                signupForm.classList.add('active');
+                if (authModalTitle) authModalTitle.textContent = 'สมัครสมาชิก';
+                if (authTogglePrompt) authTogglePrompt.textContent = 'มีบัญชีแล้ว?';
+                if (authToggleLink) authToggleLink.textContent = 'เข้าสู่ระบบ';
+            } else {
+                signupForm.classList.remove('active');
+                loginForm.classList.add('active');
+                if (authModalTitle) authModalTitle.textContent = 'เข้าสู่ระบบ';
+                if (authTogglePrompt) authTogglePrompt.textContent = 'ยังไม่มีบัญชี?';
+                if (authToggleLink) authToggleLink.textContent = 'สมัครสมาชิก';
+            }
+        };
+        
+        window.closeEnrollmentModal = function() {
+            const enrollmentModal = document.getElementById('enrollmentModal');
+            if (enrollmentModal) {
+                enrollmentModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        };
+        
+        window.selectPaymentMethod = function(element) {
+            document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+            element.classList.add('selected');
+        };
+    </script>
+    
     <!-- Auth & Enrollment Script -->
     <script type="module">
         // Configuration
@@ -1290,6 +1365,7 @@
             const configModule = await import('../lib/config.js');
             config = configModule.config;
         } catch (e) {
+            console.warn('⚠️ Cannot load config.js, using fallback');
             config = {
                 supabaseUrl: 'https://srtsdminbdmxtvjgriev.supabase.co',
                 supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNydHNkbWluYmRteHR2amdyaWV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY4OTU2NzMsImV4cCI6MjA1MjQ3MTY3M30.XYZ123',
@@ -1297,7 +1373,18 @@
             };
         }
         
-        const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+        // Initialize Supabase
+        let supabase;
+        try {
+            if (config.supabaseUrl && config.supabaseAnonKey) {
+                supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+                console.log('✅ Supabase client initialized');
+            } else {
+                console.error('❌ Supabase config is missing');
+            }
+        } catch (error) {
+            console.error('❌ Failed to initialize Supabase:', error);
+        }
         
         // Payment Config
         const PAYMENT_CONFIG = {
@@ -1306,10 +1393,7 @@
         };
 
         // DOM Elements
-        const authModal = document.getElementById('authModal');
-        const authModalClose = document.getElementById('authModalClose');
         const userMenu = document.getElementById('userMenu');
-        const enrollmentModal = document.getElementById('enrollmentModal');
         const coursesGrid = document.getElementById('coursesGrid');
         const coursesEmpty = document.getElementById('coursesEmpty');
         const loginForm = document.getElementById('loginForm');
@@ -1318,46 +1402,18 @@
         let currentUser = null;
         let isAdmin = false;
         let selectedCourse = null;
-        let currentView = 'login';
 
         // ========== AUTH FUNCTIONS ==========
-        function openAuthModal(view = 'login') {
-            authModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            switchAuthView(view);
-        }
-        
-        function closeAuthModal() {
-            authModal.classList.remove('active');
-            document.body.style.overflow = '';
-            resetAuthForms();
-        }
-        
-        function switchAuthView(view) {
-            currentView = view;
-            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-            if (view === 'login') {
-                document.getElementById('loginForm').classList.add('active');
-                document.getElementById('authModalTitle').textContent = 'เข้าสู่ระบบ';
-                document.getElementById('authTogglePrompt').textContent = 'ยังไม่มีบัญชี?';
-                document.getElementById('authToggleLink').textContent = 'สมัครสมาชิก';
-            } else if (view === 'signup') {
-                document.getElementById('signupForm').classList.add('active');
-                document.getElementById('authModalTitle').textContent = 'สมัครสมาชิก';
-                document.getElementById('authTogglePrompt').textContent = 'มีบัญชีแล้ว?';
-                document.getElementById('authToggleLink').textContent = 'เข้าสู่ระบบ';
-            }
-        }
-        
-        function resetAuthForms() {
-            loginForm.reset();
-            signupForm.reset();
-            switchAuthView('login');
-        }
-
         async function checkAuth() {
+            if (!supabase) {
+                console.error('Supabase not initialized');
+                return null;
+            }
+            
             try {
-                const { data } = await supabase.auth.getSession();
+                const { data, error } = await supabase.auth.getSession();
+                if (error) throw error;
+                
                 currentUser = data?.session?.user || null;
                 
                 if (currentUser) {
@@ -1397,17 +1453,14 @@
             }
         }
 
-        // Auth Event Listeners
-        authModalClose?.addEventListener('click', closeAuthModal);
-        authModal?.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
-        
-        document.getElementById('authToggleLink')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            switchAuthView(currentView === 'login' ? 'signup' : 'login');
-        });
-
+        // Auth Form Submissions
         loginForm?.addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!supabase) {
+                alert('ระบบกำลังมีปัญหา กรุณาลองใหม่อีกครั้ง');
+                return;
+            }
+            
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             const btn = document.getElementById('loginBtn');
@@ -1433,6 +1486,11 @@
 
         signupForm?.addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!supabase) {
+                alert('ระบบกำลังมีปัญหา กรุณาลองใหม่อีกครั้ง');
+                return;
+            }
+            
             const name = document.getElementById('signupName').value;
             const email = document.getElementById('signupEmail').value;
             const password = document.getElementById('signupPassword').value;
@@ -1465,7 +1523,7 @@
         });
 
         // ========== ENROLLMENT FUNCTIONS ==========
-        function openEnrollmentModal(course) {
+        window.openEnrollmentModal = function(course) {
             selectedCourse = course;
             
             document.getElementById('enrollmentStep1').style.display = 'block';
@@ -1489,15 +1547,9 @@
                 generateTestQRCode(course.price || 0);
             }
             
-            enrollmentModal.classList.add('active');
+            document.getElementById('enrollmentModal').classList.add('active');
             document.body.style.overflow = 'hidden';
-        }
-        
-        function closeEnrollmentModal() {
-            enrollmentModal.classList.remove('active');
-            document.body.style.overflow = '';
-            selectedCourse = null;
-        }
+        };
         
         // ========== QR CODE GENERATOR ==========
         function generateTestQRCode(amount) {
@@ -1537,8 +1589,13 @@
             }
         }
         
-        async function submitEnrollment(e) {
-            e.preventDefault();
+        window.submitEnrollment = async function(e) {
+            if (e) e.preventDefault();
+            
+            if (!supabase) {
+                alert('ระบบกำลังมีปัญหา กรุณาลองใหม่อีกครั้ง');
+                return;
+            }
             
             const submitBtn = document.getElementById('enrollmentSubmit');
             submitBtn.disabled = true;
@@ -1586,10 +1643,15 @@
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<span id="enrollmentSubmitText">สมัครเรียน</span><i class="fas fa-arrow-right"></i>';
             }
-        }
+        };
         
         // ========== LOAD COURSES ==========
         async function loadCourses() {
+            if (!supabase) {
+                console.error('Supabase not initialized');
+                return;
+            }
+            
             try {
                 let query = supabase.from('courses').select('*').eq('published', true).order('created_at', { ascending: false });
                 if (isAdmin) {
@@ -1656,29 +1718,10 @@
             }
         }
         
-        // ========== EVENT LISTENERS ==========
-        document.getElementById('enrollmentModalClose')?.addEventListener('click', closeEnrollmentModal);
-        enrollmentModal?.addEventListener('click', function(e) { 
-            if (e.target === enrollmentModal) closeEnrollmentModal(); 
-        });
-        document.getElementById('enrollmentCancel')?.addEventListener('click', closeEnrollmentModal);
-        document.getElementById('backToCourses')?.addEventListener('click', closeEnrollmentModal);
-        document.getElementById('enrollmentForm')?.addEventListener('submit', submitEnrollment);
-        
-        document.querySelectorAll('.payment-method').forEach(function(method) {
-            method.addEventListener('click', function() {
-                document.querySelectorAll('.payment-method').forEach(function(m) { 
-                    m.classList.remove('selected'); 
-                });
-                this.classList.add('selected');
-            });
-        });
-        
+        // ========== FILE UPLOAD PREVIEW ==========
         const fileInput = document.getElementById('paymentSlip');
         const fileUpload = document.querySelector('.file-upload');
-        fileUpload?.addEventListener('click', function() {
-            fileInput?.click();
-        });
+        
         fileInput?.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -1702,10 +1745,12 @@
             await checkAuth();
             await loadCourses();
             
-            supabase.auth.onAuthStateChange(function() { 
-                checkAuth(); 
-                loadCourses(); 
-            });
+            if (supabase) {
+                supabase.auth.onAuthStateChange(function() { 
+                    checkAuth(); 
+                    loadCourses(); 
+                });
+            }
             
             document.getElementById('loader').style.display = 'none';
         }
