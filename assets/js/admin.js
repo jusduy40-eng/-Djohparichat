@@ -1,115 +1,292 @@
 // ========================================
 // ADMIN PANEL JAVASCRIPT
-// Compatible with Vercel API + Supabase
+// Compatible with Supabase Auth
 // ========================================
 
-// Base API URL (อัตโนมัติตามโดเมน)
-const API_BASE = '/api';
-
-// Token Key สำหรับเก็บใน localStorage
-const TOKEN_KEY = 'djohparichat_admin_token';
-
-document.addEventListener('DOMContentLoaded', () => {
-    // ตรวจสอบว่าอยู่ในหน้าไหน
-    const path = window.location.pathname;
-    
-    initAdminSidebar();
-    
-    if (path.includes('login.html')) {
-        initLogin();
-    } else {
-        // หน้าอื่นๆ ใน admin ต้องตรวจสอบสิทธิ์ก่อน
-        checkAuth();
-        initAdminTable();
-        initImageUpload();
-        initFormValidation();
-        loadContents(); // โหลดข้อมูลจากฐานข้อมูล
-    }
-});
-
-// ========================================
-// AUTHENTICATION
-// ========================================
-
-// ตรวจสอบสิทธิ์การเข้าถึง
-function checkAuth() {
-    const token = localStorage.getItem(TOKEN_KEY);
-    const currentPath = window.location.pathname;
-    
-    // ถ้าไม่มี token และไม่ใช่หน้า login ให้ redirect
-    if (!token && !currentPath.includes('login.html')) {
-        window.location.href = 'login.html';
-        return false;
-    }
-    
-    // ถ้ามี token แต่อยู่หน้า login ให้ไป dashboard
-    if (token && currentPath.includes('login.html')) {
-        window.location.href = 'index.html';
-        return false;
-    }
-    
-    return true;
+// Import Supabase from CDN (ถ้ายังไม่ได้โหลดใน HTML)
+if (!window.supabase) {
+    console.error('❌ Supabase CDN not loaded. Please add:');
+    console.error('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>');
 }
 
-// ฟังก์ชัน Login
-function initLogin() {
+// ========== CONFIG ==========
+let config;
+let supabase;
+
+async function loadConfig() {
+    try {
+        const configModule = await import('../lib/config.js');
+        config = configModule.config;
+    } catch (e) {
+        console.warn('⚠️ Using fallback config');
+        config = {
+            supabaseUrl: 'https://srtsdminbdmxtvjgriev.supabase.co',
+            supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNydHNkbWluYmRteHR2amdyaWV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY4OTU2NzMsImV4cCI6MjA1MjQ3MTY3M30.XYZ123',
+            adminEmail: ['jusduy40@gmail.com']
+        };
+    }
+    
+    // Initialize Supabase client
+    if (config?.supabaseUrl && config?.supabaseAnonKey) {
+        supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+        console.log('✅ Supabase client initialized');
+    }
+}
+
+// ========== GLOBAL STATE ==========
+let currentUser = null;
+let isAdmin = false;
+let authChecked = false;
+
+// ========== AUTH FUNCTIONS ==========
+
+// เช็คสิทธิ์แอดมิน (ใช้ครั้งเดียวต่อหน้า)
+async function checkAdminAuth() {
+    if (authChecked) return isAdmin; // ป้องกันเช็คซ้ำ
+    if (!supabase) await loadConfig();
+    
+    try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+            console.error('Session error:', error);
+            return false;
+        }
+        
+        currentUser = session?.user || null;
+        
+        if (currentUser) {
+            // เช็คอีเมลแอดมิน
+            const adminEmails = Array.isArray(config.adminEmail) 
+                ? config.adminEmail 
+                : [config.adminEmail].filter(e => e);
+            
+            // อนุญาตถ้าเป็นแอดมิน หรือ ไม่มี config (สำหรับทดสอบ)
+            isAdmin = adminEmails.length === 0 || adminEmails.includes(currentUser.email);
+            
+            if (isAdmin) {
+                console.log('✅ Admin authenticated:', currentUser.email);
+                // อัปเดตแสดงอีเมลใน UI
+                const emailEl = document.getElementById('adminEmail');
+                if (emailEl) {
+                    emailEl.textContent = currentUser.email?.split('@')[0] || 'Admin';
+                }
+            }
+        }
+        
+        authChecked = true;
+        return isAdmin;
+        
+    } catch (error) {
+        console.error('Auth check error:', error);
+        return false;
+    }
+}
+
+// ฟังก์ชัน Login ด้วย Supabase
+async function handleLogin(email, password) {
+    if (!supabase) await loadConfig();
+    
+    const { data, error } = await supabase.auth.signInWithPassword({ 
+        email, 
+        password 
+    });
+    
+    if (error) throw error;
+    return data;
+}
+
+// ฟังก์ชัน Logout
+async function handleLogout() {
+    if (!supabase) await loadConfig();
+    
+    await supabase.auth.signOut();
+    currentUser = null;
+    isAdmin = false;
+    authChecked = false;
+    
+    // ลบข้อมูลใน localStorage (ถ้ามี)
+    localStorage.removeItem('djohparichat_admin_token');
+    
+    console.log('✅ Logged out');
+}
+
+// ========== INIT ==========
+document.addEventListener('DOMContentLoaded', async () => {
+    // 1. โหลด config และสร้าง Supabase client
+    await loadConfig();
+    
+    // 2. ตรวจสอบ path ปัจจุบัน
+    const path = window.location.pathname;
+    const isLoginPage = path.includes('login.html') || path.includes('auth');
+    
+    // 3. Init Sidebar (ทำงานทุกหน้า)
+    initAdminSidebar();
+    
+    // 4. เช็คสิทธิ์
+    const isAuth = await checkAdminAuth();
+    
+    if (isLoginPage) {
+        // หน้า Login
+        if (isAuth) {
+            // ถ้าล็อกอินแล้ว ให้ไป dashboard แทน
+            window.location.href = 'index.html';
+        } else {
+            // ยังไม่ล็อกอิน → แสดงฟอร์ม
+            initLoginPage();
+        }
+    } else {
+        // หน้าอื่นๆ ใน admin
+        if (!isAuth) {
+            // ไม่มีสิทธิ์ → ไปหน้าหลักหรือแสดง overlay
+            showLoginOverlay();
+        } else {
+            // มีสิทธิ์ → โหลดฟีเจอร์
+            hideLoginOverlay();
+            initAdminTable();
+            initImageUpload();
+            initFormValidation();
+            loadContents();
+        }
+    }
+    
+    // 5. Listen auth state changes (สำหรับทุกหน้า)
+    setupAuthListener();
+});
+
+// ========== LOGIN PAGE ==========
+function initLoginPage() {
     const loginForm = document.getElementById('loginForm');
     
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const password = document.getElementById('password').value;
+            const email = document.getElementById('loginEmail')?.value || 
+                         document.getElementById('email')?.value;
+            const password = document.getElementById('loginPassword')?.value || 
+                            document.getElementById('password')?.value;
             const submitBtn = loginForm.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerHTML;
+            const originalBtnText = submitBtn?.innerHTML;
             
-            // แสดงสถานะกำลังโหลด
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบ...';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังเข้าสู่ระบบ...';
+            }
             
             try {
-                const response = await fetch(`${API_BASE}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password })
-                });
+                await handleLogin(email, password);
                 
-                const data = await response.json();
+                showAdminNotification('success', 'เข้าสู่ระบบสำเร็จ!');
                 
-                if (data.success && data.token) {
-                    // เก็บ Token ไว้
-                    localStorage.setItem(TOKEN_KEY, data.token);
-                    showAdminNotification('success', 'เข้าสู่ระบบสำเร็จ!');
-                    
-                    // ไปหน้า Dashboard
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1000);
-                } else {
-                    showAdminNotification('error', data.message || 'รหัสผ่านไม่ถูกต้อง');
-                }
+                // รอเล็กน้อยแล้วไป dashboard
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+                
             } catch (error) {
                 console.error('Login error:', error);
-                showAdminNotification('error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
+                showAdminNotification('error', error.message || 'เข้าสู่ระบบไม่สำเร็จ');
             } finally {
-                // คืนค่าปุ่มเดิม
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
+                if (submitBtn && originalBtnText) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+            }
+        });
+    }
+    
+    // ปุ่มสมัครสมาชิก (ถ้ามี)
+    const signupForm = document.getElementById('signupForm');
+    if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('signupName')?.value;
+            const email = document.getElementById('signupEmail')?.value;
+            const password = document.getElementById('signupPassword')?.value;
+            
+            if (password?.length < 6) {
+                showAdminNotification('error', 'รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
+                return;
+            }
+            
+            try {
+                const { error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: { data: { name } }
+                });
+                
+                if (error) throw error;
+                
+                showAdminNotification('success', 'สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมล');
+                signupForm.reset();
+                
+            } catch (error) {
+                showAdminNotification('error', error.message || 'สมัครไม่สำเร็จ');
             }
         });
     }
 }
 
-// ฟังก์ชัน Logout
-function logout() {
-    localStorage.removeItem(TOKEN_KEY);
-    window.location.href = 'login.html';
+// ========== AUTH LISTENER ==========
+function setupAuthListener() {
+    if (!supabase) return;
+    
+    supabase.auth.onAuthStateChange(async (event, session) => {
+        console.log('🔄 Auth state changed:', event);
+        
+        if (event === 'SIGNED_IN' && session?.user) {
+            currentUser = session.user;
+            
+            // เช็คสิทธิ์แอดมินใหม่
+            const adminEmails = Array.isArray(config.adminEmail) 
+                ? config.adminEmail 
+                : [config.adminEmail].filter(e => e);
+            
+            isAdmin = adminEmails.length === 0 || adminEmails.includes(currentUser.email);
+            
+            if (isAdmin) {
+                hideLoginOverlay();
+                // รีโหลดหน้าถ้าจำเป็น
+                if (window.location.pathname.includes('settings')) {
+                    location.reload();
+                }
+            }
+        }
+        
+        if (event === 'SIGNED_OUT') {
+            currentUser = null;
+            isAdmin = false;
+            authChecked = false;
+            showLoginOverlay();
+        }
+    });
 }
 
-// ========================================
-// SIDEBAR & UI
-// ========================================
+// ========== LOGIN OVERLAY ==========
+function showLoginOverlay() {
+    const overlay = document.getElementById('loginOverlay');
+    if (overlay) {
+        overlay.classList.remove('hidden');
+        // ปิดการคลิกที่เนื้อหาหลัก
+        document.querySelector('.admin-sidebar')?.style.setProperty('pointer-events', 'none');
+        document.querySelector('.admin-main')?.style.setProperty('pointer-events', 'none');
+    }
+}
 
+function hideLoginOverlay() {
+    const overlay = document.getElementById('loginOverlay');
+    if (overlay) {
+        overlay.classList.add('hidden');
+        // เปิดการคลิกที่เนื้อหาหลัก
+        document.querySelector('.admin-sidebar')?.style.setProperty('pointer-events', '');
+        document.querySelector('.admin-main')?.style.setProperty('pointer-events', '');
+    }
+}
+
+// ========== SIDEBAR ==========
 function initAdminSidebar() {
     const sidebar = document.querySelector('.admin-sidebar');
     const toggleBtn = document.querySelector('.admin-mobile-toggle');
@@ -129,23 +306,26 @@ function initAdminSidebar() {
         });
     }
     
-    // ปุ่ม Logout
-    const logoutBtn = document.querySelector('.admin-nav a.logout');
+    // ปุ่ม Logout ใน sidebar
+    const logoutBtn = document.querySelector('.admin-nav a.logout') || 
+                     document.getElementById('sidebarLogout') ||
+                     document.getElementById('logoutBtn');
+    
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
+        logoutBtn.addEventListener('click', async (e) => {
             e.preventDefault();
-            logout();
+            if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
+                await handleLogout();
+                window.location.href = '../index';
+            }
         });
     }
 }
 
-// ========================================
-// LOAD & DISPLAY CONTENTS
-// ========================================
-
+// ========== LOAD CONTENTS ==========
 async function loadContents() {
     const tableBody = document.querySelector('.admin-table tbody');
-    if (!tableBody) return;
+    if (!tableBody || !supabase) return;
     
     // แสดงสถานะกำลังโหลด
     tableBody.innerHTML = `
@@ -157,25 +337,29 @@ async function loadContents() {
     `;
     
     try {
-        const token = localStorage.getItem(TOKEN_KEY);
-        const response = await fetch(`${API_BASE}/contents`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        // โหลดจากตาราง contents หรือ about_content ตามความเหมาะสม
+        const { data, error } = await supabase
+            .from('contents')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(50);
         
-        const data = await response.json();
-        
-        if (response.ok) {
-            renderContentsTable(data, tableBody);
-        } else {
-            tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-red">โหลดข้อมูลไม่สำเร็จ</td></tr>`;
+        if (error) {
+            // ถ้าไม่มีตาราง contents ให้ลองโหลดจาก about_content
+            const { data: aboutData, error: aboutError } = await supabase
+                .from('about_content')
+                .select('*');
+            
+            if (aboutError) throw aboutError;
+            renderContentsTable(aboutData, tableBody);
+            return;
         }
+        
+        renderContentsTable(data, tableBody);
+        
     } catch (error) {
         console.error('Load contents error:', error);
-        tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-red">เกิดข้อผิดพลาดในการเชื่อมต่อ</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-error">โหลดข้อมูลไม่สำเร็จ</td></tr>`;
     }
 }
 
@@ -185,26 +369,33 @@ function renderContentsTable(contents, tableBody) {
         return;
     }
     
-    tableBody.innerHTML = contents.map(item => `
-        <tr data-id="${item.id}">
-            <td>${escapeHtml(item.title_th || item.title || '-')}</td>
-            <td><span class="badge badge-${getCategoryColor(item.category)}">${item.category || '-'}</span></td>
-            <td>${formatDate(item.created_at)}</td>
-            <td>
-                <span class="status ${item.published ? 'published' : 'draft'}">
-                    ${item.published ? 'เผยแพร่' : 'ร่าง'}
-                </span>
-            </td>
-            <td>
-                <button class="btn-icon edit" data-action="edit" title="แก้ไข">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn-icon delete" data-action="delete" title="ลบ">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        </tr>
-    `).join('');
+    tableBody.innerHTML = contents.map(item => {
+        const title = item.title_th || item.title || item.key || '-';
+        const category = item.category || 'general';
+        const published = item.published !== false;
+        const createdAt = item.created_at || item.updated_at;
+        
+        return `
+            <tr data-id="${item.id}">
+                <td>${escapeHtml(title)}</td>
+                <td><span class="badge badge-${getCategoryColor(category)}">${category}</span></td>
+                <td>${formatDate(createdAt)}</td>
+                <td>
+                    <span class="status ${published ? 'published' : 'draft'}">
+                        ${published ? 'เผยแพร่' : 'ร่าง'}
+                    </span>
+                </td>
+                <td>
+                    <button class="btn-icon edit" data-action="edit" title="แก้ไข">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon delete" data-action="delete" title="ลบ">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
     
     // เพิ่ม Event Listener ให้ปุ่มใหม่
     initTableActions();
@@ -216,7 +407,9 @@ function getCategoryColor(category) {
         'ai': 'blue',
         'insurance': 'gold',
         'training': 'green',
-        'portfolio': 'purple'
+        'portfolio': 'purple',
+        'text': 'blue',
+        'image': 'green'
     };
     return colors[category?.toLowerCase()] || 'gray';
 }
@@ -227,7 +420,9 @@ function formatDate(dateString) {
     return new Date(dateString).toLocaleString('th-TH', {
         year: 'numeric',
         month: 'short',
-        day: 'numeric'
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
     });
 }
 
@@ -241,13 +436,10 @@ function escapeHtml(text) {
         '"': '&quot;',
         "'": '&#039;'
     };
-    return text.replace(/[&<>"']/g, m => map[m]);
+    return String(text).replace(/[&<>"']/g, m => map[m]);
 }
 
-// ========================================
-// TABLE ACTIONS (Edit/Delete)
-// ========================================
-
+// ========== TABLE ACTIONS ==========
 function initAdminTable() {
     initTableActions();
     
@@ -255,7 +447,7 @@ function initAdminTable() {
     const addBtn = document.getElementById('addContentBtn');
     if (addBtn) {
         addBtn.addEventListener('click', () => {
-            openContentModal(); // เปิด Modal เพิ่มเนื้อหา (ต้องสร้าง HTML Modal เพิ่ม)
+            openContentModal();
         });
     }
 }
@@ -265,12 +457,14 @@ function initTableActions() {
     document.querySelectorAll('.btn-icon.edit').forEach(btn => {
         btn.addEventListener('click', async function() {
             const row = this.closest('tr');
-            const id = row.dataset.id;
-            const title = row.querySelector('td:first-child').textContent;
+            const id = row?.dataset.id;
+            const title = row?.querySelector('td:first-child')?.textContent || 'รายการ';
             
             console.log('Edit content ID:', id);
-            // TODO: เปิด Modal แก้ไข หรือเปลี่ยนหน้าไปหน้า edit
             showAdminNotification('info', `กำลังแก้ไข: ${title}`);
+            
+            // TODO: เปิด Modal แก้ไข หรือ redirect ไปหน้า edit
+            // window.location.href = `contents.html?edit=${id}`;
         });
     });
 
@@ -280,43 +474,46 @@ function initTableActions() {
             if (!confirm('คุณแน่ใจหรือไม่ที่จะลบรายการนี้?')) return;
             
             const row = this.closest('tr');
-            const id = row.dataset.id;
-            const token = localStorage.getItem(TOKEN_KEY);
+            const id = row?.dataset.id;
+            
+            if (!id || !supabase) return;
             
             try {
-                const response = await fetch(`${API_BASE}/contents`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ id })
-                });
+                // ลองลบจากตาราง contents ก่อน
+                let { error } = await supabase
+                    .from('contents')
+                    .delete()
+                    .eq('id', id);
                 
-                const data = await response.json();
-                
-                if (data.success) {
-                    // อนิเมชั่นลบ
-                    row.style.transition = 'all 0.3s ease';
-                    row.style.opacity = '0';
-                    row.style.transform = 'translateX(-100%)';
-                    setTimeout(() => row.remove(), 300);
-                    showAdminNotification('success', 'ลบข้อมูลสำเร็จ');
-                } else {
-                    showAdminNotification('error', 'ลบข้อมูลไม่สำเร็จ');
+                // ถ้าไม่มีตาราง contents ให้ลอง about_content
+                if (error?.code === '42P01') {
+                    const { error: aboutError } = await supabase
+                        .from('about_content')
+                        .delete()
+                        .eq('id', id);
+                    
+                    if (aboutError) throw aboutError;
+                } else if (error) {
+                    throw error;
                 }
+                
+                // อนิเมชั่นลบ
+                row.style.transition = 'all 0.3s ease';
+                row.style.opacity = '0';
+                row.style.transform = 'translateX(-100%)';
+                setTimeout(() => row.remove(), 300);
+                
+                showAdminNotification('success', 'ลบข้อมูลสำเร็จ');
+                
             } catch (error) {
                 console.error('Delete error:', error);
-                showAdminNotification('error', 'เกิดข้อผิดพลาดในการเชื่อมต่อ');
+                showAdminNotification('error', 'ลบข้อมูลไม่สำเร็จ: ' + error.message);
             }
         });
     });
 }
 
-// ========================================
-// IMAGE UPLOAD (Supabase Storage)
-// ========================================
-
+// ========== IMAGE UPLOAD ==========
 function initImageUpload() {
     const uploadArea = document.querySelector('.image-upload');
     
@@ -330,7 +527,6 @@ function triggerFileInput() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.multiple = true;
     
     input.addEventListener('change', (e) => {
         handleFiles(e.target.files);
@@ -342,66 +538,65 @@ function triggerFileInput() {
 function setupDragAndDrop(uploadArea) {
     uploadArea.addEventListener('dragover', (e) => {
         e.preventDefault();
-        uploadArea.style.borderColor = 'var(--primary-blue)';
-        uploadArea.style.background = 'var(--sky-blue)';
+        uploadArea.style.borderColor = 'var(--primary-blue, #1e88e5)';
+        uploadArea.style.background = 'var(--sky-blue, #e3f2fd)';
     });
 
     uploadArea.addEventListener('dragleave', () => {
-        uploadArea.style.borderColor = 'var(--gray-300)';
+        uploadArea.style.borderColor = 'var(--gray-300, #cbd5e1)';
         uploadArea.style.background = 'transparent';
     });
 
     uploadArea.addEventListener('drop', (e) => {
         e.preventDefault();
-        uploadArea.style.borderColor = 'var(--gray-300)';
+        uploadArea.style.borderColor = 'var(--gray-300, #cbd5e1)';
         uploadArea.style.background = 'transparent';
         handleFiles(e.dataTransfer.files);
     });
 }
 
 async function handleFiles(files) {
-    const token = localStorage.getItem(TOKEN_KEY);
+    if (!supabase) return;
     
     for (const file of Array.from(files)) {
         if (!file.type.startsWith('image/')) continue;
+        if (file.size > 5 * 1024 * 1024) {
+            showAdminNotification('error', 'ไฟล์ใหญ่เกินไป (สูงสุด 5MB)');
+            continue;
+        }
         
         showAdminNotification('info', `กำลังอัปโหลด: ${file.name}`);
         
         try {
             // อัปโหลดไป Supabase Storage
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('bucket', 'images'); // ชื่อ bucket ใน Supabase
+            const fileExt = file.name.split('.').pop();
+            const fileName = `admin-${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
             
-            const response = await fetch(`${API_BASE}/upload`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                    // ไม่ต้องตั้ง Content-Type เพราะ FormData ตั้งให้เอง
-                },
-                body: formData
-            });
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('images')
+                .upload(fileName, file);
             
-            const data = await response.json();
+            if (uploadError) throw uploadError;
             
-            if (data.success) {
-                showAdminNotification('success', `อัปโหลดสำเร็จ: ${file.name}`);
-                // TODO: แสดงภาพพรีวิว หรือเก็บ URL ลงฟอร์ม
-                console.log('Uploaded URL:', data.url);
-            } else {
-                showAdminNotification('error', `อัปโหลดไม่สำเร็จ: ${file.name}`);
-            }
+            // Get public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('images')
+                .getPublicUrl(fileName);
+            
+            showAdminNotification('success', `อัปโหลดสำเร็จ: ${file.name}`);
+            console.log('Uploaded URL:', publicUrl);
+            
+            // TODO: แสดงพรีวิวหรือเก็บ URL ลงฟอร์ม
+            // document.getElementById('imagePreview').src = publicUrl;
+            
         } catch (error) {
             console.error('Upload error:', error);
-            showAdminNotification('error', 'เกิดข้อผิดพลาดในการอัปโหลด');
+            showAdminNotification('error', 'อัปโหลดไม่สำเร็จ: ' + error.message);
         }
     }
 }
 
-// ========================================
-// FORM SUBMISSION (Create/Update Content)
-// ========================================
-
+// ========== FORM SUBMISSION ==========
 function initFormValidation() {
     const forms = document.querySelectorAll('.admin-form');
     
@@ -411,7 +606,6 @@ function initFormValidation() {
             
             const formData = new FormData(form);
             const data = Object.fromEntries(formData);
-            const token = localStorage.getItem(TOKEN_KEY);
             
             const submitBtn = form.querySelector('button[type="submit"]');
             const originalBtnText = submitBtn?.innerHTML;
@@ -422,39 +616,47 @@ function initFormValidation() {
             }
             
             try {
-                // ตรวจสอบว่าเป็นหน้าสร้างใหม่หรือแก้ไข
-                const isEdit = data.id && data.id !== '';
-                const method = isEdit ? 'PUT' : 'POST';
+                const isEdit = data.id && data.id !== 'undefined';
                 
-                const response = await fetch(`${API_BASE}/contents`, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showAdminNotification('success', isEdit ? 'อัปเดตข้อมูลสำเร็จ' : 'บันทึกข้อมูลสำเร็จ');
+                if (isEdit) {
+                    // Update existing
+                    const { error } = await supabase
+                        .from('contents')
+                        .update({
+                            ...data,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', data.id);
                     
-                    // รีโหลดตารางถ้าอยู่หน้าจัดการเนื้อหา
-                    if (window.location.pathname.includes('contents.html')) {
-                        setTimeout(() => loadContents(), 1000);
-                    }
-                    
-                    // รีเซ็ตฟอร์มถ้าไม่ใช่หน้าแก้ไข
-                    if (!isEdit) {
-                        form.reset();
-                    }
+                    if (error) throw error;
+                    showAdminNotification('success', 'อัปเดตข้อมูลสำเร็จ');
                 } else {
-                    showAdminNotification('error', result.message || 'บันทึกไม่สำเร็จ');
+                    // Create new
+                    const { error } = await supabase
+                        .from('contents')
+                        .insert([{
+                            ...data,
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        }]);
+                    
+                    if (error) throw error;
+                    showAdminNotification('success', 'บันทึกข้อมูลสำเร็จ');
                 }
+                
+                // รีโหลดตารางถ้าอยู่หน้าจัดการเนื้อหา
+                if (window.location.pathname.includes('contents')) {
+                    setTimeout(() => loadContents(), 1000);
+                }
+                
+                // รีเซ็ตฟอร์มถ้าไม่ใช่หน้าแก้ไข
+                if (!isEdit) {
+                    form.reset();
+                }
+                
             } catch (error) {
                 console.error('Form submit error:', error);
-                showAdminNotification('error', 'เกิดข้อผิดพลาดในการเชื่อมต่อ');
+                showAdminNotification('error', 'บันทึกไม่สำเร็จ: ' + error.message);
             } finally {
                 if (submitBtn && originalBtnText) {
                     submitBtn.disabled = false;
@@ -465,70 +667,78 @@ function initFormValidation() {
     });
 }
 
-// ========================================
-// NOTIFICATIONS
-// ========================================
-
+// ========== NOTIFICATIONS ==========
 function showAdminNotification(type, message) {
     // ลบ notification เก่าถ้ามี
     const existing = document.querySelector('.admin-notification');
     if (existing) existing.remove();
     
     const notification = document.createElement('div');
-    notification.className = `admin-notification notification notification-${type}`;
-    notification.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-        <span>${message}</span>
-    `;
+    notification.className = `admin-notification notification-${type}`;
     
-    // Style
+    const icons = {
+        success: 'check-circle',
+        error: 'exclamation-circle',
+        info: 'info-circle',
+        warning: 'exclamation-triangle'
+    };
+    
+    const colors = {
+        success: '#10b981',
+        error: '#ef4444',
+        info: '#3b82f6',
+        warning: '#f59e0b'
+    };
+    
     Object.assign(notification.style, {
         position: 'fixed',
         top: '80px',
         right: '20px',
         padding: '14px 20px',
-        background: type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3',
+        background: colors[type] || colors.info,
         color: 'white',
-        borderRadius: '8px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+        borderRadius: '12px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
         display: 'flex',
         alignItems: 'center',
         gap: '10px',
         zIndex: '9999',
         maxWidth: '350px',
-        animation: 'slideIn 0.3s ease'
+        animation: 'slideIn 0.3s ease',
+        fontFamily: 'inherit',
+        fontSize: '0.95rem'
     });
+    
+    notification.innerHTML = `
+        <i class="fas fa-${icons[type] || icons.info}"></i>
+        <span>${escapeHtml(message)}</span>
+    `;
     
     document.body.appendChild(notification);
     
-    // ลบอัตโนมัติหลัง 3 วินาที
+    // ลบอัตโนมัติหลัง 3-4 วินาที
     setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => notification.remove(), 300);
-    }, 3000);
+    }, type === 'error' ? 5000 : 3000);
 }
 
-// ========================================
-// MODAL HELPER (สำหรับเปิด/ปิดฟอร์มเพิ่มเนื้อหา)
-// ========================================
-
+// ========== MODAL HELPER ==========
 function openContentModal(content = null) {
+    console.log('Open modal for:', content ? 'edit' : 'create', content);
+    showAdminNotification('info', 'เปิดฟอร์มเพิ่มเนื้อหา (ต้องสร้าง Modal HTML)');
+    
     // TODO: สร้าง Modal HTML ใน admin/contents.html แล้วเรียกฟังก์ชันนี้
     // ตัวอย่าง:
     // document.getElementById('contentModal').style.display = 'block';
     // if (content) { /* กรอกข้อมูลสำหรับแก้ไข */ }
-    
-    console.log('Open modal for:', content ? 'edit' : 'create', content);
-    showAdminNotification('info', 'เปิดฟอร์มเพิ่มเนื้อหา (ต้องสร้าง Modal HTML)');
 }
 
 function closeContentModal() {
     // document.getElementById('contentModal').style.display = 'none';
 }
 
-// ========================================
-// UTILITY: Add CSS for notifications if not exists
-// ========================================
+// ========== ADD CSS FOR ANIMATIONS ==========
 if (!document.querySelector('#admin-notification-styles')) {
     const style = document.createElement('style');
     style.id = 'admin-notification-styles';
@@ -548,13 +758,50 @@ if (!document.querySelector('#admin-notification-styles')) {
             font-size: 0.75rem;
             font-weight: 600;
         }
-        .badge-blue { background: #e3f2fd; color: #1565c0; }
-        .badge-gold { background: #fff8e1; color: #f57f17; }
-        .badge-green { background: #e8f5e9; color: #2e7d32; }
-        .badge-purple { background: #f3e5f5; color: #7b1fa2; }
-        .badge-gray { background: #f5f5f5; color: #616161; }
-        .text-red { color: #f44336; }
+        .badge-blue { background: #dbeafe; color: #1d4ed8; }
+        .badge-gold { background: #fef3c7; color: #92400e; }
+        .badge-green { background: #d1fae5; color: #065f46; }
+        .badge-purple { background: #ede9fe; color: #5b21b6; }
+        .badge-gray { background: #f1f5f9; color: #64748b; }
+        .text-error { color: #ef4444; }
         .text-center { text-align: center; }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status.published { background: #d1fae5; color: #065f46; }
+        .status.draft { background: #fef3c7; color: #92400e; }
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            margin-right: 4px;
+        }
+        .btn-icon.edit { background: #dbeafe; color: #1d4ed8; }
+        .btn-icon.edit:hover { background: #1d4ed8; color: white; }
+        .btn-icon.delete { background: #fee2e2; color: #ef4444; }
+        .btn-icon.delete:hover { background: #ef4444; color: white; }
     `;
     document.head.appendChild(style);
+}
+
+// ========== EXPORT FOR USE IN OTHER FILES ==========
+if (typeof window !== 'undefined') {
+    window.adminAuth = {
+        checkAdminAuth,
+        handleLogin,
+        handleLogout,
+        currentUser: () => currentUser,
+        isAdmin: () => isAdmin
+    };
 }
