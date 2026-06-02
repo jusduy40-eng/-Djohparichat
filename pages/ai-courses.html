@@ -19,7 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        /* ========== AUTH MODAL (เหมือน index.html) ========== */
+        /* ========== AUTH MODAL (เหมือน index) ========== */
         .auth-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center;
@@ -313,16 +313,16 @@
     <nav id="navbar" class="navbar">
         <div class="container">
             <div class="nav-wrapper">
-                <a href="../index.html" class="logo">
+                <a href="../index" class="logo">
                     <span class="logo-icon"><i class="fas fa-graduation-cap"></i></span>
                     <span class="logo-text">Djohparichat</span>
                 </a>
                 <div class="nav-menu" id="navMenu">
                     <ul class="nav-list">
-                        <li><a href="../index.html" class="nav-link" data-th="หน้าหลัก" data-en="Home">หน้าหลัก</a></li>
-                        <li><a href="services.html" class="nav-link" data-th="บริการ" data-en="Services">บริการ</a></li>
-                        <li><a href="ai-courses.html" class="nav-link active" data-th="หลักสูตร AI" data-en="AI Courses">หลักสูตร AI</a></li>
-                        <li><a href="about.html" class="nav-link" data-th="เกี่ยวกับเรา" data-en="About">เกี่ยวกับเรา</a></li>
+                        <li><a href="../index" class="nav-link" data-th="หน้าหลัก" data-en="Home">หน้าหลัก</a></li>
+                        <li><a href="services" class="nav-link" data-th="บริการ" data-en="Services">บริการ</a></li>
+                        <li><a href="ai-courses" class="nav-link active" data-th="หลักสูตร AI" data-en="AI Courses">หลักสูตร AI</a></li>
+                        <li><a href="about" class="nav-link" data-th="เกี่ยวกับเรา" data-en="About">เกี่ยวกับเรา</a></li>
                     </ul>
                 </div>
                 <div class="nav-actions">
@@ -376,7 +376,7 @@
 
     <!-- Admin Link -->
     <div class="admin-link" id="adminLink" style="display: none;">
-        <a href="../admin/index.html" title="Admin Panel"><i class="fas fa-cog"></i></a>
+        <a href="../admin/index" title="Admin Panel"><i class="fas fa-cog"></i></a>
     </div>
 
     <!-- Scripts -->
@@ -445,8 +445,8 @@
                             <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: var(--gray-500);"></i>
                         </div>
                         <div class="user-dropdown" id="userDropdown">
-                            <a href="profile.html"><i class="fas fa-user-edit"></i> แก้ไขโปรไฟล์</a>
-                            <a href="my-courses.html"><i class="fas fa-graduation-cap"></i> ประวัติการเรียน</a>
+                            <a href="profile"><i class="fas fa-user-edit"></i> แก้ไขโปรไฟล์</a>
+                            <a href="my-courses"><i class="fas fa-graduation-cap"></i> ประวัติการเรียน</a>
                             <div class="divider"></div>
                             <a href="#" id="logoutBtn" class="logout"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
                         </div>`;
@@ -574,7 +574,7 @@
                             : '';
                         
                         const enrollBtn = currentUser 
-                            ? `<a href="../pages/contact.html?course=${course.id}" class="btn btn-primary" data-th="สมัครเรียน" data-en="Enroll Now">สมัครเรียน</a>`
+                            ? `<a href="../pages/contact?course=${course.id}" class="btn btn-primary" data-th="สมัครเรียน" data-en="Enroll Now">สมัครเรียน</a>`
                             : `<button class="btn btn-primary" onclick="openAuthModal('login')" data-th="เข้าสู่ระบบเพื่อสมัคร" data-en="Login to Enroll">เข้าสู่ระบบเพื่อสมัคร</button>`;
                         
                         return `
@@ -604,7 +604,7 @@
             // Make edit function global
             window.editCourse = function(courseId) {
                 // Redirect to admin course editor
-                window.location.href = `../admin/courses.html?edit=${courseId}`;
+                window.location.href = `../admin/courses?edit=${courseId}`;
             };
 
             // ========================================
