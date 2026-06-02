@@ -251,7 +251,7 @@
                             <small>กรอกอย่างน้อย 1 ช่องทาง</small>
                         </div>
                         
-                        <!-- Payment Section (แสดงเฉพาะคอร์สเสียเงิน) -->
+                        <!-- Payment Section -->
                         <div id="paymentSection" class="payment-section" style="display:none;">
                             <h4 style="margin:0 0 12px;"><i class="fas fa-credit-card"></i> ชำระเงิน</h4>
                             <p style="margin:0 0 12px;color:var(--gray-600);">
@@ -608,7 +608,15 @@
                     
                     const isTH = document.documentElement.lang === 'th';
                     
-                    coursesGrid.innerHTML = courses.map(function(course) {
+                    // สร้าง HTML สำหรับแต่ละคอร์ส
+                    courses.forEach(course => {
+                        const card = document.createElement('div');
+                        card.className = 'course-card' + (course.is_featured ? ' featured' : '');
+                        card.dataset.courseId = course.id;
+                        card.dataset.coursePrice = course.price || 0;
+                        card.dataset.courseIsFree = course.is_free;
+                        card.dataset.courseTitle = course.title_th;
+                        
                         const priceDisplay = course.is_free 
                             ? '<span class="course-price free">ฟรี</span>'
                             : '<span class="course-price">฿' + (course.price || 0).toLocaleString('th-TH') + '</span>';
@@ -616,27 +624,37 @@
                         const badge = course.is_featured ? '<span class="course-badge">แนะนำ</span>' : '';
                         const editBtn = isAdmin ? '<button class="admin-edit-btn" onclick="editCourse(\'' + course.id + '\')"><i class="fas fa-edit"></i></button>' : '';
                         
-                        let enrollBtn;
-                        if (currentUser) {
-                            enrollBtn = '<button class="btn btn-primary" onclick="openEnrollmentModal(' + JSON.stringify(course).replace(/'/g, "\\'") + ')">สมัครเรียน</button>';
-                        } else {
-                            enrollBtn = '<button class="btn btn-primary" onclick="openAuthModal()">เข้าสู่ระบบเพื่อสมัคร</button>';
+                        let featuresHtml = '';
+                        if (course.features && course.features.length > 0) {
+                            featuresHtml = course.features.map(f => {
+                                const text = isTH ? f.th : (f.en || f.th);
+                                return '<li><i class="fas fa-check"></i> ' + text + '</li>';
+                            }).join('');
                         }
                         
-                        return '<div class="course-card ' + (course.is_featured ? 'featured' : '') + '">' +
+                        const enrollBtn = currentUser 
+                            ? '<button class="btn btn-primary enroll-btn">สมัครเรียน</button>'
+                            : '<button class="btn btn-primary" onclick="openAuthModal()">เข้าสู่ระบบเพื่อสมัคร</button>';
+                        
+                        card.innerHTML = 
                             editBtn + badge +
                             '<div class="course-icon"><i class="fas ' + (course.icon || 'fa-robot') + '"></i></div>' +
-                            '<h3 class="course-title">' + (isTH ? course.title_th : course.title_en || course.title_th) + '</h3>' +
-                            '<p class="course-description">' + (isTH ? course.description_th : course.description_en || course.description_th) + '</p>' +
-                            '<ul class="course-features">' +
-                            (course.features ? course.features.map(function(f) { 
-                                return '<li><i class="fas fa-check"></i> ' + (isTH ? f.th : f.en || f.th) + '</li>'; 
-                            }).join('') : '') +
-                            '</ul>' +
+                            '<h3 class="course-title">' + (isTH ? course.title_th : (course.title_en || course.title_th)) + '</h3>' +
+                            '<p class="course-description">' + (isTH ? course.description_th : (course.description_en || course.description_th)) + '</p>' +
+                            '<ul class="course-features">' + featuresHtml + '</ul>' +
                             priceDisplay +
-                            '<div class="course-actions">' + enrollBtn + '</div>' +
-                        '</div>';
-                    }).join('');
+                            '<div class="course-actions">' + enrollBtn + '</div>';
+                        
+                        // เพิ่ม event listener สำหรับปุ่มสมัครเรียน
+                        const enrollButton = card.querySelector('.enroll-btn');
+                        if (enrollButton) {
+                            enrollButton.addEventListener('click', function() {
+                                openEnrollmentModal(course);
+                            });
+                        }
+                        
+                        coursesGrid.appendChild(card);
+                    });
                     
                 } catch (error) {
                     console.error('Load courses error:', error);
