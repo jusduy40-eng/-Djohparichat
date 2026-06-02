@@ -19,18 +19,244 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        /* ========== PAGE HEADER (เหมือนหน้าหลัก) ========== */
+        /* ========== NAVIGATION (แบบใหม่ตามภาพ) ========== */
+        .navbar {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #1e88e5;
+            font-weight: 700;
+            font-size: 1.4rem;
+        }
+        
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .nav-list {
+            display: flex;
+            list-style: none;
+            gap: 8px;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .nav-link {
+            padding: 8px 16px;
+            text-decoration: none;
+            color: #475569;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: #1e88e5;
+            background: #f0f9ff;
+        }
+        
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .language-switcher {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8fafc;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        
+        .lang-btn {
+            background: none;
+            border: none;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #94a3b8;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 0.85rem;
+        }
+        
+        .lang-btn.active {
+            background: #1e88e5;
+            color: white;
+        }
+        
+        .lang-divider {
+            color: #cbd5e1;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-pill {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .btn-login {
+            background: white;
+            color: #1e88e5;
+            border: 2px solid #1e88e5;
+        }
+        
+        .btn-login:hover {
+            background: #f0f9ff;
+        }
+        
+        .btn-signup {
+            background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+            color: white;
+        }
+        
+        .btn-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+        }
+        
+        .user-menu:hover {
+            background: #f1f5f9;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .user-name {
+            font-weight: 500;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+        
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            min-width: 200px;
+            padding: 8px 0;
+            z-index: 1000;
+            display: none;
+            animation: slideDown 0.2s ease;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-dropdown.active {
+            display: block;
+        }
+        
+        .user-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            color: #475569;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        
+        .user-dropdown a:hover {
+            background: #f8fafc;
+            color: #1e88e5;
+        }
+        
+        .user-dropdown .divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 4px 0;
+        }
+        
+        .user-dropdown .logout {
+            color: #ef4444;
+        }
+        
+        .user-dropdown .logout i {
+            color: #ef4444;
+        }
+        
+        /* ========== PAGE HEADER ========== */
         .page-header {
             background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
             color: white;
             padding: 40px 0 30px;
             text-align: center;
         }
+        
         .page-header h1 {
             font-size: 1.8rem;
             margin: 0 0 8px;
             font-weight: 700;
         }
+        
         .page-header p {
             font-size: 0.95rem;
             opacity: 0.95;
@@ -54,10 +280,12 @@
             position: relative;
             border: 1px solid #f1f5f9;
         }
+        
         .course-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 8px 24px rgba(30, 136, 229, 0.12);
         }
+        
         .course-card.featured {
             border: 2px solid #1e88e5;
         }
@@ -156,206 +384,7 @@
             box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
         }
         
-        /* ========== EMPTY & LOADING STATES ========== */
-        .courses-empty, .courses-loading {
-            text-align: center;
-            padding: 60px 20px;
-            color: #94a3b8;
-        }
-        
-        .courses-empty i, .courses-loading i {
-            font-size: 3rem;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-        
-        /* ========== AUTH MODAL (เหมือนหน้าหลัก) ========== */
-        .auth-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            padding: 20px;
-        }
-        
-        .auth-modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .auth-modal-content {
-            background: white;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 420px;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-        }
-        
-        .auth-modal.active .auth-modal-content {
-            transform: translateY(0);
-        }
-        
-        .auth-modal-close {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            width: 36px;
-            height: 36px;
-            border: none;
-            background: rgba(0,0,0,0.05);
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #64748b;
-            transition: all 0.2s ease;
-        }
-        
-        .auth-modal-close:hover {
-            background: rgba(0,0,0,0.1);
-            transform: rotate(90deg);
-        }
-        
-        .auth-modal-header {
-            padding: 32px 28px 20px;
-            text-align: center;
-        }
-        
-        .auth-modal-header h3 {
-            font-size: 1.5rem;
-            color: #1e293b;
-            margin: 0 0 6px;
-            font-weight: 700;
-        }
-        
-        .auth-modal-header p {
-            color: #64748b;
-            margin: 0;
-            font-size: 0.9rem;
-        }
-        
-        .auth-modal-body {
-            padding: 0 28px 28px;
-        }
-        
-        .auth-form {
-            display: none;
-            flex-direction: column;
-            gap: 16px;
-        }
-        
-        .auth-form.active {
-            display: flex;
-        }
-        
-        .auth-form .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        
-        .auth-form .form-group label {
-            font-weight: 600;
-            color: #475569;
-            font-size: 0.9rem;
-        }
-        
-        .auth-form .form-group input {
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
-            outline: none;
-        }
-        
-        .auth-form .form-group input:focus {
-            border-color: #1e88e5;
-            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
-        }
-        
-        .auth-form .btn-auth {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 8px;
-        }
-        
-        .auth-form .btn-auth:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
-        }
-        
-        .auth-divider {
-            text-align: center;
-            margin: 20px 0;
-            position: relative;
-        }
-        
-        .auth-divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #e2e8f0;
-        }
-        
-        .auth-divider span {
-            background: white;
-            padding: 0 12px;
-            color: #94a3b8;
-            font-size: 0.9rem;
-            position: relative;
-        }
-        
-        .auth-toggle {
-            text-align: center;
-            margin-top: 16px;
-            font-size: 0.95rem;
-            color: #64748b;
-        }
-        
-        .auth-toggle a {
-            color: #1e88e5;
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        
-        .auth-toggle a:hover {
-            text-decoration: underline;
-        }
-        
-        /* ========== ENROLLMENT MODAL (ปรับขนาดให้เล็กลง) ========== */
+        /* ========== ENROLLMENT MODAL (Scroll ได้) ========== */
         .enrollment-modal {
             position: fixed;
             top: 0;
@@ -425,6 +454,7 @@
             padding: 24px 28px;
             background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
             color: white;
+            flex-shrink: 0;
         }
         
         .modal-header h3 {
@@ -761,6 +791,7 @@
             display: flex;
             justify-content: flex-end;
             gap: 10px;
+            flex-shrink: 0;
         }
         
         .btn {
@@ -866,6 +897,9 @@
         
         /* Responsive */
         @media (max-width: 768px) {
+            .nav-list {
+                display: none;
+            }
             .page-header {
                 padding: 32px 0 24px;
             }
@@ -878,6 +912,7 @@
             }
             .enrollment-modal-content {
                 max-width: calc(100vw - 32px);
+                max-height: 95vh;
             }
             .modal-header h3 {
                 font-size: 1.2rem;
@@ -903,31 +938,28 @@
         </div>
     </div>
 
-    <!-- Navigation (เหมือนหน้าหลัก) -->
+    <!-- Navigation (แบบใหม่) -->
     <nav id="navbar" class="navbar">
-        <div class="container">
-            <div class="nav-wrapper">
-                <a href="../index" class="logo">
-                    <span class="logo-icon"><i class="fas fa-graduation-cap"></i></span>
-                    <span class="logo-text">Djohparichat</span>
-                </a>
-                <div class="nav-menu" id="navMenu">
-                    <ul class="nav-list">
-                        <li><a href="../index" class="nav-link" data-th="หน้าหลัก" data-en="Home">หน้าหลัก</a></li>
-                        <li><a href="services" class="nav-link" data-th="บริการ" data-en="Services">บริการ</a></li>
-                        <li><a href="ai-courses" class="nav-link active" data-th="หลักสูตร AI" data-en="AI Courses">หลักสูตร AI</a></li>
-                        <li><a href="about" class="nav-link" data-th="เกี่ยวกับเรา" data-en="About">เกี่ยวกับเรา</a></li>
-                    </ul>
+        <div class="nav-wrapper">
+            <a href="../index" class="logo">
+                <span class="logo-icon"><i class="fas fa-graduation-cap"></i></span>
+                <span class="logo-text">Djohparichat</span>
+            </a>
+            <div class="nav-menu" id="navMenu">
+                <ul class="nav-list">
+                    <li><a href="../index" class="nav-link" data-th="หน้าหลัก" data-en="Home">หน้าหลัก</a></li>
+                    <li><a href="services" class="nav-link" data-th="บริการ" data-en="Services">บริการ</a></li>
+                    <li><a href="ai-courses" class="nav-link active" data-th="หลักสูตร AI" data-en="AI Courses">หลักสูตร AI</a></li>
+                    <li><a href="about" class="nav-link" data-th="เกี่ยวกับเรา" data-en="About">เกี่ยวกับเรา</a></li>
+                </ul>
+            </div>
+            <div class="nav-actions">
+                <div class="language-switcher">
+                    <button class="lang-btn active" data-lang="th">TH</button>
+                    <span class="lang-divider">|</span>
+                    <button class="lang-btn" data-lang="en">EN</button>
                 </div>
-                <div class="nav-actions">
-                    <div class="language-switcher">
-                        <button class="lang-btn active" data-lang="th">TH</button>
-                        <span class="lang-divider">|</span>
-                        <button class="lang-btn" data-lang="en">EN</button>
-                    </div>
-                    <div class="user-menu" id="userMenu"></div>
-                    <button class="mobile-toggle" id="mobileToggle"><span class="hamburger"></span></button>
-                </div>
+                <div class="user-menu" id="userMenu"></div>
             </div>
         </div>
     </nav>
@@ -1016,7 +1048,7 @@
         </div>
     </footer>
 
-    <!-- Enrollment Modal -->
+    <!-- Enrollment Modal (Scroll ได้) -->
     <div id="enrollmentModal" class="enrollment-modal">
         <div class="enrollment-modal-content">
             <button class="modal-close" id="enrollmentModalClose" onclick="closeEnrollmentModal()"><i class="fas fa-times"></i></button>
@@ -1298,9 +1330,10 @@
                 if (currentUser) {
                     const initials = currentUser.email?.charAt(0).toUpperCase() || 'U';
                     userMenu.innerHTML = `
-                        <div class="user-info" id="userInfo">
+                        <div class="user-menu" id="userInfo" style="position:relative;">
                             <div class="user-avatar">${initials}</div>
                             <span class="user-name">${currentUser.email?.split('@')[0]}</span>
+                            <i class="fas fa-chevron-down" style="font-size:0.75rem;color:#94a3b8;"></i>
                         </div>
                         <div class="user-dropdown" id="userDropdown">
                             <a href="my-courses"><i class="fas fa-graduation-cap"></i> คอร์สของฉัน</a>
@@ -1323,7 +1356,11 @@
                     const adminEmails = Array.isArray(config.adminEmail) ? config.adminEmail : [config.adminEmail].filter(e => e);
                     isAdmin = adminEmails.length > 0 && adminEmails.includes(currentUser.email);
                 } else {
-                    userMenu.innerHTML = `<button class="btn btn-primary btn-sm" onclick="openAuthModal('login')">เข้าสู่ระบบ</button>`;
+                    userMenu.innerHTML = `
+                        <div class="auth-buttons">
+                            <button class="btn-pill btn-login" onclick="openAuthModal('login')">เข้าสู่ระบบ</button>
+                            <button class="btn-pill btn-signup" onclick="openAuthModal('signup')">สมัครสมาชิก</button>
+                        </div>`;
                 }
                 return currentUser;
             } catch (error) {
