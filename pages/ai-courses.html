@@ -19,6 +19,23 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
+                /* บังคับซ่อน Auth Modal ตั้งแต่เริ่มต้น */
+        .auth-modal {
+            display: none !important;
+        }
+        
+        .auth-modal.active {
+            display: flex !important;
+        }
+        
+        /* บังคับซ่อน Enrollment Modal ตั้งแต่เริ่มต้น */
+        .enrollment-modal {
+            display: none !important;
+        }
+        
+        .enrollment-modal.active {
+            display: flex !important;
+        }
         /* ========== NAVIGATION (แบบใหม่ตามภาพ) ========== */
         .navbar {
             background: white;
